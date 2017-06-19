@@ -1,0 +1,56 @@
+\chapter{Prior Work}
+
+    \section{SfM-Net}
+    
+        \citet{SFMNET} implement a deep learning approach to structure from motion. 
+        Their architecture consists of two subnetworks:
+        \begin{itemize}
+            \item Structure 
+                \\
+                Learns per-frame depth.
+                The input is a single frame. 
+                The output of the CNN is a cloud of 3D points, one for each pixel value in the input image.
+            \item Motion
+                \\
+                The input is a pair of frames.
+                The CNN computes a set of $K$ segmentation masks for moving objects. 
+                Using these masks, each pixel is assigned to an object specific transformation given by a rotation and a translation.
+                In addition, camera rotation and translation are computed using the features of the inner layers.
+        \end{itemize}
+        Given a pair of images, the forward operation of the network works as follows:
+        \begin{enumerate}
+            \item The structure network computes the point cloud for the first frame.
+            \item The motion network computes the object transformations as well as the camera transformation using both frames.
+            \item The point cloud is transformed using the learned object transformations and masks.
+            \item The transformed 3D points are re-projected to 2D using the learned camera transformation between the two frames.
+        \end{enumerate}
+        The transformed point cloud corresponds to the depth of the second frame.
+        Optical flow can be computed directly from the re-projected points.
+        
+        The authors of the paper propose various modes of supervision to evaluate the architecture and to handle ambiguities in the reconstruction due to the ill-posed problem:
+        \begin{itemize}
+            \item Self-supervision
+                \\
+                No ground truth is given.
+                The loss is defined by the brightness constancy constraint of the second frame warped to the first frame using the predicted optical flow.
+                For this mode, they use the {KITTI} 2012/15 datasets
+            \item Depth
+                \\
+                Ground truth is given in the form of depth for each pixel.
+                This can be acquired for example by a Kinect sensor.
+                They use the {RGB-D SLAM} dataset for ground truth depth.
+                This helps to improve camera motion estimation. 
+            \item Camera motion
+                \\
+                Camera motion is given as ground truth in form of a rotation and translation matrix.
+                The relative transformation between predicted and ground truth transformation is 
+            \item Optical flow and object motion
+                \\
+                They use this type of supervision with the MoSeg dataset which contains ground truth segmentation for each frame.
+                This dataset contains more non-rigid body transformation.
+                They evaluate the quality of the object motion mask by Intersection over union (IoU).
+        \end{itemize}
+        
+    \section{Unsupervised CNN for Single View Depth Estimation}
+    
+        The work of \citet{garg2016} 
