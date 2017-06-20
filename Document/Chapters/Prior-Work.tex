@@ -79,7 +79,26 @@
         
         \section{05/2017 - A Survey on Structure from Motion}
         
-        	\citet{survey2017}
+        	\citet{survey2017} give a very good and concise definition of structure from motion:
+        	
+        	\say{The structure from motion (SfM) problem in computer vision is the problem of recovering the three-dimensional (3D) structure of a stationary scene from a set of projective measurements, represented as a collection of two-dimensional (2D) images, via estimation of motion of the cameras corresponding to these images.}
+        	
+        	The three basic steps of SfM are:
+        	\begin{itemize}
+        		\item Feature detection, extraction and matching
+        		\item Camera motion estimation
+        		\item Recovery of 3D structure
+        	\end{itemize}
+        	
+        	\paragraph{Bundle adjustment} 
+        		This technique simply considers to minimize the re-projection error of the unknown 3D points and camera matrices.
+        		The re-projection error is formulated as the euclidean distance between the known image coordinates and the projection of the unknown points using the unknown camera matrices.
+        		As stated by \citet{survey2017}, the problem is non-convex and in practice, common optimization algorithms achieve only a poor local minimum.
+        		
+        	\paragraph{The eight point algorithm}
+        	
+        	
+        	
         
         
         
