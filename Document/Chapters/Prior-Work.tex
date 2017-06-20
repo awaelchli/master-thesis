@@ -1,16 +1,16 @@
 \chapter{Prior Work}
 
-    \section{SfM-Net}
+    \section{04/2017 - SfM-Net}
     
         \citet{SFMNET} implement a deep learning approach to structure from motion. 
         Their architecture consists of two subnetworks:
         \begin{itemize}
-            \item Structure 
+            \item \textbf{Structure }
                 \\
                 Learns per-frame depth.
                 The input is a single frame. 
                 The output of the CNN is a cloud of 3D points, one for each pixel value in the input image.
-            \item Motion
+            \item \textbf{Motion}
                 \\
                 The input is a pair of frames.
                 The CNN computes a set of $K$ segmentation masks for moving objects. 
@@ -29,28 +29,58 @@
         
         The authors of the paper propose various modes of supervision to evaluate the architecture and to handle ambiguities in the reconstruction due to the ill-posed problem:
         \begin{itemize}
-            \item Self-supervision
+            \item \textbf{Self-supervision}
                 \\
                 No ground truth is given.
                 The loss is defined by the brightness constancy constraint of the second frame warped to the first frame using the predicted optical flow.
                 For this mode, they use the {KITTI} 2012/15 datasets
-            \item Depth
+            \item \textbf{Depth}
                 \\
                 Ground truth is given in the form of depth for each pixel.
                 This can be acquired for example by a Kinect sensor.
                 They use the {RGB-D SLAM} dataset for ground truth depth.
                 This helps to improve camera motion estimation. 
-            \item Camera motion
+            \item \textbf{Camera motion}
                 \\
                 Camera motion is given as ground truth in form of a rotation and translation matrix.
                 The relative transformation between predicted and ground truth transformation is 
-            \item Optical flow and object motion
+            \item \textbf{Optical flow and object motion}
                 \\
                 They use this type of supervision with the MoSeg dataset which contains ground truth segmentation for each frame.
                 This dataset contains more non-rigid body transformation.
                 They evaluate the quality of the object motion mask by Intersection over union (IoU).
         \end{itemize}
         
-    \section{Unsupervised CNN for Single View Depth Estimation}
+    \section{07/2016 - Unsupervised CNN for Single View Depth Estimation}
     
-        The work of \citet{garg2016} 
+        The work of \citet{garg2016} implements a autoencoder on stereo pair images to predict depth from a single image.
+        Their architecture consist of the following parts.
+        \begin{itemize}
+        	\item \textbf{Encoder}
+        		\\
+        		Takes a single image as input. 
+        		At training time, this is the left image of a stereo pair.
+        		The output is the predicted disparity map (scaled inverse depth).
+        	\item \textbf{Decoder}
+        		\\
+        		The decoder is only used at training time.
+        		It takes two inputs: The predicted disparities from the encoder and the right image of the stereo pair.
+        		The right image is warped using the displacements and compared to the encoder input (left image) using the color constancy error (photometric error).
+        \end{itemize}
+        Since the stereo pair is rectified, the disparity is a displacement along the scanline of the images.
+        Thus the decoder implements a simple geometric transformation that does not need to be learned.
+        At test time, only the encoder network with a single image as input is used.
+        
+        As noted by the author, there are standard stereo algorithms that produce disparity maps.
+        However, these methods can not deal with distortions such as lens flare, motion blur, shadows, etc.
+        The idea is that a neural network could learn to deal with such problems that occur in natural images.
+        
+        The dataset they use is {KITTI} which they augment by random crops, color channel scaling, and flipping the images.
+        
+        \section{05/2017 - A Survey on Structure from Motion}
+        
+        	\citet{survey2017}
+        
+        
+        
+        
