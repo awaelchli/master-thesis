@@ -1,8 +1,10 @@
 \chapter{Prior Work}
 
+	\todo{Add text that introduces the chapter}
+
     \section{04/2017 - SfM-Net}
     
-        \citet{SFMNET} implement a deep learning approach to structure from motion. 
+        \cite{SFMNET} implement a deep learning approach to structure from motion. 
         Their architecture consists of two subnetworks:
         \begin{itemize}
             \item \textbf{Structure }
@@ -53,7 +55,7 @@
         
     \section{07/2016 - Unsupervised CNN for Single View Depth Estimation}
     
-        The work of \citet{garg2016} implements a autoencoder on stereo pair images to predict depth from a single image.
+        The work of \cite{garg2016} implements a autoencoder on stereo pair images to predict depth from a single image.
         Their architecture consist of the following parts.
         \begin{itemize}
         	\item \textbf{Encoder}
@@ -79,7 +81,7 @@
         
         \section{05/2017 - A Survey on Structure from Motion}
         
-        	\citet{survey2017} give a very good and concise definition of structure from motion:
+        	\cite{survey2017} give a very good and concise definition of structure from motion:
         	
         	\say{The structure from motion (SfM) problem in computer vision is the problem of recovering the three-dimensional (3D) structure of a stationary scene from a set of projective measurements, represented as a collection of two-dimensional (2D) images, via estimation of motion of the cameras corresponding to these images.}
         	
@@ -93,9 +95,35 @@
         	\paragraph{Bundle adjustment} 
         		This technique simply considers to minimize the re-projection error of the unknown 3D points and camera matrices.
         		The re-projection error is formulated as the euclidean distance between the known image coordinates and the projection of the unknown points using the unknown camera matrices.
-        		As stated by \citet{survey2017}, the problem is non-convex and in practice, common optimization algorithms achieve only a poor local minimum.
+        		As stated by \cite{survey2017}, the problem is non-convex and in practice, common optimization algorithms achieve only a poor local minimum.
         		
         	\paragraph{The eight point algorithm}
+        	
+        	\paragraph{Factorization methods}
+        		The first method proposed by \cite{tomasi1992factorization} only works with an orthographic camera model.
+        		A measurement matrix $W \in \mathbb{R}^{2n \times m}$ is defined as
+        		\begin{equation}
+        			W =
+        			\begin{bmatrix}
+        			x_{11} & \cdots & x_{1m} \\ 
+        			\vdots & \ddots & \vdots \\ 
+        			x_{n1} & \cdots & x_{nm} \\ 
+        			y_{11} & \cdots & y_{1m} \\ 
+        			\vdots & \ddots  & \vdots \\ 
+        			y_{n1} & \cdots & y_{nm}
+        			\end{bmatrix}. 
+        		\end{equation}
+        		It contains the 2D coordinates of the $m$ orthographically projected 3D points for each of the $n$ cameras.
+        		Under the assumption that the origin of global coordinate system is located at the center of the point cloud, the matrix $W$ can be factorized into
+        		\begin{equation}
+        			W = RS,
+        		\end{equation}
+        		where $R \in \mathbb{R}^{2n \times 3}$ contains the orientation vectors of each camera and $S \in \mathbb{R}^{3 \times m}$  are the 3D points.
+        		As described by \cite{tomasi1992factorization}, this factorization can be achieved using the singular value decomposition (SVD) as $W = U \varSigma V^\top$ and deriving $R$ and $S$ from $U$, $V$ and $\varSigma$.
+        		\todo{Add more details? Less details?}
+        		
+        		
+        		
         	
         	
         	

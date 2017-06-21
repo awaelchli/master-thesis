@@ -1,31 +1,49 @@
 \documentclass[a4paper]{report}
 
+% Bibliography management
 \usepackage{natbib}
 \bibpunct{[}{]}{,}{a}{}{;}
+
+% IAM templates
 \usepackage{fancyheadings}
 \usepackage{iamdip}
-\usepackage[pdftex]{graphicx}
+
+% Figures
 \usepackage{subfig}
+
+% Math packages
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{amssymb}
 \usepackage{amsfonts}
+
+% Hyperlinks
 \usepackage{url}
 \usepackage{hyperref}
+
+% Code snippets
 \usepackage{listings}
 
+% PDF 
+\usepackage[pdftex]{graphicx}
 \usepackage{pdfpages}
 
-% For quotations
+% Quotations
 \usepackage{dirtytalk}
 
+% Colored text
+\usepackage{xcolor}
 
+% Page setup
 \headrulewidth 0.5pt \addtolength{\headheight}{5pt}
-
 \lhead[\fancyplain{}{\rm\thepage}]{\fancyplain{}{\rightmark}}
 \rhead[\fancyplain{}{\leftmark}]{\fancyplain{}{\rm\thepage}}
 \cfoot{}
 
+% Custom commands
+\newcommand\todo[1]{\textcolor{red}{#1}}
+
+% Path setup
 \graphicspath{{../Figures/}}
 
 \begin{document}
@@ -83,8 +101,8 @@
 \listoffigures
 
 \addcontentsline{toc}{chapter}{\numberline{}Bibliography}
-%\bibliographystyle{alphadin}
-\bibliographystyle{plainnat}
+\bibliographystyle{alphadin}
+%\bibliographystyle{plainnat}
 \nocite{*}
 \bibliography{thesis}
 
