@@ -121,16 +121,37 @@
         		where $R \in \mathbb{R}^{2n \times 3}$ contains the orientation vectors of each camera and $S \in \mathbb{R}^{3 \times m}$  are the 3D points.
         		As described by \cite{tomasi1992factorization}, this factorization can be achieved using the singular value decomposition (SVD) as $W = U \varSigma V^\top$ and deriving $R$ and $S$ from $U$, $V$ and $\varSigma$.
         		\todo{Add more details? Less details?}
-        		This factorization method was later extended by \cite{sturm1996factorization} for projective cameras.
+        		This factorization method was later extended by \cite{sturm1996factorization} for perspective cameras.
         		
         	\paragraph{Camera location estimation}
         		To estimate the location and orientation of the cameras, one needs to find the rotation matrices $R_i \in \mathbb{R}^{3 \times 3}$ and translations $t_i \in \mathbb{R}^{3}$ for each of the cameras.
         	
-        	
+       	\section{2015 - PoseNet}
+       		The PoseNet, as proposed by \cite{kendall2015posenet}, is a CNN that performs regression for the location and orientation of the camera given a single image as input.
+       		It outputs a 7D vector that describes the pose $p = [x, q]^\top$ as the camera location $x$ (3D) and orientation $q$ (4D quaternion).
+       		They simultaneously learn location and orientation with the euclidean loss
+       		\begin{equation}
+       			l(I) = \left\|
+       						\hat{x} - x 
+       					\right\|_2 
+       					+ \beta 
+       					\left\| 
+       						\hat{q} - \frac{q}{\left\| q \right\|} 
+       					\right\|_2,
+       		\end{equation}
+       		where $\beta$ is a parameter to balance the expected error of pose and orientation.
+       		The architecture is a modified GoogleNet with 23 layers which was trained on a classification task.
+       		They replace the last layers to perform regression instead of classification.
+       		
+       		\\
+       		\todo{add summary}
+        
         \section{02/2017 - Relative Camera Pose Estimation Using Convolutional Neural Networks}
-        By \cite{melekhov2017poseCNN}
-        \\
-       	\todo{add summary}
+        	By \cite{melekhov2017poseCNN}
+        	\\
+       		\todo{add summary}
+       	
+       	
         
         
         
