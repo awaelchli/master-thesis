@@ -2,6 +2,9 @@
 
 	\todo{Add text that introduces the chapter}
 	
+	\todo{Find good structure/order to present the different works}
+	
+	\todo{Better point out differences and similarities}
 		
 	\section{04/2017 - SfM-Net}
 
@@ -94,14 +97,30 @@
 			\end{itemize}
 			
 			\paragraph{Bundle adjustment} 
-				This technique simply considers to minimize the re-projection error of the unknown 3D points and camera matrices.
+				This technique considers to minimize the re-projection error of the unknown 3D points and camera matrices.
 				The re-projection error is formulated as the euclidean distance between the known image coordinates and the projection of the unknown points using the unknown camera matrices.
 				As stated by \cite{survey2017}, the problem is non-convex and in practice, common optimization algorithms achieve only a poor local minimum.
 				
 			\paragraph{The eight point algorithm}
 				The eight point algorithm, introduced by \cite{longuet1981}, is an algorithm that computes the \emph{fundamental matrix}.
 				This matrix describes the relationship between corresponding points in the image planes of two cameras with different relative pose.
-				The 
+				The elements of the $3 \times 3$ matrix can be found with eight known pairs of corresponding points (two projections that depict the same 3D point), where one element in the matrix must be fixed because the scale of the matrix is ambiguous.
+				These eight points form a system of eight equations which are derived from the epipolar constraint, which can be explained as follows:
+				When a 3D point is observed by a camera, it projects to a point. 
+				The second camera observes the same point, but it will project to a different 2D point in the image plane.
+				The epipolar constraint states the the second point must lie on a 2D line (the epipolar line) across the image plane.
+				\todo{?? show image from book/paper that shows how epipolar line relates to 3D point}
+				
+				The algorithm requires eight points to be known.
+				If this is not the case, a feature detection algorithm such as {SIFT} can be applied to find suitable correspondences.
+				\todo{more explanation?}
+				
+				In practice, there are further problems that must be addressed. 
+				First, the essential matrix is supposed to be of rank two. 
+				However, this is only true when the corresponding points are exact.
+				But in practice, there is often noise that results in a rank three matrix.
+				
+				\todo{Second...} 
 			
 			\paragraph{Factorization methods}
 				The first method proposed by \cite{tomasi1992factorization} only works with an orthographic camera model.
@@ -129,6 +148,8 @@
 				
 			\paragraph{Camera location estimation}
 				To estimate the location and orientation of the cameras, one needs to find the rotation matrices $R_i \in \mathbb{R}^{3 \times 3}$ and translations $t_i \in \mathbb{R}^{3}$ for each of the cameras.
+				
+				\todo{?? This might be the focus of the thesis}
 			
 		\section{2015 - PoseNet}
 		
