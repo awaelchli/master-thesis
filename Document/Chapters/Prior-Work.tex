@@ -39,7 +39,7 @@
 			\\
 			No ground truth is given.
 			The loss is defined by the brightness constancy constraint of the second frame warped to the first frame using the predicted optical flow.
-			For this mode, they use the {KITTI} 2012/15 datasets
+			For this mode, they use the {KITTI} 2012/15 datasets.
 		\item \textbf{Depth}
 			\\
 			Ground truth is given in the form of depth for each pixel.
@@ -109,7 +109,7 @@
 		However, these methods can not deal with distortions such as lens flare, motion blur, shadows, etc.
 		The idea is that a neural network could learn to deal with such problems that occur in natural images.
 		
-		The dataset they use is {KITTI} which they augment by random crops, color channel scaling, and flipping the images.
+		The dataset they use is {KITTI} \cite{Geiger2012KITTI} which they augment by random crops, color channel scaling, and flipping the images.
 		
 		\section{05/2017 - A Survey on Structure from Motion}
 		\todo{summary not finished}
