@@ -11,7 +11,7 @@
 		\cite{SFMNET} implement a deep learning approach to structure from motion. 
 		Their architecture consists of two subnetworks:
 		\begin{itemize}
-			\item \textbf{Structure }
+			\item \textbf{Structure}
 				\\
 				Learns per-frame depth.
 				The input is a single frame. 
@@ -54,8 +54,36 @@
 			\\
 			They use this type of supervision with the MoSeg dataset which contains ground truth segmentation for each frame.
 			This dataset contains more non-rigid body transformation.
-			They evaluate the quality of the object motion mask by Intersection over union (IoU).
+			They evaluate the quality of the object motion mask by intersection over union (IoU).
 		\end{itemize}
+		
+	\section{04/2017 - Unsupervised Learning of Depth and Ego-Motion from Video}
+		
+		This work from \cite{zhou2017unsupervised} is concurrent to the SfM-Net by \cite{SFMNET}.
+		Both works share a similar concept.
+		However, \cite{zhou2017unsupervised} focus on unsupervised training and do not explicitly model scene dynamics.
+		Similar to SfM-Net, their architecture consists of two jointly trained network, one for learning depth from a single image (Depth-CNN), and another for learning camera motion from two frames (Pose-CNN).
+		
+		The key difference to SfM-Net is that they train with an image sequence $I_1, \dots, I_N$ with one image being the target image $I_t$.
+		The task for the motion network is to synthesize the target image from two nearby views $I_{t - 1}$ and $I_{t + 1}$.
+		
+		\begin{itemize}
+			\item \textbf{Depth-CNN}
+				\\
+				Takes the target image $I_t$ as input and predicts a per-pixel depth map $\hat{D}_t$.
+			\item \textbf{Pose-CNN}
+				\\
+				Uses two source images $I_{t - 1}$ and $I_{t + 1}$ as input and predicts relative camera poses $\hat{T}_{t \rightarrow t - 1}$ and $\hat{T}_{t \rightarrow t + 1}$. 
+				These transformations are then used to synthesize the target image.
+		\end{itemize}
+		Using both the estimated depth and pose matrix as well as the intrinsic matrix of the camera, the coordinate frame of the source images is warped to the coordinate frame of the target image.
+		To transfer the color information from one frame to the other, bilinear interpolation is used.
+		The general term for this is \emph{differentiable image warping}.
+		
+		When working with realistic data, it is important to make the model robust to non-static objects in the scenes, occlusions and non-Lambertian surfaces.
+		To do this, the network is forced to additionally learn a per-pixel mask for each target-source pair.
+		They add a regularization term to force the mask to have non-zero values.
+		
 		
 	\section{07/2016 - Unsupervised CNN for Single View Depth Estimation}
 	
@@ -84,6 +112,7 @@
 		The dataset they use is {KITTI} which they augment by random crops, color channel scaling, and flipping the images.
 		
 		\section{05/2017 - A Survey on Structure from Motion}
+		\todo{summary not finished}
 		
 			\cite{survey2017} give a very good and concise definition of structure from motion:
 			
@@ -183,6 +212,7 @@
 			\todo{connection to other work?}
 		
 		\section{02/2017 - Relative Camera Pose Estimation Using Convolutional Neural Networks}
+		
 			By \cite{melekhov2017poseCNN}
 			\\
 			\todo{add summary}
