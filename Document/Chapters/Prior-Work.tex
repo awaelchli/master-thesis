@@ -5,7 +5,9 @@
 	\todo{Find good structure/order to present the different works}
 	
 	\todo{Better point out differences and similarities}
-		
+	
+	\section{Feature-based methods SURF, ORB, SIFT}
+	
 	\section{04/2017 - SfM-Net}
 
 		\cite{SFMNET} implement a deep learning approach to structure from motion. 
@@ -62,7 +64,7 @@
 		This work from \cite{zhou2017unsupervised} is concurrent to the SfM-Net by \cite{SFMNET}.
 		Both works share a similar concept.
 		However, \cite{zhou2017unsupervised} focus on unsupervised training and do not explicitly model scene dynamics.
-		Similar to SfM-Net, their architecture consists of two jointly trained network, one for learning depth from a single image (Depth-CNN), and another for learning camera motion from two frames (Pose-CNN).
+		Similar to SfM-Net, their architecture consists of two jointly trained networks, one for learning depth from a single image (Depth-CNN), and another for learning camera motion from two frames (Pose-CNN).
 		
 		The key difference to SfM-Net is that they train with an image sequence $I_1, \dots, I_N$ with one image being the target image $I_t$.
 		The task for the motion network is to synthesize the target image from two nearby views $I_{t - 1}$ and $I_{t + 1}$.
@@ -86,7 +88,7 @@
 		
 		
 	\section{07/2016 - Unsupervised CNN for Single View Depth Estimation}
-	
+		
 		The work of \cite{garg2016} implements a autoencoder on stereo pair images to predict depth from a single image.
 		Their architecture consist of the following parts.
 		\begin{itemize}
@@ -111,111 +113,128 @@
 		
 		The dataset they use is {KITTI} \cite{Geiger2012KITTI} which they augment by random crops, color channel scaling, and flipping the images.
 		
-		\section{05/2017 - A Survey on Structure from Motion}
-		\todo{summary not finished}
+	\section{05/2017 - A Survey on Structure from Motion}
+	\todo{summary not finished}
+	
+		\cite{survey2017} give a very good and concise definition of structure from motion:
 		
-			\cite{survey2017} give a very good and concise definition of structure from motion:
-			
-			\say{The structure from motion (SfM) problem in computer vision is the problem of recovering the three-dimensional (3D) structure of a stationary scene from a set of projective measurements, represented as a collection of two-dimensional (2D) images, via estimation of motion of the cameras corresponding to these images.}
-			
-			The three basic steps of SfM are:
-			\begin{itemize}
-				\item Feature detection, extraction and matching
-				\item Camera motion estimation
-				\item Recovery of 3D structure
-			\end{itemize}
-			
-			\paragraph{Bundle adjustment} 
-				This technique considers to minimize the re-projection error of the unknown 3D points and camera matrices.
-				The re-projection error is formulated as the euclidean distance between the known image coordinates and the projection of the unknown points using the unknown camera matrices.
-				As stated by \cite{survey2017}, the problem is non-convex and in practice, common optimization algorithms achieve only a poor local minimum.
-				
-			\paragraph{The eight point algorithm}
-				The eight point algorithm, introduced by \cite{longuet1981}, is an algorithm that computes the \emph{fundamental matrix}.
-				This matrix describes the relationship between corresponding points in the image planes of two cameras with different relative pose.
-				The elements of the $3 \times 3$ matrix can be found with eight known pairs of corresponding points (two projections that depict the same 3D point), where one element in the matrix must be fixed because the scale of the matrix is ambiguous.
-				These eight points form a system of eight equations which are derived from the epipolar constraint, which can be explained as follows:
-				When a 3D point is observed by a camera, it projects to a point. 
-				The second camera observes the same point, but it will project to a different 2D point in the image plane.
-				The epipolar constraint states the the second point must lie on a 2D line (the epipolar line) across the image plane.
-				\todo{?? show image from book/paper that shows how epipolar line relates to 3D point}
-				
-				The algorithm requires eight points to be known.
-				If this is not the case, a feature detection algorithm such as {SIFT} can be applied to find suitable correspondences.
-				\todo{more explanation?}
-				
-				In practice, there are further problems that must be addressed. 
-				First, the essential matrix is supposed to be of rank two. 
-				However, this is only true when the corresponding points are exact.
-				But in practice, there is often noise that results in a rank three matrix.
-				
-				\todo{Second...} 
-			
-			\paragraph{Factorization methods}
-				The first method proposed by \cite{tomasi1992factorization} only works with an orthographic camera model.
-				A measurement matrix $W \in \mathbb{R}^{2n \times m}$ is defined as
-				\begin{equation}
-					W =
-					\begin{bmatrix}
-						x_{11} & \cdots & x_{1m} \\ 
-						\vdots & \ddots & \vdots \\ 
-						x_{n1} & \cdots & x_{nm} \\ 
-						y_{11} & \cdots & y_{1m} \\ 
-						\vdots & \ddots & \vdots \\ 
-						y_{n1} & \cdots & y_{nm}
-					\end{bmatrix}. 
-				\end{equation}
-				It contains the 2D coordinates of the $m$ orthographically projected 3D points for each of the $n$ cameras.
-				Under the assumption that the origin of global coordinate system is located at the center of the point cloud, the matrix $W$ can be factorized into
-				\begin{equation}
-					W = RS,
-				\end{equation}
-				where $R \in \mathbb{R}^{2n \times 3}$ contains the orientation vectors of each camera and $S \in \mathbb{R}^{3 \times m}$  are the 3D points.
-				As described by \cite{tomasi1992factorization}, this factorization can be achieved using the singular value decomposition (SVD) as $W = U \varSigma V^\top$ and deriving $R$ and $S$ from $U$, $V$ and $\varSigma$.
-				\todo{Add more details? Less details?}
-				This factorization method was later extended by \cite{sturm1996factorization} for perspective cameras.
-				
-			\paragraph{Camera location estimation}
-				To estimate the location and orientation of the cameras, one needs to find the rotation matrices $R_i \in \mathbb{R}^{3 \times 3}$ and translations $t_i \in \mathbb{R}^{3}$ for each of the cameras.
-				
-				\todo{?? This might be the focus of the thesis}
-			
-		\section{2015 - PoseNet}
+		\say{The structure from motion (SfM) problem in computer vision is the problem of recovering the three-dimensional (3D) structure of a stationary scene from a set of projective measurements, represented as a collection of two-dimensional (2D) images, via estimation of motion of the cameras corresponding to these images.}
 		
-			The PoseNet, as proposed by \cite{kendall2015posenet}, is a CNN that performs regression for the location and orientation of the camera given a single image as input.
-			It outputs a 7D vector that describes the pose $p = [x, q]^\top$ as the camera location $x$ (3D) and orientation $q$ (4D quaternion).
-			They simultaneously learn location and orientation with the euclidean loss
+		The three basic steps of SfM are:
+		\begin{itemize}
+			\item Feature detection, extraction and matching
+			\item Camera motion estimation
+			\item Recovery of 3D structure
+		\end{itemize}
+		
+		\paragraph{Bundle adjustment} 
+			This technique considers to minimize the re-projection error of the unknown 3D points and camera matrices.
+			The re-projection error is formulated as the euclidean distance between the known image coordinates and the projection of the unknown points using the unknown camera matrices.
+			As stated by \cite{survey2017}, the problem is non-convex and in practice, common optimization algorithms achieve only a poor local minimum.
+			
+		\paragraph{The eight point algorithm}
+			The eight point algorithm, introduced by \cite{longuet1981}, is an algorithm that computes the \emph{fundamental matrix}.
+			This matrix describes the relationship between corresponding points in the image planes of two cameras with different relative pose.
+			The elements of the $3 \times 3$ matrix can be found with eight known pairs of corresponding points (two projections that depict the same 3D point), where one element in the matrix must be fixed because the scale of the matrix is ambiguous.
+			These eight points form a system of eight equations which are derived from the epipolar constraint, which can be explained as follows:
+			When a 3D point is observed by a camera, it projects to a point. 
+			The second camera observes the same point, but it will project to a different 2D point in the image plane.
+			The epipolar constraint states the the second point must lie on a 2D line (the epipolar line) across the image plane.
+			\todo{?? show image from book/paper that shows how epipolar line relates to 3D point}
+			
+			The algorithm requires eight points to be known.
+			If this is not the case, a feature detection algorithm such as {SIFT} can be applied to find suitable correspondences.
+			\todo{more explanation?}
+			
+			In practice, there are further problems that must be addressed. 
+			First, the essential matrix is supposed to be of rank two. 
+			However, this is only true when the corresponding points are exact.
+			But in practice, there is often noise that results in a rank three matrix.
+			
+			\todo{Second...} 
+		
+		\paragraph{Factorization methods}
+			The first method proposed by \cite{tomasi1992factorization} only works with an orthographic camera model.
+			A measurement matrix $W \in \mathbb{R}^{2n \times m}$ is defined as
 			\begin{equation}
-				\mathcal{L}(I) = 
-				\left\|
-					\hat{x} - x 
-				\right\|_2 
-				+ \beta 
-				\left\| 
-					\hat{q} - \frac{q}{\left\| q \right\|} 
-				\right\|_2,
+				W =
+				\begin{bmatrix}
+					x_{11} & \cdots & x_{1m} \\ 
+					\vdots & \ddots & \vdots \\ 
+					x_{n1} & \cdots & x_{nm} \\ 
+					y_{11} & \cdots & y_{1m} \\ 
+					\vdots & \ddots & \vdots \\ 
+					y_{n1} & \cdots & y_{nm}
+				\end{bmatrix}. 
 			\end{equation}
-			where $\beta$ is a parameter to balance the expected error of pose and orientation.
-			The architecture is a modified \emph{GoogleNet} with 23 layers which was trained on a classification task.
-			They replace the last layers to perform regression instead of classification.
+			It contains the 2D coordinates of the $m$ orthographically projected 3D points for each of the $n$ cameras.
+			Under the assumption that the origin of global coordinate system is located at the center of the point cloud, the matrix $W$ can be factorized into
+			\begin{equation}
+				W = RS,
+			\end{equation}
+			where $R \in \mathbb{R}^{2n \times 3}$ contains the orientation vectors of each camera and $S \in \mathbb{R}^{3 \times m}$  are the 3D points.
+			As described by \cite{tomasi1992factorization}, this factorization can be achieved using the singular value decomposition (SVD) as $W = U \varSigma V^\top$ and deriving $R$ and $S$ from $U$, $V$ and $\varSigma$.
+			\todo{Add more details? Less details?}
+			This factorization method was later extended by \cite{sturm1996factorization} for perspective cameras.
 			
-			Because CNNs require a large amount of training data, the authors apply transfer learning by pretraining the network on a different task with large datasets such as \emph{ImageNet} and \emph{Places}.
-			Pose regression is performed using the pre-trained network and their own dataset called \emph{Cambridge Landmarks} with five scenes of camera motion in large scale outdoor areas.
-			For this limited dataset, ground truth pose is available.
-			A challenge that comes with this dataset is the clutter in form of moving pedestrians and cars.
-			Also, due to the long trajectories, weather and lighting conditions change a lot.
+		\paragraph{Camera location estimation}
+			To estimate the location and orientation of the cameras, one needs to find the rotation matrices $R_i \in \mathbb{R}^{3 \times 3}$ and translations $t_i \in \mathbb{R}^{3}$ for each of the cameras.
 			
-			In their experiments they find that the system is robust to large spatial distance between camera samples.
-			Also, from the visualization of the features they observe that the network does not only produce high response outputs for high level features, but is also sensitive to large textureless regions where {SIFT}-based approaches typically fail.
-			
-			The paper demonstrates that transfer-learning can be used for pose estimation when a large labeled dataset for training is not available and that the pre-trained network can learn pose information despite being forced to produce pose-invariant outputs.
-			\todo{connection to other work?}
+			\todo{?? This might be the focus of the thesis}
 		
-		\section{02/2017 - Relative Camera Pose Estimation Using Convolutional Neural Networks}
+	\section{2015 - PoseNet}
 		
-			By \cite{melekhov2017poseCNN}
-			\\
-			\todo{add summary}
+		The PoseNet, as proposed by \cite{kendall2015posenet}, is a CNN that performs regression for the location and orientation of the camera given a single image as input.
+		It outputs a 7D vector that describes the pose $p = [x, q]^\top$ as the camera location $x$ (3D vector) and orientation $q$ (4D quaternion).
+		They simultaneously learn location and orientation with the euclidean loss
+		\begin{equation}
+			\mathcal{L}(I) = 
+			\left\|
+				\hat{x} - x 
+			\right\|_2 
+			+ \beta 
+			\left\| 
+				\hat{q} - \frac{q}{\left\| q \right\|} 
+			\right\|_2,
+		\end{equation}
+		where $\beta$ is a parameter to balance the expected error of pose and orientation.
+		The architecture is a modified \emph{GoogleNet} with 23 layers which was trained on a classification task.
+		They replace the last layers to perform regression instead of classification.
+		
+		Because CNNs require a large amount of training data, the authors apply transfer learning by pretraining the network on a different task with large datasets such as \emph{ImageNet} and \emph{Places}.
+		Pose regression is performed using the pre-trained network and their own dataset called \emph{Cambridge Landmarks} with five scenes of camera motion in large scale outdoor areas.
+		For this limited dataset, ground truth pose is available.
+		A challenge that comes with this dataset is the clutter in form of moving pedestrians and cars.
+		Also, due to the long trajectories, weather and lighting conditions change a lot.
+		
+		In their experiments they find that the system is robust to large spatial distance between camera samples.
+		Also, from the visualization of the features they observe that the network does not only produce high response outputs for high level features, but is also sensitive to large textureless regions where {SIFT}-based approaches typically fail.
+		
+		The paper demonstrates that transfer-learning can be used for pose estimation when a large labeled dataset for training is not available and that the pre-trained network can learn pose information despite being forced to produce pose-invariant outputs.
+		\todo{connection to other work?}
+	
+	\section{02/2017 - Relative Camera Pose Estimation Using Convolutional Neural Networks}
+	
+		\cite{melekhov2017poseCNN} propose a CNN architecture to estimate the relative pose between two cameras.
+		Similar to PoseNet \cite{kendall2015posenet}, they estimate the 7D vector of pose by a quaternion and a translation vector.
+		Their network is composed of two main parts.
+		\begin{itemize}
+			\item \textbf{Representation part}
+				\\
+				The inputs are the two camera images. 
+				This part has two identical branches with shared weights of five convolutional layers with ReLUs and spatial pyramid pooling at the end.
+				Each branch processes one of the input images.
+			\item \textbf{Regression part}
+				\\
+				Regression is performed on the output of the representation part using two fully-connected layers to estimate the relative pose.
+		\end{itemize}
+		The weights for the Siamese network are initialized from a pre-trained AlexNet on the \emph{ImageNet} and \emph{Places} datasets.
+		In order to overcome the limitation in the input size due to the fully-connected layers, \cite{melekhov2017poseCNN} apply spatial pyramid pooling (SPP) in the representation part.
+		This allows for a larger size of input images for the network to be able to extract more structural information that helps reconstructing the pose.
+		
+		The dataset used for training is a crowd-sourced image collection with ground truth pose from a structure from motion pipeline based on local feature matching.
+		For testing and comparison with other works they use the {DTU} dataset where the exact pose is obtained from a robotic arm that moves the camera.
+		
 		
 		
 		
