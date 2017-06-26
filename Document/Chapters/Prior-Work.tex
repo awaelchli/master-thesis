@@ -137,34 +137,8 @@
 		The dataset they use is {KITTI} \cite{Geiger2012KITTI} which they augment by random crops, color channel scaling, and flipping the images.
 		
 	
-	
-	\section{02/2017 - Relative Camera Pose Estimation Using Convolutional Neural Networks}
-	
-		\cite{melekhov2017poseCNN} propose a CNN architecture to estimate the relative pose between two cameras.
-		Similar to PoseNet \cite{kendall2015posenet}, they estimate the 7D vector of pose by a quaternion and a translation vector.
-		Their network is composed of two main parts.
-		\begin{itemize}
-			\item \textbf{Representation part}
-				\\
-				The inputs are the two camera images. 
-				This part has two identical branches with shared weights of five convolutional layers with ReLUs and spatial pyramid pooling at the end.
-				Each branch processes one of the input images.
-			\item \textbf{Regression part}
-				\\
-				Regression is performed on the output of the representation part using two fully-connected layers to estimate the relative pose.
-		\end{itemize}
-		The weights for the Siamese network are initialized from a pre-trained AlexNet on the \emph{ImageNet} and \emph{Places} datasets.
-		In order to overcome the limitation in the input size due to the fully-connected layers, \cite{melekhov2017poseCNN} apply spatial pyramid pooling (SPP) in the representation part.
-		This allows for a larger size of input images for the network to be able to extract more structural information that helps reconstructing the pose.
-		
-		The dataset used for training is a crowd-sourced image collection with ground truth pose from a structure from motion pipeline based on local feature matching.
-		For testing and comparison with other works they use the {DTU} dataset where the exact pose is obtained from a robotic arm that moves the camera.
-		\todo{incomplete summary}
-		
-
-
 	\section{04/2017 - SfM-Net}
-
+		
 		\cite{SFMNET} implement a deep learning approach to structure from motion. 
 		Their architecture consists of two subnetworks:
 		\begin{itemize}
@@ -241,8 +215,26 @@
 		To do this, the network is forced to additionally learn a per-pixel mask for each target-source pair.
 		They add a regularization term to force the mask to have non-zero values.
 		
+	\section{05/2017 - Relative Camera Pose Estimation Using Convolutional Neural Networks}
+	
+		\cite{melekhov2017poseCNN} propose a CNN architecture to estimate the relative pose between two cameras.
+		Similar to PoseNet \cite{kendall2015posenet}, they estimate the 7D vector of pose by a quaternion and a translation vector.
+		Their network is composed of two main parts.
+		\begin{itemize}
+			\item \textbf{Representation part}
+				\\
+				The inputs are the two camera images. 
+				This part has two identical branches with shared weights of five convolutional layers with ReLUs and spatial pyramid pooling at the end.
+				Each branch processes one of the input images.
+			\item \textbf{Regression part}
+				\\
+				Regression is performed on the output of the representation part using two fully-connected layers to estimate the relative pose.
+		\end{itemize}
+		The weights for the Siamese network are initialized from a pre-trained AlexNet on the \emph{ImageNet} and \emph{Places} datasets.
+		In order to overcome the limitation in the input size due to the fully-connected layers, \cite{melekhov2017poseCNN} apply spatial pyramid pooling (SPP) in the representation part.
+		This allows for a larger size of input images for the network to be able to extract more structural information that helps reconstructing the pose.
 		
-		
-		
-		
+		The dataset used for training is a crowd-sourced image collection with ground truth pose from a structure from motion pipeline based on local feature matching.
+		For testing and comparison with other works they use the {DTU} dataset where the exact pose is obtained from a robotic arm that moves the camera.
+		\todo{incomplete summary}
 		
