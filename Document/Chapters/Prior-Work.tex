@@ -1,81 +1,92 @@
 \chapter{Prior Work}
-
-	\todo{Add text that introduces the chapter}
 	
-	\todo{Find good structure/order to present the different works}
+	\todo{Add text that introduces the chapter} \\
+	\todo{Find good structure/order to present the different works} \\
+	\todo{Better point out differences and similarities} \\
 	
-	\todo{Better point out differences and similarities}
+	\noindent
+	Possible definition of structure from motion by \cite{survey2017}:
+	
+	\say{The structure from motion (SfM) problem in computer vision is the problem of recovering the three-dimensional (3D) structure of a stationary scene from a set of projective measurements, represented as a collection of two-dimensional (2D) images, via estimation of motion of the cameras corresponding to these images.}
+	
+	One can define the three basic steps of SfM as:
+	\begin{enumerate}
+		\item Feature detection, extraction and matching
+		\item Camera motion estimation
+		\item Recovery of 3D structure
+	\end{enumerate}
+	This chapter presents the prior work that focuses on one or multiple of these steps.
 	
 	\section{Feature-based methods SURF, ORB, SIFT}
-	
-	\section{05/2017 - A Survey on Structure from Motion}
-		\todo{summary not finished}
+%	
+%	\section{05/2017 - A Survey on Structure from Motion}
+%		\todo{summary not finished}
+%		
+	\section{Bundle Adjustment} 
+		This technique considers to minimize the re-projection error of the unknown 3D points and camera matrices.
+		The re-projection error is formulated as the euclidean distance between the known image coordinates and the projection of the unknown points using the unknown camera matrices.
+		As stated by \cite{survey2017}, the problem is non-convex and in practice, common optimization algorithms achieve only a poor local minimum.
 		
-		\cite{survey2017} give a very good and concise definition of structure from motion:
+	\section{The Eight Point Algorithm}
+		The eight point algorithm, introduced by \cite{longuet1981}, is an algorithm that computes the \emph{essential matrix} $E$ which encodes the relative translation $t$ and rotation $R$ between two cameras as
+		\begin{equation}
+			E = \left[ t \right]_\times R,
+		\end{equation}
+		where $\left[ t \right]_\times$ is the matrix that computes the cross-product between $t$ and an arbitrary vector.
+		This matrix describes the relationship between corresponding points in the image planes of two cameras with different relative pose.
 		
-		\say{The structure from motion (SfM) problem in computer vision is the problem of recovering the three-dimensional (3D) structure of a stationary scene from a set of projective measurements, represented as a collection of two-dimensional (2D) images, via estimation of motion of the cameras corresponding to these images.}
+		The elements of the $3 \times 3$ matrix can be found with eight known pairs of corresponding points (two projections that depict the same 3D point), where one element in the matrix must be fixed because the scale of the matrix is ambiguous.
+		These eight points form a system of eight equations which are derived from the epipolar constraint, which can be explained as follows:
+		When a 3D point is observed by a camera, it projects to a 2D point in the image plane. 
+		The second camera observes the same 3D point, but it will project to a different 2D point.
+		The epipolar constraint states the the second point, given the first one, must lie on a 2D line (the epipolar line) across the image plane.
+		\todo{?? show image from book/paper that shows how epipolar line relates to 3D point}
+		In other words, the essential matrix $E$ is the matrix that maps a point $\hat{x}_0$ in image 0 to its epipolar line in $l_1 = E \hat{x}_0$.
+		Given a corresponding point $\hat{x}_1$ in image 1, it must lie on the epipolar line, i.e. $\hat{x}_1^\top l_1 = 0$.
+		This leads to the epipolar constraint
+		\begin{equation}
+			\hat{x}_1^\top E \hat{x}_0 = 0.
+		\end{equation}
 		
-		The three basic steps of SfM are:
-		\begin{itemize}
-			\item Feature detection, extraction and matching
-			\item Camera motion estimation
-			\item Recovery of 3D structure
-		\end{itemize}
+		The algorithm requires eight points to be known.
+		If this is not the case, a feature detection algorithm such as {SIFT} can be applied to find suitable correspondences.
+		\todo{more explanation?}
 		
-		\paragraph{Bundle adjustment} 
-			This technique considers to minimize the re-projection error of the unknown 3D points and camera matrices.
-			The re-projection error is formulated as the euclidean distance between the known image coordinates and the projection of the unknown points using the unknown camera matrices.
-			As stated by \cite{survey2017}, the problem is non-convex and in practice, common optimization algorithms achieve only a poor local minimum.
-			
-		\paragraph{The eight point algorithm}
-			The eight point algorithm, introduced by \cite{longuet1981}, is an algorithm that computes the \emph{fundamental matrix}.
-			This matrix describes the relationship between corresponding points in the image planes of two cameras with different relative pose.
-			The elements of the $3 \times 3$ matrix can be found with eight known pairs of corresponding points (two projections that depict the same 3D point), where one element in the matrix must be fixed because the scale of the matrix is ambiguous.
-			These eight points form a system of eight equations which are derived from the epipolar constraint, which can be explained as follows:
-			When a 3D point is observed by a camera, it projects to a point. 
-			The second camera observes the same point, but it will project to a different 2D point in the image plane.
-			The epipolar constraint states the the second point must lie on a 2D line (the epipolar line) across the image plane.
-			\todo{?? show image from book/paper that shows how epipolar line relates to 3D point}
-			
-			The algorithm requires eight points to be known.
-			If this is not the case, a feature detection algorithm such as {SIFT} can be applied to find suitable correspondences.
-			\todo{more explanation?}
-			
-			In practice, there are further problems that must be addressed. 
-			First, the essential matrix is supposed to be of rank two. 
-			However, this is only true when the corresponding points are exact.
-			But in practice, there is often noise that results in a rank three matrix.
-			
-			\todo{Second...} 
+		In practice, there are further problems that must be addressed. 
+		First, the essential matrix is supposed to be of rank two. 
+		However, this is only true when the corresponding points are exact.
+		But in practice, there is often noise that results in a rank three matrix.
 		
-		\paragraph{Factorization methods}
-			The first method proposed by \cite{tomasi1992factorization} only works with an orthographic camera model.
-			A measurement matrix $W \in \mathbb{R}^{2n \times m}$ is defined as
-			\begin{equation}
-				W =
-				\begin{bmatrix}
-					x_{11} & \cdots & x_{1m} \\ 
-					\vdots & \ddots & \vdots \\ 
-					x_{n1} & \cdots & x_{nm} \\ 
-					y_{11} & \cdots & y_{1m} \\ 
-					\vdots & \ddots & \vdots \\ 
-					y_{n1} & \cdots & y_{nm}
-				\end{bmatrix}. 
-			\end{equation}
-			It contains the 2D coordinates of the $m$ orthographically projected 3D points for each of the $n$ cameras.
-			Under the assumption that the origin of global coordinate system is located at the center of the point cloud, the matrix $W$ can be factorized into
-			\begin{equation}
-				W = RS,
-			\end{equation}
-			where $R \in \mathbb{R}^{2n \times 3}$ contains the orientation vectors of each camera and $S \in \mathbb{R}^{3 \times m}$  are the 3D points.
-			As described by \cite{tomasi1992factorization}, this factorization can be achieved using the singular value decomposition (SVD) as $W = U \varSigma V^\top$ and deriving $R$ and $S$ from $U$, $V$ and $\varSigma$.
-			\todo{Add more details? Less details?}
-			This factorization method was later extended by \cite{sturm1996factorization} for perspective cameras.
-			
-		\paragraph{Camera location estimation}
-			To estimate the location and orientation of the cameras, one needs to find the rotation matrices $R_i \in \mathbb{R}^{3 \times 3}$ and translations $t_i \in \mathbb{R}^{3}$ for each of the cameras.
-			
-			\todo{?? This might be the focus of the thesis}
+		\todo{Second...} 
+		
+	\section{Factorization Methods}
+		The first method proposed by \cite{tomasi1992factorization} only works with an orthographic camera model.
+		A measurement matrix $W \in \mathbb{R}^{2n \times m}$ is defined as
+		\begin{equation}
+			W =
+			\begin{bmatrix}
+				x_{11} & \cdots & x_{1m} \\ 
+				\vdots & \ddots & \vdots \\ 
+				x_{n1} & \cdots & x_{nm} \\ 
+				y_{11} & \cdots & y_{1m} \\ 
+				\vdots & \ddots & \vdots \\ 
+				y_{n1} & \cdots & y_{nm}
+			\end{bmatrix}. 
+		\end{equation}
+		It contains the 2D coordinates of the $m$ orthographically projected 3D points for each of the $n$ cameras.
+		Under the assumption that the origin of global coordinate system is located at the center of the point cloud, the matrix $W$ can be factorized into
+		\begin{equation}
+			W = RS,
+		\end{equation}
+		where $R \in \mathbb{R}^{2n \times 3}$ contains the orientation vectors of each camera and $S \in \mathbb{R}^{3 \times m}$  are the 3D points.
+		As described by \cite{tomasi1992factorization}, this factorization can be achieved using the singular value decomposition (SVD) as $W = U \varSigma V^\top$ and deriving $R$ and $S$ from $U$, $V$ and $\varSigma$.
+		\todo{Add more details? Less details?}
+		This factorization method was later extended by \cite{sturm1996factorization} for perspective cameras.
+		
+	\section{Camera Location Estimation}
+		To estimate the location and orientation of the cameras, one needs to find the rotation matrices $R_i \in \mathbb{R}^{3 \times 3}$ and translations $t_i \in \mathbb{R}^{3}$ for each of the cameras.
+		
+		\todo{?? This might be the focus of the thesis}
 		
 	
 	\section{2015 - PoseNet}
