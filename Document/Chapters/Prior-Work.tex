@@ -28,36 +28,37 @@
 		As stated by \cite{survey2017}, the problem is non-convex and in practice, common optimization algorithms achieve only a poor local minimum.
 		
 	\section{The Eight Point Algorithm}
-		The eight point algorithm, introduced by \cite{longuet1981}, is an algorithm that computes the \emph{essential matrix} $E$ which encodes the relative translation $t$ and rotation $R$ between two cameras as
+		The eight point algorithm, as introduced by \cite{longuet1981}, 
+		The essential matrix is defined as 
 		\begin{equation}
 			E = \left[ t \right]_\times R,
 		\end{equation}
 		where $\left[ t \right]_\times$ is the matrix that computes the cross-product between $t$ and an arbitrary vector.
-		This matrix describes the relationship between corresponding points in the image planes of two cameras with different relative pose.
-		
-		The elements of the $3 \times 3$ matrix can be found with eight known pairs of corresponding points (two projections that depict the same 3D point), where one element in the matrix must be fixed because the scale of the matrix is ambiguous.
-		These eight points form a system of eight equations which are derived from the epipolar constraint, which can be explained as follows:
-		When a 3D point is observed by a camera, it projects to a 2D point in the image plane. 
-		The second camera observes the same 3D point, but it will project to a different 2D point.
-		The epipolar constraint states the the second point, given the first one, must lie on a 2D line (the epipolar line) across the image plane.
-		\todo{?? show image from book/paper that shows how epipolar line relates to 3D point}
-		In other words, the essential matrix $E$ is the matrix that maps a point $\hat{x}_0$ in image 0 to its epipolar line in $l_1 = E \hat{x}_0$.
-		Given a corresponding point $\hat{x}_1$ in image 1, it must lie on the epipolar line, i.e. $\hat{x}_1^\top l_1 = 0$.
-		This leads to the epipolar constraint
+		It describes the relationship between corresponding points in the image planes of the two cameras.
+		When $R$ and $t$ are unknown, it is possible to compute the essential matrix using known corresponding points.
+		The epipolar constraint is formulated as 
 		\begin{equation}
-			\hat{x}_1^\top E \hat{x}_0 = 0.
+			\hat{x}_1^\top E \hat{x}_0 = 0,
 		\end{equation}
+		where $\hat{x}_0$ and $\hat{x}_1$ are the corresponding points in image one and two respectively.
+		The unknown elements of the essential matrix can be determined using this system of equations.
+		It requires eight equations for eight elements of the matrix and one element has to be fixed because any scaling of the true matrix satisfies the epipolar constraint.
+		After estimating $E$, the rotation and translation can be recovered from it up to some ambiguities.
 		
-		The algorithm requires eight points to be known.
-		If this is not the case, a feature detection algorithm such as {SIFT} can be applied to find suitable correspondences.
-		\todo{more explanation?}
-		
-		In practice, there are further problems that must be addressed. 
-		First, the essential matrix is supposed to be of rank two. 
-		However, this is only true when the corresponding points are exact.
-		But in practice, there is often noise that results in a rank three matrix.
-		
-		\todo{Second...} 
+		In practice, there are some problems that need to be addressed.
+		First, the corresponding points are usually not known and must be found using a feature detection and matching technique (SfM step 1).
+		This then can lead to outliers, which are wrong correspondences.
+		In this case, {RANSAC} is applied to select the best eight points among many possible choices.
+		Second, the selected points are usually not exact and contain noise that lead to a rank three estimate of $E$ instead of rank two.
+		The singular value decomposition is used to discard the component with the smallest singular value.
+		\todo{numerical issues, 5 point algorithm}
+		Third, in some cases the calibration matrices $K_0$ and $K_1$ are unknown.
+		This means that the normalized coordinates are $\hat{x}_j = K_j^{-1} x_j$ are no longer available and only the image coordinates $x_j$ are known.
+		This results in the so called \emph{fundamental matrix} $F$ in the epipolar constraint:
+		\begin{equation}
+			\hat{x}_1^\top E \hat{x}_0 = x_1^\top K_1^{-\top} E K_0^{-1} x_0 = x_1^\top F x_0 = 0.
+		\end{equation}
+		\todo{explain use of F}
 		
 	\section{Factorization Methods}
 		The first method proposed by \cite{tomasi1992factorization} only works with an orthographic camera model.
