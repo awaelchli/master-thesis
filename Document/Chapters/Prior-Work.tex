@@ -18,26 +18,19 @@
 	This chapter presents the prior work that focuses on one or multiple of these steps.
 	
 	\section{Feature-based methods SURF, ORB, SIFT}
-%	
-%	\section{05/2017 - A Survey on Structure from Motion}
-%		\todo{summary not finished}
-%		
-	\section{Bundle Adjustment} 
-		This technique considers to minimize the re-projection error of the unknown 3D points and camera matrices.
-		The re-projection error is formulated as the euclidean distance between the known image coordinates and the projection of the unknown points using the unknown camera matrices.
-		As stated by \cite{survey2017}, the problem is non-convex and in practice, common optimization algorithms achieve only a poor local minimum.
-		
+	
+
 	\section{The Eight Point Algorithm}
 		The eight point algorithm, as introduced by \cite{longuet1981}, 
-		The essential matrix is defined as 
-		\begin{equation}
+		The \emph{essential matrix} is defined as 
+		\begin{equation}\label{eq:essential_matrix}
 			E = \left[ t \right]_\times R,
 		\end{equation}
 		where $\left[ t \right]_\times$ is the matrix that computes the cross-product between $t$ and an arbitrary vector.
 		It describes the relationship between corresponding points in the image planes of the two cameras.
 		When $R$ and $t$ are unknown, it is possible to compute the essential matrix using known corresponding points.
 		The epipolar constraint is formulated as 
-		\begin{equation}
+		\begin{equation}\label{eq:epipolar_constraint}
 			\hat{x}_1^\top E \hat{x}_0 = 0,
 		\end{equation}
 		where $\hat{x}_0$ and $\hat{x}_1$ are the corresponding points in image one and two respectively.
@@ -47,7 +40,7 @@
 		
 		In practice, there are some problems that need to be addressed.
 		First, the corresponding points are usually not known and must be found using a feature detection and matching technique (SfM step 1).
-		This then can lead to outliers, which are wrong correspondences.
+		This then can lead to outliers which are wrong correspondences.
 		In this case, {RANSAC} is applied to select the best eight points among many possible choices.
 		Second, the selected points are usually not exact and contain noise that lead to a rank three estimate of $E$ instead of rank two.
 		The singular value decomposition is used to discard the component with the smallest singular value.
@@ -58,12 +51,13 @@
 		\begin{equation}
 			\hat{x}_1^\top E \hat{x}_0 = x_1^\top K_1^{-\top} E K_0^{-1} x_0 = x_1^\top F x_0 = 0.
 		\end{equation}
-		\todo{explain use of F}
+		\todo{explain what F is used for}
 		
 	\section{Factorization Methods}
-		The first method proposed by \cite{tomasi1992factorization} only works with an orthographic camera model.
-		A measurement matrix $W \in \mathbb{R}^{2n \times m}$ is defined as
-		\begin{equation}
+		The factorization method can be used to recover camera motion and 3D shape simultaneously (step 2 and 3).
+		A first method was introduced by \cite{tomasi1992factorization} that works with an orthographic camera model.
+		It uses the so called \emph{measurement matrix} $W \in \mathbb{R}^{2n \times m}$ which is defined as
+		\begin{equation}\label{eq:measurement_matrix}
 			W =
 			\begin{bmatrix}
 				x_{11} & \cdots & x_{1m} \\ 
@@ -75,23 +69,48 @@
 			\end{bmatrix}. 
 		\end{equation}
 		It contains the 2D coordinates of the $m$ orthographically projected 3D points for each of the $n$ cameras.
-		Under the assumption that the origin of global coordinate system is located at the center of the point cloud, the matrix $W$ can be factorized into
-		\begin{equation}
-			W = RS,
+		Under the assumption that the origin of global coordinate system is located at the centroid of the point cloud, the matrix $W$ can be factorized into
+		\begin{equation}\label{eq:factorization_method}
+			W = MS,
 		\end{equation}
-		where $R \in \mathbb{R}^{2n \times 3}$ contains the orientation vectors of each camera and $S \in \mathbb{R}^{3 \times m}$  are the 3D points.
-		As described by \cite{tomasi1992factorization}, this factorization can be achieved using the singular value decomposition (SVD) as $W = U \varSigma V^\top$ and deriving $R$ and $S$ from $U$, $V$ and $\varSigma$.
+		where $M \in \mathbb{R}^{2n \times 3}$ contains the $2 \times 3$ projection matrices of each camera and $S \in \mathbb{R}^{3 \times m}$  are the points of the observed 3D shape.
+		As described by \cite{tomasi1992factorization}, this factorization can be achieved using the singular value decomposition (SVD) as $W = U \varSigma V^\top$ and deriving $M$ and $S$ from $U$, $V$ and $\varSigma$.
 		\todo{Add more details? Less details?}
-		This factorization method was later extended by \cite{sturm1996factorization} for perspective cameras.
 		
-	\section{Camera Location Estimation}
-		To estimate the location and orientation of the cameras, one needs to find the rotation matrices $R_i \in \mathbb{R}^{3 \times 3}$ and translations $t_i \in \mathbb{R}^{3}$ for each of the cameras.
+		This factorization method has some disadvantages.
+		First, it can not be applied to the commonly used perspective projection model, although it is approximated by the orthographic model for distant objects.
+		The works of \cite{sturm1996factorization} and \cite{christy1996euclidean} have extended the factorization method for perspective projection using an iterative process.
+		Second, in order for the factorization method to work, all points of the shape must be visible in every frame, i.e. to obtain the measurement matrix one needs to find the correspondences across all frames.
 		
-		\todo{?? This might be the focus of the thesis}
+	\section{Bundle Adjustment} 
+		Another method to solve multi-view SfM is the method of \emph{bundle adjustment}.
+		It is the most general technique for simultaneously recovering 3D shape and camera pose, but it is also computationally expensive.
+		The bundle adjustment technique aims to minimize the re-projection error of the unknown 3D points and camera matrices.
+		The re-projection error is formulated as the euclidean distance between the known image coordinates and the projection of the unknown points using the unknown camera matrices.
 		
+		More formally, let 
+			$\left \lbrace C_j \right \rbrace_{j = 1}^{m}$ 
+		be the (unknown) camera matrices that encode location, rotation and intrinsic parameters, let 
+			$\left \lbrace p_i \right \rbrace_{i = 1}^{n}$ 
+		denote the (unknown) 3D points and let $x_{ij}$ be the (known) observed 2D coordinates of the point $p_i$ in camera $j$.
+		Then, the objective of bundle adjustment is defined as
+		\begin{equation}\label{eq:bundle_adjustment}
+			\begin{aligned}
+				& \underset{\left\lbrace p_i \right\rbrace, \left\lbrace C_j \right\rbrace}{\text{min}}
+				& & \sum_{i = 1}^{n} \sum_{j = 1}^{m} v(i, j) \left\| P(C_j, p_i) - x_{ij} \right\|_2 ,
+			\end{aligned}
+		\end{equation}
+		where $v(i, j)$ denotes the visibility of point $i$ in camera $j$ and $P$ is the projection operation with homogeneous division.
+		This optimization problem is non-convex and as explained by \cite{survey2017} na\"ive optimization algorithms achieve only a poor local minimum.
+		One approach to find a better local minimum is to initialize using an other SfM algorithm such as the factorization method.
+		
+%	\section{Camera Location Estimation}
+%		To estimate the location and orientation of the cameras, one needs to find the rotation matrices $R_i \in \mathbb{R}^{3 \times 3}$ and translations $t_i \in \mathbb{R}^{3}$ for each of the cameras.
+%		
+%		\todo{?? This might be the focus of the thesis}
+%		
 	
 	\section{2015 - PoseNet}
-		
 		The PoseNet, as proposed by \cite{kendall2015posenet}, is a CNN that performs regression for the location and orientation of the camera given a single image as input.
 		It outputs a 7D vector that describes the pose $p = [x, q]^\top$ as the camera location $x$ (3D) and orientation $q$ (4D quaternion).
 		They simultaneously learn location and orientation with the euclidean loss
