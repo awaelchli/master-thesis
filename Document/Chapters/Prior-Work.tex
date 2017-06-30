@@ -141,6 +141,10 @@
 		\todo{connection to other work?}
 		
 		
+	\section{04/2016 - 3d-r2n2: A unified approach for single and multi-view 3d object reconstruction}
+		
+		\cite{choy20163d}
+		
 	\section{07/2016 - Unsupervised CNN for Single View Depth Estimation}
 		
 		The work of \cite{garg2016} implements a autoencoder on stereo pair images to predict depth from a single image.
@@ -244,6 +248,36 @@
 		When working with realistic data, it is important to make the model robust to non-static objects in the scenes, occlusions and non-Lambertian surfaces.
 		To do this, the network is forced to additionally learn a per-pixel mask for each target-source pair.
 		They add a regularization term to force the mask to have non-zero values.
+		
+	\section{04/2017 - DeMoN: Depth and Motion Network for Learning Monocular Stereo}
+		
+		\cite{ummenhofer2016demon} propose a network architecture to learn depth, motion as well as optical flow and surface normals from two images.
+		
+		Network architecture:
+		\begin{itemize}
+			\item \textbf{Bootstrap network}
+				\\
+				Consists of a pair of encoder-decoder networks.
+				The first encoder-decoder predicts optical flow and its confidence.
+				The second encoder-decoder takes the previously computed optical flow and confidence, as well as the original image pair and a warp of the second image using the estimated flow.
+				In addition, there are three fully connected layers predicting motion.
+				By taking the image pair as input, the network can make use of motion parallax.
+			\item \textbf{Iterative network}
+				\\
+				The architecture is identical to the bootstrap network, but takes additional inputs.
+				It is applied iteratively with the idea to improve previous estimates of depth, normals and motion.
+				The network is trained using four iterations.
+			\item \textbf{Refinement network}
+				\\
+				Up-samples the low resolution predictions to the full image resolution.
+		\end{itemize}
+		Motion is parameterized using an axis-angle representation and depth is estimated by its inverse value $1 / z$ in order to represent points at infinity.
+		For surface normals, motion and optical flow they use the euclidean loss and for depth L1.
+		In addition to the point wise loss for depth, they define a scale invariant gradient loss that penalizes relative depth errors between neighboring pixels.
+		
+		Datasets used: {SUN3D}, {RGB-D SLAM}, {MVS}, {Scenes11}, {NYUv2}
+		
+		
 		
 	\section{05/2017 - Relative Camera Pose Estimation Using Convolutional Neural Networks}
 	
