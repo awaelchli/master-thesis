@@ -21,10 +21,11 @@
 	
 
 	\section{The Eight Point Algorithm}
-		The eight point algorithm, as introduced by \cite{longuet1981}, 
-		The \emph{essential matrix} is defined as 
+		The eight point algorithm, as introduced by \cite{longuet1981}, makes use of the epipolar geometry between a pair of views in order to compute relative translation and orientation of the cameras.
+		The relationship between the two camera views is described by the so-called \emph{essential matrix}.
+		It is defined as 
 		\begin{equation}\label{eq:essential_matrix}
-			E = \left[ t \right]_\times R,
+			E = \left[ t \right]_\times \! R,
 		\end{equation}
 		where $\left[ t \right]_\times$ is the matrix that computes the cross-product between $t$ and an arbitrary vector.
 		It describes the relationship between corresponding points in the image planes of the two cameras.
@@ -252,8 +253,7 @@
 	\section{04/2017 - DeMoN: Depth and Motion Network for Learning Monocular Stereo}
 		
 		\cite{ummenhofer2016demon} propose a network architecture to learn depth, motion as well as optical flow and surface normals from two images.
-		
-		Network architecture:
+		The network architecture consists of three subnetworks in sequence:
 		\begin{itemize}
 			\item \textbf{Bootstrap network}
 				\\
@@ -275,9 +275,9 @@
 		For surface normals, motion and optical flow they use the euclidean loss and for depth L1.
 		In addition to the point wise loss for depth, they define a scale invariant gradient loss that penalizes relative depth errors between neighboring pixels.
 		
-		Datasets used: {SUN3D}, {RGB-D SLAM}, {MVS}, {Scenes11}, {NYUv2}
-		
-		
+		They evaluate the performance of the network on various datasets: {SUN3D}, {RGB-D SLAM}, {MVS}, {Scenes11}, and {NYUv2}.
+		The results show that estimating normals and flow in addition to depth and motion slightly improves the performance of the system.
+		Compared to works for depth from a single image, their results demonstrate that the network learns to use motion parallax from the stereo images to generalize better to scenes that heavily differ from the examples seen during training.
 		
 	\section{05/2017 - Relative Camera Pose Estimation Using Convolutional Neural Networks}
 	
