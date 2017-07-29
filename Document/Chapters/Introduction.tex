@@ -3,13 +3,13 @@
 	\section{Relative Camera Pose}
 		Equations to transform pose in world coordinates to relative pose with respect to the coordinate frame of the first camera.
 		\begin{equation}
-			R_{2 \rightarrow 1} = R_{\text{w} \rightarrow 1} R_{2 \rightarrow \text{w}}
-								= R_{1 \rightarrow \text{w}}^{-1} R_{2 \rightarrow \text{w}}
-								= R_{1 \rightarrow \text{w}}^{\top} R_{2 \rightarrow \text{w}}
+			\matr{R}_{2 \rightarrow 1} 	= \matr{R}_{\text{w} \rightarrow 1} \matr{R}_{2 \rightarrow \text{w}}
+										= \matr{R}_{1 \rightarrow \text{w}}^{-1} \matr{R}_{2 \rightarrow \text{w}}
+										= \matr{R}_{1 \rightarrow \text{w}}^{\top} \matr{R}_{2 \rightarrow \text{w}}
 		\end{equation}
 		
 		\begin{equation}
-			t_{2 \rightarrow 1} = R_{1 \rightarrow \text{w}}^{\top} (t_2 - t_1)
+			\matr{R}_{2 \rightarrow 1} = \matr{R}_{1 \rightarrow \text{w}}^{\top} (\matr{t}_2 - \matr{t}_1)
 		\end{equation}
 
 	\section{Two-Frame Structure from Motion}
