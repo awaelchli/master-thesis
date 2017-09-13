@@ -19,3 +19,49 @@
 	\section{Two-Frame Structure from Motion}
 	
 	\section{Multiview Structure from Motion}
+	
+	\section{Quaternions}
+		Quaternions are four-dimensional numbers.
+		They are an extension of the complex numbers\footnote{A more appropriate name is \emph{compound numbers}.\todo{disputable}}.
+		Formally, a quaternion is defined as $\vectr{q} = w + \vectr{i}x + \vectr{j}y + \vectr{k}z$ where $w, x, y, z \in \mathbb{R}$ and $\vectr{i},\vectr{j}$ and $\vectr{k}$ are the basis elements of the quaternion space.
+		The  can also be written as a tuple $\vectr{q} = (w, x, y, z) \in \mathbb{R}^4$ by using the notation
+		\begin{equation}
+			\vectr{1} = 
+			\begin{bmatrix}
+				1 \\ 
+				0 \\ 
+				0 \\ 
+				0
+			\end{bmatrix},\quad
+			\vectr{i} = 
+			\begin{bmatrix}
+				0 \\ 
+				1 \\ 
+				0 \\ 
+				0
+			\end{bmatrix},\quad
+			\vectr{j} = 
+			\begin{bmatrix}
+				0 \\ 
+				0 \\ 
+				1 \\ 
+				0
+			\end{bmatrix},\quad
+			\vectr{k} =
+			\begin{bmatrix}
+				0 \\ 
+				0 \\ 
+				0 \\ 
+				1
+			\end{bmatrix}.
+		\end{equation}
+		But quaternions are not just tuples of numbers. 
+		They are equipped with a separate addition and multiplication.
+		Addition is simply carried out element-wise, whereas multiplication makes use of the distributive rule and the property
+		\begin{equation}
+			\vectr{i}^2 = \vectr{j}^2 = \vectr{k}^2 = \vectr{i}\vectr{j}\vectr{k} = -1.
+		\end{equation}
+		
+		
+	
+	\section{PyTorch}
