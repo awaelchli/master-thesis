@@ -61,7 +61,18 @@
 		\begin{equation}
 			\vectr{i}^2 = \vectr{j}^2 = \vectr{k}^2 = \vectr{i}\vectr{j}\vectr{k} = -1.
 		\end{equation}
+		The norm of a quaternion is defined as
+		\begin{equation}
+			\lVert \vectr{q} \rVert = \sqrt{w^2 + x^2 + y^2 + z^2}.
+		\end{equation}
 		
-		
+		A very interesting subset of the quaternions are the unit quaternions. These are all the quaternions with $\lVert \vectr{q} \rVert = 1$. 
+		The quaternions of this form describe 3D rotations and can be parameterized by
+		\begin{equation}
+			\cos\left(\tfrac{\theta}{2}\right) + 
+			\sin\left(\tfrac{\theta}{2}\right) \left(a_1 \vectr{i} + a_2 \vectr{j} + a_3 \vectr{k}\right),
+		\end{equation}
+		where $\theta \in \mathbb{R}$ is the angle of rotation around a unit-length axis $\vectr{a} = (a_1, a_2, a_3) \in \mathbb{R}^3$.
+		\todo{explain that quaternions are not unique representation of rotations, and that negative axis-angle is represented by the same quaternion}
 	
 	\section{PyTorch}
