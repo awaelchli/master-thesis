@@ -2,16 +2,6 @@
 
 	\section{Relative Camera Pose}
 		Equations to transform pose in world coordinates to relative pose with respect to the coordinate frame of the first camera.
-		\begin{equation}
-			\matr{R}_{2 \rightarrow 1} 	= \matr{R}_{\text{w} \rightarrow 1} \matr{R}_{2 \rightarrow \text{w}}
-										= \matr{R}_{1 \rightarrow \text{w}}^{-1} \matr{R}_{2 \rightarrow \text{w}}
-										= \matr{R}_{1 \rightarrow \text{w}}^{\top} \matr{R}_{2 \rightarrow \text{w}}
-		\end{equation}
-		
-		\begin{equation}
-			\matr{R}_{2 \rightarrow 1} = \matr{R}_{1 \rightarrow \text{w}}^{\top} (\matr{t}_2 - \matr{t}_1)
-		\end{equation}
-
 
 	\section{Rotation Metrics}
 	\cite{huynh2009metrics}
@@ -20,11 +10,49 @@
 	
 	\section{Multiview Structure from Motion}
 	
-	\section{Quaternions}
+	\section{Camera Pose and Transformations}
+		The camera pose, also known as the \emph{extrinsic parameters}, is a combination of position and orientation.
+		Together, they define a coordinate transformation from the camera coordinate frame to the world coordinate frame.
+		Such a transformation is commonly represented by a translation vector $\vectr{t} \in \mathbb{R}^3$ and a rotation matrix $\matr{R} \in SO(3)$. 
+		Together, they describe a rigid transformation which can also be written as a $4 \times 4$ matrix of the form
+		\begin{equation}
+			\matr{T} = 
+			\begin{bmatrix}
+				\matr{R} 	& \vectr{t} \\
+				0 			& 1
+			\end{bmatrix} 
+			\in SE(3).
+		\end{equation}
+		\todo{Insert a figure showing: world coordinate frame, camera coordinate frame, transformation matrix}
+		
+		In Structure from Motion, there is not only one camera, but many cameras with different transformations.
+		This is also the case in this work, but the sequence of transformations is ordered according to the path of the camera motion. 
+		Specifically, we deal with a sequence of rotations $\matr{R}_1, \dots, \matr{R}_n$ and translations $\vectr{t}_1, \dots, \vectr{t}_n$. 
+		Depending on how the poses are obtained, they are all relative to a common (world) coordinate frame.
+		Sometimes it is useful to have the coordinate frame of the first camera transform be the common frame for all transformations.
+		This can be achieved by applying the transformations
+		\begin{align*}
+			\matr{R}_{i}^\prime 	&= \matr{R}_{1}^{\top} \matr{R}_{i} \\
+			\vectr{t}_{i}^\prime 	&= \matr{R}_{1}^{\top} (\vectr{t}_i - \vectr{t}_1)
+		\end{align*}
+%		\begin{equation}
+%			\matr{R}_{i \rightarrow 1} 	= \matr{R}_{\text{w} \rightarrow 1} \matr{R}_{i \rightarrow \text{w}}
+%										= \matr{R}_{1 \rightarrow \text{w}}^{-1} \matr{R}_{i \rightarrow \text{w}}
+%										= \matr{R}_{1 \rightarrow \text{w}}^{\top} \matr{R}_{i \rightarrow \text{w}}
+%		\end{equation}
+%		\begin{equation}
+%		\vectr{t}_{i \rightarrow 1} = \matr{R}_{1 \rightarrow \text{w}}^{\top} (\vectr{t}_i - \vectr{t}_1)
+%		\end{equation}
+		to get the new relative rotation $\matr{R}_{i}^\prime$ and relative translation $\vectr{t}_{i}^\prime$.
+		Note that for $i = 1$ we obtain $\matr{R}_{1}^\prime = \matr{I}$ and $\vectr{t}_{1}^\prime = \vectr{0}$.
+		
+		\noindent\rule{2cm}{0.4pt}
+		
+		
 		Quaternions are four-dimensional numbers.
 		They are an extension of the complex numbers\footnote{A more appropriate name is \emph{compound numbers}.\todo{disputable}}.
 		Formally, a quaternion is defined as $\vectr{q} = w + \vectr{i}x + \vectr{j}y + \vectr{k}z$ where $w, x, y, z \in \mathbb{R}$ and $\vectr{i},\vectr{j}$ and $\vectr{k}$ are the basis elements of the quaternion space.
-		The  can also be written as a tuple $\vectr{q} = (w, x, y, z) \in \mathbb{R}^4$ by using the notation
+		The quaternion can also be written as a tuple $\vectr{q} = (w, x, y, z) \in \mathbb{R}^4$ by using the notation
 		\begin{equation}
 			\vectr{1} = 
 			\begin{bmatrix}
