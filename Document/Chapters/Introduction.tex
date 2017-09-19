@@ -31,10 +31,13 @@
 		Depending on how the poses are obtained, they are all relative to a common (world) coordinate frame.
 		Sometimes it is useful to have the coordinate frame of the first camera transform be the common frame for all transformations.
 		This can be achieved by applying the transformations
-		\begin{align*}
-			\matr{R}_{i}^\prime 	&= \matr{R}_{1}^{\top} \matr{R}_{i} \\
-			\vectr{t}_{i}^\prime 	&= \matr{R}_{1}^{\top} (\vectr{t}_i - \vectr{t}_1)
-		\end{align*}
+		\begin{align}
+			\label{eq:relative_rotation_conversion}
+			\begin{split}
+				\matr{R}_{i}^\prime 	&= \matr{R}_{1}^{\top} \matr{R}_{i} \\
+				\vectr{t}_{i}^\prime 	&= \matr{R}_{1}^{\top} (\vectr{t}_i - \vectr{t}_1)
+			\end{split}
+		\end{align}
 %		\begin{equation}
 %			\matr{R}_{i \rightarrow 1} 	= \matr{R}_{\text{w} \rightarrow 1} \matr{R}_{i \rightarrow \text{w}}
 %										= \matr{R}_{1 \rightarrow \text{w}}^{-1} \matr{R}_{i \rightarrow \text{w}}
@@ -89,12 +92,12 @@
 		\begin{equation}
 			\vectr{i}^2 = \vectr{j}^2 = \vectr{k}^2 = \vectr{i}\vectr{j}\vectr{k} = -1.
 		\end{equation}
-		The norm of a quaternion is defined as
+		Furthermore, the norm of a quaternion is defined as
 		\begin{equation}
 			\lVert \vectr{q} \rVert = \sqrt{w^2 + x^2 + y^2 + z^2}.
 		\end{equation}
 		
-		A very interesting subset of the quaternions are the unit quaternions. These are all the quaternions with $\lVert \vectr{q} \rVert = 1$. 
+		In this thesis, we are particularly interested in the subset of quaternions called the \emph{unit quaternions}. These are all the quaternions with unit norm, i.e. $\lVert \vectr{q} \rVert = 1$. 
 		The quaternions of this form describe 3D rotations and can be parameterized by
 		\begin{equation}
 			\cos\left(\tfrac{\theta}{2}\right) + 
