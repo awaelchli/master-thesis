@@ -50,8 +50,18 @@
 		Note that for $i = 1$ we obtain $\matr{R}_{1}^\prime = \matr{I}$ and $\vectr{t}_{1}^\prime = \vectr{0}$.
 		
 		\noindent\rule{2cm}{0.4pt}
+		\todo{make good transition}
 		
+		So far, we have seen rotations represented as matrices. 
+		However, it is redundant to describe rotations with nine numbers when in fact there are only three degrees of freedom for a three-dimensional rotation, i.e. two degrees for the orientation of the axis and one for the angle of rotation around the axis.
+		It is also not straightforward to interpolate rotations in $SO(3)$, or to find the best approximation for a matrix that lies outside of $SO(3)$.\todo{citation needed}
 		
+		Below we discuss and compare three other popular representations used to describe rotations.
+		\paragraph{Euler Angles}
+		
+		\paragraph{Axis-Angle}
+		
+		\paragraph{Quaternions}
 		Quaternions are four-dimensional numbers.
 		They are an extension of the complex numbers\footnote{A more appropriate name is \emph{compound numbers}.\todo{disputable}}.
 		Formally, a quaternion is defined as $\vectr{q} = w + \vectr{i}x + \vectr{j}y + \vectr{k}z$ where $w, x, y, z \in \mathbb{R}$ and $\vectr{i},\vectr{j}$ and $\vectr{k}$ are the basis elements of the quaternion space.
