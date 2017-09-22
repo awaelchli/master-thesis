@@ -57,6 +57,25 @@
 		It is also not straightforward to interpolate rotations in $SO(3)$, or to find the best approximation for a matrix that lies outside of $SO(3)$.\todo{citation needed}
 		
 		Below we discuss and compare three other popular representations used to describe rotations.
+		A brief overview is also shown in table~\ref{tbl:comparison_representations_of_rotations}.
+		\begin{table}
+			\small
+			\begin{center}
+				\begin{tabular}{|l|p{2.5cm}|p{2.5cm}|p{2.5cm}|p{2.5cm}|}
+					\hline
+					& Euler angles & Matrix & Axis-angle & Unit quaternion \\ \hline
+					Typical use case & Robotics, Avionics & Computer Graphics, Physics & Intermediate representation & Computer Graphics, Physics \\ \hline
+					Constraint & None & Orthonormality & Unit norm axis & 4D unit sphere \\ \hline
+					Disadvantage & Gimbal lock & Numerically unstable & & Less intuitive \\ \hline
+					Interpolation & hard & hard & hard & easy \\ \hline
+					Identity rotation & ambiguous & unique & ambiguous &unique \\ 
+					\hline
+				\end{tabular}
+			\end{center}
+			\label{tbl:comparison_representations_of_rotations}
+			\caption[short text]{text}
+		\end{table}
+		
 		\paragraph{Euler Angles}
 		
 		\paragraph{Axis-Angle}
