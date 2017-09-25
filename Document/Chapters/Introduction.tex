@@ -31,8 +31,7 @@
 		Depending on how the poses are obtained, they are all relative to a common (world) coordinate frame.
 		Sometimes it is useful to have the coordinate frame of the first camera transform be the common frame for all transformations.
 		This can be achieved by applying the transformations
-		\begin{align}
-			\label{eq:relative_rotation_conversion}
+		\begin{align}\label{eq:relative_rotation_conversion}
 			\begin{split}
 				\matr{R}_{i}^\prime 	&= \matr{R}_{1}^{\top} \matr{R}_{i} \\
 				\vectr{t}_{i}^\prime 	&= \matr{R}_{1}^{\top} (\vectr{t}_i - \vectr{t}_1)
@@ -135,4 +134,62 @@
 		where $\theta \in \mathbb{R}$ is the angle of rotation around a unit-length axis $\vectr{a} = (a_1, a_2, a_3) \in \mathbb{R}^3$.
 		\todo{explain that quaternions are not unique representation of rotations, and that negative axis-angle is represented by the same quaternion}
 	
+	
+	\section{Recurrent Neural Networks}
+		\todo{Need references to early works on RNNs}
+		
+		From colah's blog.
+		
+		
+		$r \colon \mathbb{R}^n \times \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}^d \times \mathbb{R}^d$
+		\begin{align}\label{eq:Vanilla-LSTM-Definition}
+			%\begin{split}
+				\begin{bmatrix}
+					\vectr{i} \\ 
+					\vectr{f} \\ 
+					\vectr{o} \\ 
+					\vectr{g}
+				\end{bmatrix}
+				&=
+				\begin{bmatrix}
+					\sigma \\ 
+					\sigma \\ 
+					\sigma \\ 
+					\tanh
+				\end{bmatrix}
+				\left(
+				\matr{W}
+				\begin{bmatrix}
+					\vectr{x}_t \\
+					\vectr{h}_{t-1}
+				\end{bmatrix}
+				+
+				\begin{bmatrix}
+					\vectr{b}_i \\ 
+					\vectr{b}_f \\ 
+					\vectr{b}_o \\ 
+					\vectr{b}_g
+				\end{bmatrix}
+				\right)
+				\\
+				\vectr{c}_t &= \vectr{i} \odot \vectr{g} + \vectr{f} \odot \vectr{c}_{t-1} \\
+				\vectr{h}_t &= \vectr{o} \odot \tanh(\vectr{c}_{t})
+			%\end{split}
+		\end{align}
+		The matrix $\matr{W} \in \mathbb{R}^{4d \times (n + d)}$ contains the weights for the input- and hidden state transformations before each gate.
+		It can be broken down into four parts:
+		\begin{align}
+			\matr{W} &=
+			\begin{bmatrix}
+				\vectr{W}_i \\ 
+				\vectr{W}_f \\ 
+				\vectr{W}_o \\ 
+				\vectr{W}_g
+			\end{bmatrix}
+		\end{align}
+		\todo{Insert a graphic with all the connections between gates, input, output}
+		
 	\section{PyTorch}
+		PyTorch is a deep learning framework for Python that comes with a rich tensor library.
+		It differs from other libraries (TensorFlow, Caffe, Theano and more) in the sense that it builds the computational graph dynamically at runtime.
+		This flexibility allows for controlling the computational flow while training or testing the network.
