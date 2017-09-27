@@ -136,12 +136,83 @@
 	
 	
 	\section{Recurrent Neural Networks}
+		\newcommand{\imagecourtesycolah}{Image courtesy Christopher Olah \mbox{\href{http://colah.github.io/}{(colah.github.io)}}}
 		\todo{Need references to early works on RNNs}
+		So far, we have looked at the feed-forward network, which is function that maps an input $\vectr{x}$ to an output $\vectr{y} = f(\vectr{x})$.
+		It will always compute the same output for the same input, independently of the input-output pairs it has seen before.
+		Now consider a sequence $\vectr{x}_1, \dots, \vectr{x}_T$ of inputs (e.g. a sentence).
+		How can we learn to predict an attribute that depends on the whole sequence (e.g. the sentiment of the sentence)?
+		One way is to concatenate the sequence to one vector and use the feed-forward network.
+		However, this will limit the sequence length to a fixed size and potentially requires more training data.
+		\todo{need reference for this statement}.
+		How do we model predictions for a variable sequence length?
+		And what if we want also the output to be a sequence? 
+		What if the output sequence needs to have a different length than the input sequence, such as in machine translation? 
+		\todo{citation needed}
 		
-		From colah's blog.
+		This is where the recurrent neural network (RNN) comes into play.
+		It is a function that maps each vector $\vectr{x}_t \in \mathbb{R}^n$ from the sequence to a hidden state
+		\begin{eqnarray}
+			\vectr{h}_t = R(\vectr{x}_t, \vectr{h}_{t-1}), & &t = 1, \dots, T
+		\end{eqnarray}
+		with the hidden state $\vectr{h}_{t-1} \in \mathbb{R}^d$ carried over from the previous prediction as a second input, where $d$ is called the \emph{hidden size} of the RNN. 
+		The hidden state represents the accumulated knowledge from all previous inputs.
+		This way, the output at each time step $t$ depends on the inputs from $\vectr{x}_1$ to $\vectr{x}_{t - 1}$.
+		\begin{figure}[tb]
+			\centering
+			\includegraphics[width=0.9\linewidth]{Images/LSTM/RNN-unrolled}
+			\caption[Unfolding the RNN]
+			{Unfolding the RNN. Left: The RNN as a cyclic graph. 
+				Right: Unfolded RNN for a number of timesteps.
+				\imagecourtesycolah}
+			\label{fig:RNN-unrolled}
+		\end{figure}
+		Figure~\ref{fig:RNN-unrolled} shows the RNN as a looping component.
+		When unfolded, one can see the information flow from one state to the next.
+		Note that it is possible to feed arbitrary sizes of sequences to the RNN.
 		
+		The simplest implementation of an RNN uses an affine transformation followed by a non-linear function:
+		\begin{equation}
+			\vectr{h}_t = 
+			\tanh \left(
+			\matr{W}
+			\begin{bmatrix}
+				\vectr{x}_t \\
+				\vectr{h}_{t-1}
+			\end{bmatrix}
+			+ \vectr{b}
+			\right)
+		\end{equation}
+		The weight matrix $\matr{W}$ has dimensions $d \times (n + d)$.
+		Sometimes it is desirable to have an output that has a different size than the hidden state (e.g. for classification).
+		In this case one can apply a second affine layer
+		\begin{equation}
+			\vectr{y}_t = \matr{V} \vectr{h}_t + \vectr{c}
+		\end{equation}
+		to obtain the prediction $\vectr{y}_t$.
+		Otherwise we define the output as $\vectr{y}_t = \vectr{h}_t$.
 		
-		$r \colon \mathbb{R}^n \times \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}^d \times \mathbb{R}^d$
+		Training an RNN is not much different from a feed-forward network.
+		The weights $\vectr{W}, \vectr{V}, \vectr{b}$ and $\vectr{c}$ are updated in the same fashion as for feed-forward networks using gradient descent on the loss function.
+		Say we define a criterion $L(\vectr{y}_t, \vectr{\hat{y}}_t)$ for the loss between prediction and ground-truth at each time step $t$.
+		Then, the total loss for the sequence is simply 
+		\begin{equation}
+			L(\{\vectr{y}_1, \dots \vectr{y}_T\}, \{\vectr{\hat{y}}_1, \dots \vectr{\hat{y}}_T\}) = \sum_{t=1}^{T} L(\vectr{y}_t, \vectr{\hat{y}}_t).
+		\end{equation}
+		The gradient computation is the same as for feed-forward networks and the back-propagation algorithm can be applied by unfolding the RNN as shown in figure~\ref{fig:RNN-unrolled}.
+		
+		\begin{figure}[tb]
+			\centering
+			\includegraphics[width=0.9\linewidth]{Images/LSTM/LSTM3-chain}\\
+			\vspace{5mm}
+			\includegraphics[width=0.5\linewidth]{Images/LSTM/LSTM2-notation}
+			\caption[Unfolded LSTM cell]
+					{Unfolded LSTM cell. 
+					\imagecourtesycolah}
+			\label{fig:LSTM3-chain}
+		\end{figure}
+		\todo{Transition from RNN to LSTM (gradient vanishing)}
+		$R \colon \mathbb{R}^n \times \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}^d \times \mathbb{R}^d$
 		\begin{align}\label{eq:Vanilla-LSTM-Definition}
 			%\begin{split}
 				\begin{bmatrix}
