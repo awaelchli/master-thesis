@@ -116,7 +116,7 @@
 		\end{equation}
 		But quaternions are not just tuples of numbers. 
 		They are equipped with a separate addition and multiplication.
-		Addition is simply carried out element-wise, whereas multiplication makes use of the distributive rule and the property
+		Addition is simply carried out element-wise as for vectors, whereas multiplication makes use of the distributive rule and the property
 		\begin{equation}
 			\vectr{i}^2 = \vectr{j}^2 = \vectr{k}^2 = \vectr{i}\vectr{j}\vectr{k} = -1.
 		\end{equation}
@@ -128,6 +128,7 @@
 		In this thesis, we are particularly interested in the subset of quaternions called the \emph{unit quaternions}. These are all the quaternions with unit norm, i.e. $\lVert \vectr{q} \rVert = 1$. 
 		The quaternions of this form describe 3D rotations and can be parameterized by
 		\begin{equation}
+			\vectr{q} = 
 			\cos\left(\tfrac{\theta}{2}\right) + 
 			\sin\left(\tfrac{\theta}{2}\right) \left(a_1 \vectr{i} + a_2 \vectr{j} + a_3 \vectr{k}\right),
 		\end{equation}
@@ -194,13 +195,36 @@
 		
 		Training an RNN is not much different from a feed-forward network.
 		The weights $\vectr{W}, \vectr{V}, \vectr{b}$ and $\vectr{c}$ are updated in the same fashion as for feed-forward networks using gradient descent on the loss function.
-		Say we define a criterion $L(\vectr{y}_t, \vectr{\hat{y}}_t)$ for the loss between prediction and ground-truth at each time step $t$.
+		Say we define a criterion $L_t(\vectr{y}_t, \vectr{\hat{y}}_t)$ for the loss between prediction and ground-truth at each time step $t$.
 		Then, the total loss for the sequence is simply 
 		\begin{equation}
-			L(\{\vectr{y}_1, \dots \vectr{y}_T\}, \{\vectr{\hat{y}}_1, \dots \vectr{\hat{y}}_T\}) = \sum_{t=1}^{T} L(\vectr{y}_t, \vectr{\hat{y}}_t).
+			L(\{\vectr{y}_1, \dots \vectr{y}_T\}, \{\vectr{\hat{y}}_1, \dots \vectr{\hat{y}}_T\}) = \sum_{t=1}^{T} L_t(\vectr{y}_t, \vectr{\hat{y}}_t).
 		\end{equation}
-		The gradient computation is the same as for feed-forward networks and the back-propagation algorithm can be applied by unfolding the RNN as shown in figure~\ref{fig:RNN-unrolled}.
+		The gradient computation is almost the same as for feed-forward networks and the back-propagation algorithm can be applied by unfolding the RNN as shown in figure~\ref{fig:RNN-unrolled}.
+		However, there is a problem with the gradient computation in the above version of the RNN (\cite{pascanu2013difficulty}, \cite{bengio1994learning}).
+		For long sequences, the gradient norm can become very small and this hurts the training.
+		The RNN is not able to learn long-term dependencies when the gradient vanishes.
+		To see this, let's write down the full equation for the gradient:
+		\begin{equation}
+			\frac{\partial L}{\partial \vectr{w}}
+			= \sum_{t=1}^{T} 
+				\frac{\partial L_t}{\partial \vectr{w}}
+			= \sum_{t=1}^{T} 
+				\sum_{k=0}^{t} 
+					\frac{\partial L_t}{\partial \vectr{y}_t}
+					\frac{\partial \vectr{y}_t}{\partial \vectr{h}_t}
+					\left(
+						\prod_{j=k+1}^{t} \frac{\partial \vectr{h}_j}{\partial \vectr{h}_{j-1}}
+					\right)
+					\frac{\partial \vectr{h}_{k}}{\partial \vectr{w}}
+		\end{equation}
+		In the above equation, we have the product term that causes the problem when the sequence is very long.
+		Note that the partial derivatives are Jacobian matrices when we take the derivatives of a vector-valued function with respect to a vector.
+		Due to many multiplications, the gradient values drop exponentially.
+		\todo{Need a better explanation why values are <1 and drop exponentially}
+		A more complete analysis is provided in \cite{pascanu2013difficulty}.
 		
+	\section{The Long Short-Term Memory}
 		\begin{figure}[tb]
 			\centering
 			\includegraphics[width=0.9\linewidth]{Images/LSTM/LSTM3-chain}\\
@@ -211,10 +235,16 @@
 					\imagecourtesycolah}
 			\label{fig:LSTM3-chain}
 		\end{figure}
-		\todo{Transition from RNN to LSTM (gradient vanishing)}
-		$R \colon \mathbb{R}^n \times \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}^d \times \mathbb{R}^d$
+		The Long Short-Term Memory (LSTM) is a version of the RNN that was designed to overcome the vanishing gradient problem described above, and it is also used in this thesis.
+		As shown in figure~\ref{fig:LSTM3-chain}, it introduces four gates (in yellow) and an additional cell state variable that is carried over from one time step to the next.
+		The recurrence can be formulated as a function 
+		% $R \colon \mathbb{R}^n \times \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}^d \times \mathbb{R}^d$
+		\begin{align}
+			(\vectr{h}_t, \vectr{c}_t) = R(\vectr{x}_t, \vectr{h}_{t-1}, \vectr{c}_{t-1}), & & t = 1, \dots, T.
+		\end{align}
+		More precisely, the hidden state and cell state are computed as follows:
 		\begin{align}\label{eq:Vanilla-LSTM-Definition}
-			%\begin{split}
+			\begin{split}
 				\begin{bmatrix}
 					\vectr{i} \\ 
 					\vectr{f} \\ 
@@ -245,7 +275,7 @@
 				\\
 				\vectr{c}_t &= \vectr{i} \odot \vectr{g} + \vectr{f} \odot \vectr{c}_{t-1} \\
 				\vectr{h}_t &= \vectr{o} \odot \tanh(\vectr{c}_{t})
-			%\end{split}
+			\end{split}
 		\end{align}
 		The matrix $\matr{W} \in \mathbb{R}^{4d \times (n + d)}$ contains the weights for the input- and hidden state transformations before each gate.
 		It can be broken down into four parts:
@@ -258,7 +288,13 @@
 				\vectr{W}_g
 			\end{bmatrix}
 		\end{align}
-		\todo{Insert a graphic with all the connections between gates, input, output}
+		We can see that there are three additional gates that control information flow with a sigmoid activation.
+		If the sigmoid output is one, all information is let through, otherwise no information passes the gate. 
+		
+		The first is the input gate $\vectr{i}$.
+		It controls how much information should be collected from the current input and hidden state.
+		The second is the forget gate $\vectr{f}$, which will learn what information should be discarded from the previous cell state.
+		Finally, the output gate $\vectr{o}$ regulates the amount of information that goes to the output $\vectr{h}_t$.
 		
 	\section{PyTorch}
 		PyTorch is a deep learning framework for Python that comes with a rich tensor library.
