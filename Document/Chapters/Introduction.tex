@@ -13,7 +13,7 @@
 	\section{Camera Pose and Transformations}
 		The camera pose, also known as the \emph{extrinsic parameters}, is a combination of position and orientation.
 		Together, they define a coordinate transformation from the camera coordinate frame to the world coordinate frame.
-		Such a transformation is commonly represented by a translation vector $\vectr{t} \in \mathbb{R}^3$ and a rotation matrix $\matr{R} \in SO(3)$. 
+		Such a transformation is commonly represented by a translation vector $\vectr{t} \in \R^3$ and a rotation matrix $\matr{R} \in SO(3)$. 
 		Together, they describe a rigid transformation which can also be written as a $4 \times 4$ matrix of the form
 		\begin{equation}
 			\matr{T} = 
@@ -82,8 +82,8 @@
 		\paragraph{Quaternions}
 		Quaternions are four-dimensional numbers.
 		They are an extension of the complex numbers\footnote{A more appropriate name is \emph{compound numbers}.\todo{disputable}}.
-		Formally, a quaternion is defined as $\vectr{q} = w + \vectr{i}x + \vectr{j}y + \vectr{k}z$ where $w, x, y, z \in \mathbb{R}$ and $\vectr{i},\vectr{j}$ and $\vectr{k}$ are the basis elements of the quaternion space.
-		The quaternion can also be written as a tuple $\vectr{q} = (w, x, y, z) \in \mathbb{R}^4$ by using the notation
+		Formally, a quaternion is defined as $\vectr{q} = w + \vectr{i}x + \vectr{j}y + \vectr{k}z$ where $w, x, y, z \in \R$ and $\vectr{i},\vectr{j}$ and $\vectr{k}$ are the basis elements of the quaternion space.
+		The quaternion can also be written as a tuple $\vectr{q} = (w, x, y, z) \in \R^4$ by using the notation
 		\begin{equation}
 			\vectr{1} = 
 			\begin{bmatrix}
@@ -132,7 +132,7 @@
 			\cos\left(\tfrac{\theta}{2}\right) + 
 			\sin\left(\tfrac{\theta}{2}\right) \left(a_1 \vectr{i} + a_2 \vectr{j} + a_3 \vectr{k}\right),
 		\end{equation}
-		where $\theta \in \mathbb{R}$ is the angle of rotation around a unit-length axis $\vectr{a} = (a_1, a_2, a_3) \in \mathbb{R}^3$.
+		where $\theta \in \R$ is the angle of rotation around a unit-length axis $\vectr{a} = (a_1, a_2, a_3) \in \R^3$.
 		\todo{explain that quaternions are not unique representation of rotations, and that negative axis-angle is represented by the same quaternion}
 	
 	
@@ -152,11 +152,11 @@
 		\todo{citation needed}
 		
 		This is where the recurrent neural network (RNN) comes into play.
-		It is a function that maps each vector $\vectr{x}_t \in \mathbb{R}^n$ from the sequence to a hidden state
+		It is a function that maps each vector $\vectr{x}_t \in \R^n$ from the sequence to a hidden state
 		\begin{eqnarray}
 			\vectr{h}_t = R(\vectr{x}_t, \vectr{h}_{t-1}), & &t = 1, \dots, T
 		\end{eqnarray}
-		with the hidden state $\vectr{h}_{t-1} \in \mathbb{R}^d$ carried over from the previous prediction as a second input, where $d$ is called the \emph{hidden size} of the RNN. 
+		with the hidden state $\vectr{h}_{t-1} \in \R^d$ carried over from the previous prediction as a second input, where $d$ is called the \emph{hidden size} of the RNN. 
 		The hidden state represents the accumulated knowledge from all previous inputs.
 		This way, the output at each time step $t$ depends on the inputs from $\vectr{x}_1$ to $\vectr{x}_{t - 1}$.
 		\begin{figure}[tb]
@@ -238,7 +238,7 @@
 		The Long Short-Term Memory (LSTM) is a version of the RNN that was designed to overcome the vanishing gradient problem described above, and it is also used in this thesis.
 		As shown in figure~\ref{fig:LSTM3-chain}, it introduces four gates (in yellow) and an additional cell state variable that is carried over from one time step to the next.
 		The recurrence can be formulated as a function 
-		% $R \colon \mathbb{R}^n \times \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}^d \times \mathbb{R}^d$
+		% $R \colon \R^n \times \R^d \times \R^d \rightarrow \R^d \times \R^d$
 		\begin{align}
 			(\vectr{h}_t, \vectr{c}_t) = R(\vectr{x}_t, \vectr{h}_{t-1}, \vectr{c}_{t-1}), & & t = 1, \dots, T.
 		\end{align}
@@ -277,7 +277,7 @@
 				\vectr{h}_t &= \vectr{o} \odot \tanh(\vectr{c}_{t})
 			\end{split}
 		\end{align}
-		The matrix $\matr{W} \in \mathbb{R}^{4d \times (n + d)}$ contains the weights for the input- and hidden state transformations before each gate.
+		The matrix $\matr{W} \in \R^{4d \times (n + d)}$ contains the weights for the input- and hidden state transformations before each gate.
 		It can be broken down into four parts:
 		\begin{align}
 			\matr{W} &=

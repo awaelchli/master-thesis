@@ -58,7 +58,7 @@
 	\section{Factorization Methods}
 		The factorization method can be used to recover camera motion and 3D shape simultaneously (step 2 and 3).
 		A first method was introduced by \cite{tomasi1992factorization} that works with an orthographic camera model.
-		It uses the so called \emph{measurement matrix} $W \in \mathbb{R}^{2n \times m}$ which is defined as
+		It uses the so called \emph{measurement matrix} $W \in \R^{2n \times m}$ which is defined as
 		\begin{equation}\label{eq:measurement_matrix}
 			W =
 			\begin{bmatrix}
@@ -75,7 +75,7 @@
 		\begin{equation}\label{eq:factorization_method}
 			W = MS,
 		\end{equation}
-		where $M \in \mathbb{R}^{2n \times 3}$ contains the $2 \times 3$ projection matrices of each camera and $S \in \mathbb{R}^{3 \times m}$  are the points of the observed 3D shape.
+		where $M \in \R^{2n \times 3}$ contains the $2 \times 3$ projection matrices of each camera and $S \in \R^{3 \times m}$  are the points of the observed 3D shape.
 		As described by \cite{tomasi1992factorization}, this factorization can be achieved using the singular value decomposition (SVD) as $W = U \varSigma V^\top$ and deriving $M$ and $S$ from $U$, $V$ and $\varSigma$.
 		\todo{Add more details? Less details?}
 		
