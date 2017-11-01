@@ -71,13 +71,39 @@
 					\hline
 				\end{tabular}
 			\end{center}
+			\caption[A comparison of representations for rotations]
+					{A comparison of representations for rotations.}
 			\label{tbl:comparison_representations_of_rotations}
-			\caption[short text]{text}
 		\end{table}
 		
 		\paragraph{Euler Angles}
+%		The fact that rotations in 3D have three degrees of freedom means there are only three coordinates needed to identify a rotation. 
+%		Euler angles are one such choice of coordinates.
+		The Euler angles represent a rotation with three numbers 
+		$\alpha, \beta, \gamma \in \left[0, 2\pi\right)$.
+		There are many different conventions and definitions of these three angles and how they are applied.
+		In this thesis, we apply the rotations in the following order. 
+		The initial coordinate frame shall be denoted by $(x, y, z)$.
+		\begin{enumerate}
+			\item The coordinate frame is rotated around the $x$-axis with angle $\alpha$. 
+			This results in a new coordinate frame $(x^\prime, y^\prime, z^\prime)$.
+			\item Next, the system is rotated around the $y^\prime$-axis by angle $\beta$. 
+			The new coordinate frame is $(x^{\prime\prime}, y^{\prime\prime}, z^{\prime\prime})$.
+			\item Finally, we perform a rotation around axis $z^{\prime\prime}$ by angle $\gamma$ to obtain the desired orientation.
+		\end{enumerate}
+		Altogether these steps can be formalized by a multiplication of three matrices that define the rotations around the different axes. 
+		The result is a rotation matrix
+		\begin{equation}
+			\matr{R}(\alpha, \beta, \gamma) =
+			\matr{R}_{z^{\prime\prime}}^\gamma
+			\matr{R}_{y^\prime}^\beta
+			\matr{R}_{x}^\alpha
+		\end{equation}
+		defined by the Euler angles. 
+		It can be shown that this representation covers all 3D rotations. \todo{citation needed}
 		
-		\paragraph{Axis-Angle}
+		
+		\paragraph{Axis-Angle}\todo{TODO}
 		
 		\paragraph{Quaternions}
 		Quaternions are four-dimensional numbers.
