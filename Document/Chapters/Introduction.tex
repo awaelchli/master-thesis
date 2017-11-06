@@ -271,7 +271,7 @@
 		As shown in figure~\ref{fig:LSTM3-chain}, it introduces four gates (in yellow) and an additional cell state variable that is carried over from one time step to the next.
 		The recurrence can be formulated as a function 
 		% $R \colon \R^n \times \R^d \times \R^d \rightarrow \R^d \times \R^d$
-		\begin{align}
+		\begin{align}\label{eq:LSTM_recurrence}
 			(\vectr{h}_t, \vectr{c}_t) = R(\vectr{x}_t, \vectr{h}_{t-1}, \vectr{c}_{t-1}), & & t = 1, \dots, T.
 		\end{align}
 		More precisely, the hidden state and cell state are computed as follows:
