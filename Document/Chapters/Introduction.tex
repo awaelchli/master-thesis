@@ -229,7 +229,7 @@
 		The weights $\vectr{W}, \vectr{V}, \vectr{b}$ and $\vectr{c}$ are updated in the same fashion as for feed-forward networks using gradient descent on the loss function.
 		Say we define a criterion $L_t(\vectr{y}_t, \vectr{\hat{y}}_t)$ for the loss between prediction and ground-truth at each time step $t$.
 		Then, the total loss for the sequence is simply 
-		\begin{equation}
+		\begin{equation}\label{eq:loss_for_rnn}
 			L(\{\vectr{y}_1, \dots \vectr{y}_T\}, \{\vectr{\hat{y}}_1, \dots \vectr{\hat{y}}_T\}) = \sum_{t=1}^{T} L_t(\vectr{y}_t, \vectr{\hat{y}}_t).
 		\end{equation}
 		The gradient computation is almost the same as for feed-forward networks and the back-propagation algorithm can be applied by unfolding the RNN as shown in figure~\ref{fig:RNN-unrolled}.
@@ -327,6 +327,10 @@
 		It controls how much information should be collected from the current input and hidden state.
 		The second is the forget gate $\vectr{f}$, which will learn what information should be discarded from the previous cell state.
 		Finally, the output gate $\vectr{o}$ regulates the amount of information that goes to the output $\vectr{h}_t$.
+	
+	\section{Gradient Computation for RNNs}
+	
+	\section{Training RNNs}
 		
 	\section{PyTorch}
 		PyTorch is a deep learning framework for Python that comes with a rich tensor library.
