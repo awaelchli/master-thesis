@@ -232,6 +232,10 @@
 		\begin{equation}\label{eq:loss_for_rnn}
 			L(\{\vectr{y}_1, \dots \vectr{y}_T\}, \{\vectr{\hat{y}}_1, \dots \vectr{\hat{y}}_T\}) = \sum_{t=1}^{T} L_t(\vectr{y}_t, \vectr{\hat{y}}_t).
 		\end{equation}
+		This loss will be used to compute gradients for updating the model parameters similar to feed-forward networks.
+		
+	\section{Gradient Computation for RNNs}
+		
 		The gradient computation is almost the same as for feed-forward networks and the back-propagation algorithm can be applied by unfolding the RNN as shown in figure~\ref{fig:RNN-unrolled}.
 		However, there is a problem with the gradient computation in the above version of the RNN (\cite{pascanu2013difficulty}, \cite{bengio1994learning}).
 		For long sequences, the gradient norm can become very small and this hurts the training.
@@ -327,9 +331,7 @@
 		It controls how much information should be collected from the current input and hidden state.
 		The second is the forget gate $\vectr{f}$, which will learn what information should be discarded from the previous cell state.
 		Finally, the output gate $\vectr{o}$ regulates the amount of information that goes to the output $\vectr{h}_t$.
-	
-	\section{Gradient Computation for RNNs}
-	
+		
 	\section{Training RNNs}
 		
 	\section{PyTorch}
