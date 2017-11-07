@@ -18,6 +18,9 @@
 \usepackage{amssymb}
 \usepackage{amsfonts}
 
+% Bold math symbols
+\usepackage{bm}
+
 % Hyperlinks
 \usepackage{url}
 \usepackage{hyperref}
@@ -46,8 +49,10 @@
 % Custom commands
 \newcommand \todo[1]{{\large \textbf{\textcolor{red}{#1}}}}
 \newcommand \const[1]{\mathrm{#1}}
-\newcommand \vectr[1]{\mathbf{#1}}
-\newcommand \matr[1]{\mathbf{#1}}
+%\newcommand \vectr[1]{\mathbf{#1}}
+%\newcommand \matr[1]{\mathbf{#1}}
+\newcommand \vectr[1]{\bm{#1}}
+\newcommand \matr[1]{\bm{#1}}
 \newcommand{\R}{\mathbb{R}}
 
 % Path setup
