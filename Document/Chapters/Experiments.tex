@@ -72,7 +72,8 @@
 			\end{tabular}
 		\end{center}
 		\caption[A simple model to memorize a binary sequence]
-		{A simple model to memorize a binary sequence. The variable $d$ is the hidden size of the LSTM.}
+				{A simple model to memorize a binary sequence. 
+				 The variable $d$ is the hidden size of the LSTM.}
 		\label{tbl:model_classification_binary_digits}
 	\end{table}
 	Finally, we have to define a suitable loss function. 
@@ -87,9 +88,8 @@
 	\todo{need better explanation of log-likelihood loss here}
 	
 	Now that task, model and loss function are defined, the model can be trained and evaluated.
-	
-	
-	
+	Because this experiment is completely artificial, it is possible to generate as much data as needed.
+	Instead of generating many smaller sequences, one can generate a single large sequence or sample digits on-the-fly.
 	
 	
 	\begin{figure}
@@ -98,17 +98,40 @@
 			\centering
 			\includegraphics[width=\linewidth]{Images/Python-Plots/accuracy-vs-look-back}
 			\caption{
+				$d = 1, T = 50, \lambda = 0.01, N = 10^5$
 				\label{fig:accuracy-vs-look-back}
 			}
 		\end{subfigure}%
 		\begin{subfigure}[b]{0.5\linewidth}
 			\includegraphics[width=\linewidth]{Images/Python-Plots/accuracy-vs-hidden-size}
 			\caption{
+				$m = 5, T = 50, \lambda = 0.01, N = 10^5$
 				\label{fig:accuracy-vs-hidden-size}
 			}
 		\end{subfigure}
-		\caption{}
-		\label{}
+		\\
+		\begin{subfigure}[b]{0.5\linewidth}
+			\includegraphics[width=\linewidth]{Images/Python-Plots/accuracy-vs-look-back2}
+			\caption{
+				$d = 50, T = 50, \lambda = 0.001, N = 10^5$
+				\label{fig:accuracy-vs-look-back2}
+			}
+		\end{subfigure}%
+		\begin{subfigure}[b]{0.5\linewidth}
+			\includegraphics[width=\linewidth]{Images/Python-Plots/more-training-data}
+			\caption{
+				$m = 14, d = 50, T = 50, \lambda = 0.001$
+				\label{fig:more-training-data}
+			}
+		\end{subfigure}
+		\caption[Ablation study: Memorizing the past with the LSTM]
+				{Accuracy on the test dataset for varying parameters while keeping others fixed. 
+				 The parameters involved are the hidden size $d$, look-back $m$, BPTT $T$, training set size $N$ and learning rate $\lambda$. 
+				 (a) The hidden size is too small.
+				 (b) Effect of increasing the hidden size.
+				 (c) Only increasing the hidden size is not enough.
+				 (d) Increasing the amount of training data.}
+		\label{fig:ablation-study-binary-memory}
 	\end{figure}
 	
 	
