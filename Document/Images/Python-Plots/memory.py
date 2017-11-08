@@ -136,3 +136,33 @@ plt.savefig('./memory/accuracy-vs-multiple-classes-and-layers.pdf', bbox_inches=
 
 if show:
     plt.show()
+
+
+################################
+# Regression vs. Classification
+################################
+plt.figure(figsize=(5, 3))
+
+x = tuple(range(2, 16))
+y1 = (1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 0.9677, 0.9605, 0.7400, 0.9955, 0.8814, 0.9040)
+y2 = (1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 0.9998, 0.9955, 0.9998, 0.0900, 0.0822, 0.0757, 0.0717, 0.0667)
+#y3 = [1 / i for i in range(2, 16)]
+
+#plt.bar(x, y, width, color='b')
+plt.plot(x, y1, 'bo-', label='Classification')
+plt.plot(x, y2, 'ro-', label='Regression')
+#plt.plot(x, y3, '--', color='gray', label='Chance')
+plt.xticks(x)
+plt.ylim((0, 1.05))
+plt.legend(loc=3)
+
+# add some text for labels, title and axes ticks
+#plt.title('Accuracy vs. Look-back')
+plt.ylabel('Accuracy')
+plt.xlabel('Number of classes C')
+plt.grid()
+
+plt.savefig('./memory/classificaton-vs-regression-num-classes.pdf', bbox_inches='tight')
+
+if show:
+    plt.show()

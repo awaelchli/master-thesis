@@ -1,5 +1,10 @@
 \chapter{Experiments and Results}
+\todo{Alternative titles: Capabilities of LSTMs, Strengths and Weaknesses of LSTM, Analysis of LSTMs, The LSTM: A Analysis}
 
+	The aim of this chapter is to develop an understanding of how the recurrent neural networks work, specifically the LSTM.
+	We begin with a very simple memorization task to demonstrate how an LSTM is trained on sequences of data and what effect different hyperparameters have.
+	Building on this knowledge, we explore more sophisticated tasks such as predicting the motion of a cloud of points which will finally lead into the challenging problem of visual odometry and structure from motion.
+	
 	\section{A First Toy Example: Memorizing Digits}
 		% Capabilities of LSTM
 		% - Memory: Describe binary memory example (sequence of binary digits)
@@ -9,20 +14,15 @@
 		% - What would one possible solution for the LSTM weights?
 		% - 
 		
-		To understand how LSTMs are used to learn from sequences of data and how their memory works, we conduct a small example for demonstration. 
+		%To understand how LSTMs are used to learn from sequences of data and how their memory works, we conduct a small example for demonstration. 
 		This first experiment is to show the capabilities and limitations of the LSTM.
 		Can it memorize the past and use this knowledge for future outputs?
 		And how far back in time can it remember?
 		Does it work best for classification or regression?
-		These are the main questions that are investigated in this section of the thesis.
+		\todo{Regression still missing from experiments!}
+		These are the main questions that are investigated in this section.
 		
-		In order to tackle a machine learning problem, one needs to define three key elements:
-		\begin{enumerate}
-			\item The task
-			\item The model
-			\item The loss function
-		\end{enumerate}
-		We begin by defining the task. 
+		\paragraph{The Task}
 		The goal is to train an LSTM that remembers the last $m$ digits of a random sequence of binary digits $\vectr{x}_t \in \{0, 1\}$. 
 		Thus, at time $t$ we would like the output to be the digit $\vectr{x}_{t-m}$ that was fed $m$ time steps before. 
 		For example, here are two sequences of zeros and ones shifted by $m = 3$:
@@ -39,6 +39,15 @@
 		The LSTM reads the digits one by one to store them in memory and at the same time it outputs the digit from memory at time $t - 3$ as highlighted by the colors above.
 		%How can we model and train this sequence-to-sequence problem?
 		
+		In order to tackle a machine learning problem, one needs to define three key elements:
+		\begin{enumerate}
+			\item Model
+			\item Performance measure
+			\item Optimization procedure
+		\end{enumerate}
+	
+		\paragraph{The Model}
+		We begin by defining the model.
 		The first part of our model is the LSTM itself as it was defined in equations~\ref{eq:LSTM_recurrence} and~\ref{eq:Vanilla-LSTM-Definition}.
 		Since the output can only be two numbers (zero and one), we will treat the problem as a classification task.
 		To do this, we add an affine layer to shrink the size of the LSTM output $\vectr{h}_t$ down to a two-element vector
@@ -61,7 +70,7 @@
 		\end{equation*}
 		The output digit $\vectr{o}_t$ must be chosen according to the highest probability.
 		A summary of the full model is shown in table~\ref{tbl:model_classification_binary_digits}.
-		\begin{table}
+		\begin{table}[tb]
 			\small
 			\begin{center}
 				\begin{tabular}{|l|c|c|c|c|}
@@ -78,6 +87,7 @@
 			\label{tbl:model_classification_binary_digits}
 		\end{table}
 		
+		\paragraph{The Performance Measure}
 		Next, we have to define a suitable loss function. 
 		For classification with softmax as the last layer, it is preferable to use the negative log-likelihood
 		\begin{equation}
@@ -90,6 +100,7 @@
 		As described in equation~\ref{eq:loss_for_rnn}, the total loss for the entire sequence is the sum over the individual losses.
 		\todo{need better explanation of log-likelihood loss here}
 		
+		\paragraph{The Optimization Procedure}
 		In order to use the loss function to update the model weights, one has to specify an optimization algorithm.
 		One of the most general purpose optimization algorithms is \emph{gradient descent}, which can find a local minimum of a function $F$ by iteratively stepping in the opposite direction of the gradient, hence the update rule
 		\begin{equation}
@@ -119,6 +130,7 @@
 		This way, there is always information available from the past even though the gradients are never propagated to the very beginning of the sequence.
 		\todo{Explain this in the theoretical section, also explain how (truncated) backpropagation works for LSTM}
 		
+		\paragraph{Results for Binary Sequence}
 		Now that task, model and optimization procedure are defined, the model can be trained and evaluated.
 		For all experiments, we train the model and test on new unseen data of the same size by computing the accuracy, that is the relative frequency of correctly predicted digits.
 		First, let's train and evaluate on the simplest model possible: The LSTM has a hidden size of one ($d = 1$).
@@ -171,45 +183,68 @@
 		But this hypothesis does not hold true when we continue to increase $m$ as demonstrated in~\ref{fig:accuracy-vs-look-back2}.
 		Figure~\ref{fig:more-training-data} shows that for higher look-back, we also need significantly more training data. 
 		
+		\paragraph{Extension to Multi-class}
+		So far we have learned a binary classifier, but we can extend the task to go beyond that to make the problem harder.
+		Instead of having only two symbols 0 and 1, we can choose each digit to be a number $\vectr{x}_t \in \{1, \dots, C\}$.
+		This is essentially a classification problem with $C$ classes.
+		The updated model is shown in table~\ref{tbl:model_classification_multi_class_digits}.
+		\begin{table}[tb]
+			\small
+			\begin{center}
+				\begin{tabular}{|l|c|c|c|c|}
+					\hline
+					Layer 	& Variable 			& Input size 	& Output size 	& Parameters 			\\ \hline
+					LSTM 	& $\vectr{h}_t$		& 1 			& $d$ 			& $4d(d + 1) + 4d$ 		\\ \hline
+					Affine 	& $\vectr{z}_t$		& $d$ 			& $C$ 			& $Cd + C$ 				\\ \hline
+					Softmax & $\vectr{p}_t$		& $C$ 			& $C$ 			& 0						\\ \hline
+				\end{tabular}
+			\end{center}
+			\caption[A simple model to memorize a sequence of numbers]
+					{A simple model to memorize a sequence of numbers.
+					 This is a generalization of the binary model in table~\ref{tbl:model_classification_binary_digits} where $C = 2$.}
+			\label{tbl:model_classification_multi_class_digits}
+		\end{table}
+		The model is trained and evaluated for each value $C \in \{1, \dots 15\}$.
+		\begin{figure}[tb]
+			\centering
+			\includegraphics[width=0.7\linewidth]{Images/Python-Plots/memory/accuracy-vs-multiple-classes-and-layers}
+			\caption[Memorizing the past with the LSTM: Multiple classes]
+					{Memorizing multiple classes with LSTM.
+					 Performance of single layer LSTM vs. stacked LSTM.
+					 Adding more layers helps deal with the higher complexity of the output.
+					 Hyperparameters: $m = 5, d = 50, T = 50, \lambda = 0.001, N = 10^5$.
+					 }
+			\label{fig:accuracy-vs-multiple-classes-and-layers}
+		\end{figure}
+		The blue line in figure~\ref{fig:accuracy-vs-multiple-classes-and-layers} shows that the accuracy decreases the more classes are used in the sequence.
+		This is due to the more complex mapping between input and output. 
+		An LSTM with a single layer can not handle the complexity.
+		As shown in the red line in figure~\ref{fig:accuracy-vs-multiple-classes-and-layers}, adding a second layer boosts the performance.
+		
+		
+	\section{Tracking a Moving Point Cloud}
+		
+		Up to this point, the input to the LSTM was always one-dimensional (a number/digit).
+		How well can it handle vectors as input?
+		This is the main question for this section.
+		To explore it, we conduct a synthetic experiment.
+		
+		\paragraph{The Task}
 		
 		\begin{figure}[tb]
 			\centering
-			\begin{subfigure}[b]{0.5\linewidth}
-				\centering
-				\includegraphics[width=\linewidth]{Images/Python-Plots/memory/accuracy-vs-multiple-classes-and-layers}
-				\caption{
-					$m = 5, d = 50, T = 50, \lambda = 0.001, N = 10^5$
-					\label{fig:accuracy-vs-multiple-classes-and-layers}
-				}
-			\end{subfigure}%
-			\begin{subfigure}[b]{0.5\linewidth}
-				\includegraphics[width=\linewidth]{example-image-a}
-				\caption{
-					$m = 5, T = 50, \lambda = 0.01, N = 10^5$
-					\label{}
-				}
-			\end{subfigure}
-			\\
-			\begin{subfigure}[b]{0.5\linewidth}
-				\includegraphics[width=\linewidth]{example-image-a}
-				\caption{
-					$d = 50, T = 50, \lambda = 0.001, N = 10^5$
-					\label{}
-				}
-			\end{subfigure}%
-			\begin{subfigure}[b]{0.5\linewidth}
-				\includegraphics[width=\linewidth]{example-image-a}
-				\caption{
-					$m = 14, d = 50, T = 50, \lambda = 0.001$
-					\label{}
-				}
-			\end{subfigure}
-			\caption[Memorizing the past with the LSTM: Multiple classes]
-			{}
-			\label{fig:ablation-study-multiclass-memory}
+			\includegraphics[width=0.7\linewidth]{example-image-a}
+			\caption[]
+					{\todo{point cloud example}}
+			\label{}
 		\end{figure}
+	
+		\paragraph{The Model}
 		
+		\paragraph{The Optimization Procedure}
 		
+		\paragraph{Results}
 		
+		\paragraph{}
 		
 		
