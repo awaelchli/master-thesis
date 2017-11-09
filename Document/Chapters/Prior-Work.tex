@@ -48,7 +48,7 @@
 		The singular value decomposition is used to discard the component with the smallest singular value.
 		\todo{numerical issues, 5 point algorithm}
 		Third, in some cases the calibration matrices $K_0$ and $K_1$ are unknown.
-		This means that the normalized coordinates are $\hat{x}_j = K_j^{-1} x_j$ are no longer available and only the image coordinates $x_j$ are known.
+		This means that the normalized coordinates $\hat{x}_j = K_j^{-1} x_j$ are no longer available and only the image coordinates $x_j$ are known.
 		This results in the so called \emph{fundamental matrix} $F$ in the epipolar constraint:
 		\begin{equation}
 			\hat{x}_1^\top E \hat{x}_0 = x_1^\top K_1^{-\top} E K_0^{-1} x_0 = x_1^\top F x_0 = 0.
