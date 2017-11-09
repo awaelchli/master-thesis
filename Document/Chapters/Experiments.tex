@@ -19,7 +19,7 @@
 		Can it memorize the past and use this knowledge for future outputs?
 		And how far back in time can it remember?
 		Does it work best for classification or regression?
-		\todo{Regression still missing from experiments!}
+		\todo{Regression still missing from experiments! (one fig. generated)}
 		These are the main questions that are investigated in this section.
 		
 		\paragraph{The Task}
@@ -225,20 +225,46 @@
 	\section{Tracking a Moving Point Cloud}
 		
 		Up to this point, the input to the LSTM was always one-dimensional (a number/digit).
-		How well can it handle vectors as input?
+		But how well can it handle vectors as input?
 		This is the main question for this section.
-		To explore it, we conduct a synthetic experiment.
+		To explore it, we conduct a synthetic experiment for a moving camera.
 		
 		\paragraph{The Task}
+		In this next experiment we would like to study the capabilities of the LSTM on a task for motion estimation.
+		To do so, we generate a few 3D points and project them into the image plane of a moving camera.
+		This will create an animation of a set of 2D points.
 		
 		\begin{figure}[tb]
 			\centering
 			\includegraphics[width=0.7\linewidth]{example-image-a}
 			\caption[]
-					{\todo{point cloud example}}
+					{\todo{point cloud example, show few points and multiple points}}
 			\label{}
 		\end{figure}
 	
+		\paragraph{The Data}
+		Each sample from the dataset is a synthetic sequence of frames seen by a moving camera in front of a cloud of 3D points.
+		There are two main steps involved in generating the data.
+		First, we generate the 3D points.
+		Second, the points need to be projected to the screen of each camera.
+		The camera is moving left and right to create a simple motion.
+		To create a large and diverse dataset, we can generate many such sequences for different point clouds and horizontal motions.
+		
+		To make this experiment very simple, the points are distributed uniformly on the surface of a sphere.
+		This can be done by sampling two random variables $z \sim \mathcal{U}(-1, 1)$ and $\theta \sim \mathcal{U}(0, 2\pi)$ that can be used to parameterize the point
+		\begin{equation}
+			\vectr{p} = 
+			\begin{bmatrix}
+				\sqrt{1 - z^2} \cos(\theta) \\ 
+				\sqrt{1 - z^2} \sin(\theta) \\
+				z
+			\end{bmatrix}
+		\end{equation}
+		on the unit sphere. 
+		After repeating this $M$ times, we obtain a cloud $C = \{\vectr{p}_1, \dots \vectr{p}_M\}$ with $M$ points.
+		Each of these points has to be projected
+		
+		
 		\paragraph{The Model}
 		
 		\paragraph{The Optimization Procedure}
