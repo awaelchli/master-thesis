@@ -167,10 +167,56 @@
 		where $\theta \in \R$ is the angle of rotation around a unit-length axis $\vectr{a} = (a_1, a_2, a_3) \in \R^3$.
 		\todo{explain that quaternions are not unique representation of rotations, and that negative axis-angle is represented by the same quaternion}
 	
-	\section{Feed-forward Neural Networks}
-	% Function y = f(x)
-	% Function familiy with weights
-	% Computational graph
+	\section{Deep Feedforward Neural Networks}
+	\todo{This summary is based on the deep learning book}
+	\todo{show a figure for a feed forward network}
+	A \emph{feedforward neural network} is a function mapping an input $\vectr{x}$ to an output $\vectr{y} = f(\vectr{x})$.
+	For example, $\vectr{y} \in \{\text{dog}, \text{cat} \}$ could be the output of the function deciding whether an image $\vectr{x}$ contains a dog or a cat. 
+	The reason it is called a \emph{deep network} is because $f$ is often a long chain of function compositions, e.g. 
+	$f = f^{(n)} \circ  \ldots  \circ f^{(2)} \circ f^{(1)}$.
+	The functions $f^{(1)}, \dots, f^{(n)}$ are called \emph{layers} and $n$ is the \emph{depth} of the network.
+	Each layer performs a computation on the output of the previous layer, hence the name \emph{feedforward}.
+	
+	A feed forward network is best visualized as a graph\footnote{More precisely it is a DAG (directed acyclic graph). It does not allow loops.}, the so-called \emph{computational graph}.
+	A node in the graph represents a single layer and the edges represent the flow of data (input/output).
+	\todo{Should explain comp. graph in terms of neurons?}
+	These networks build the foundation of deep learning.
+	Why?
+	Because in general $f$ is unknown and must be learned to solve a specific task.
+	The practical approach to finding a suitable $f$ is to consider a family of functions $f_{\vectr{w}}$ defined by the \emph{parameters} $\vectr{w}$, also called \emph{weights}.
+	For example, the layer $i$ in the network might be a linear function $f_{}^{(i)}(\vectr{x}) = \matr{W} \vectr{x}$ where the parameters of this layer are the elements of the matrix $\matr{W}$.
+	
+	The collective of all functions in the family is called the \emph{model}.
+	To solve the task (e.g. classifying dogs and cats), one has to \emph{train} the model.
+	In other words, one has to search through the space of all parameters $\vectr{w}$ to find the ones that perform the best.
+	The performance is measured with the \emph{loss function} 
+	$L(f_{\vectr{w}}(\vectr{x}), \vectr{y}) \in \R$ that compares the prediction 
+	$\vectr{\hat{y}} = f_{\vectr{w}}(\vectr{x})$ with the \emph{ground truth} $\vectr{y}$ and gives a score how close they are.
+	The ground truth comes from the dataset, which is the most important resource of knowledge for training a model.
+	The dataset contains many samples $\vectr{x}^{(1)}, \dots, \vectr{x}^{(N)}$ each with a ground truth label 
+	$\vectr{y}^{(1)}, \dots, \vectr{y}^{(N)}$, e.g. each dog image in the dataset has a label 'dog' and each image with a cat has the label 'cat'.
+	
+	The loss function is not only used to evaluate the performance of the model, but to find optimal parameters for the model as part of the training.
+	In general, the objective is to minimize the loss function on the data, that is
+	\begin{equation}\label{eq:optimal_parameter_neural_network}
+		\vectr{w}^\ast = \argmin_{\vectr{w}} 
+		\sum_{i = 1}^{N} 
+			L(f_{\vectr{w}}(\vectr{x}^{(i)}), \vectr{y}^{(i)}).
+	\end{equation}
+	The resulting function $f_{\vectr{w}^\ast}$ is a solution that best satisfies the loss function on all the data.
+	How can $\vectr{w}^\ast$ be found?
+	A common way to minimize the loss is to use gradient descent.
+	It is one of the most general purpose optimization algorithms.
+	Gradient descent can find a local minimum of a function $F$ by iteratively stepping in the opposite direction of the gradient, which can be described by the update rule
+	\begin{equation}
+		\vectr{w} \leftarrow 
+		\vectr{w} - \lambda \frac{\partial F(\vectr{w})}{\partial \vectr{w}}.
+	\end{equation}
+	The parameter $\vectr{w}$ converges close to a local minimum when a suitable learning rate $\lambda$ is chosen. \todo{citation needed / is "converge" the right word to use here?}
+	
+	%In the context of this experiment, $\vectr{w}$ are the model parameters and $F$ is the loss over the training data. 
+	
+	
 	% Gradient computation with backpropagation
 	% Gradient descent
 	% 
@@ -178,7 +224,7 @@
 	\section{Recurrent Neural Networks}
 		\newcommand{\imagecourtesycolah}{Image courtesy Christopher Olah \mbox{\href{http://colah.github.io/}{(colah.github.io)}}}
 		\todo{Need references to early works on RNNs}
-		So far, we have looked at the feed-forward network, which is function that maps an input $\vectr{x}$ to an output $\vectr{y} = f(\vectr{x})$.
+		So far, we have looked at the feedforward network, which is function that maps an input $\vectr{x}$ to an output $\vectr{y} = f(\vectr{x})$.
 		It will always compute the same output for the same input, independently of the input-output pairs it has seen before.
 		Now consider a sequence $\vectr{x}_1, \dots, \vectr{x}_T$ of inputs (e.g. a sentence).
 		How can we learn to predict an attribute that depends on the whole sequence (e.g. the sentiment of the sentence)?
@@ -340,7 +386,7 @@
 		Finally, the output gate $\vectr{o}$ regulates the amount of information that goes to the output $\vectr{h}_t$.
 		
 	\section{Training RNNs}
-		There are several ways one can train an RNN.
+		There are several ways an RNN can be trained.
 		
 		% Many to many
 		% Many to one
