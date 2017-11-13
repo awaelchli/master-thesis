@@ -213,7 +213,25 @@
 			\vectr{w} - \lambda \frac{\partial F(\vectr{w})}{\partial \vectr{w}}.
 		\end{equation}
 		The parameters $\vectr{w}$ converge close to a local minimum when a suitable learning rate $\lambda$ is chosen. \todo{citation needed / is "converge" the right word to use here?}
-		The following steps describe a typical training procedure.
+		In the context of deep learning, $F$ is the loss function evaluated over the training data.
+		More precisely, the update rule is
+		\begin{equation}\label{eq:gradient_descent_update_rule}
+			\vectr{w} \leftarrow 
+			\vectr{w} - \lambda 
+			\frac{\partial}{\partial \vectr{w}}
+			\sum_{i = 1}^{N} 
+				L(f_{\vectr{w}}(\vectr{x}^{(i)}), \vectr{y}^{(i)}).
+		\end{equation}
+		One parameter update with gradient descent requires the model to be evaluated for the entire dataset.
+		This is a very expensive operation and in practice it is most often unfeasible.
+		\emph{Stochastic} gradient descent is a modification that performs the update for each sample, which means that the sum in equation~\ref{eq:gradient_descent_update_rule} is dropped and the update rule is simply
+		\begin{equation}\label{eq:stochastic_gradient_descent_update_rule}
+			\vectr{w} \leftarrow 
+			\vectr{w} - \lambda 
+			\frac{\partial L(f_{\vectr{w}}(\vectr{x}^{(i)}), \vectr{y}^{(i)})}{\partial \vectr{w}}
+			.
+		\end{equation}
+		The following steps describe a typical training procedure of a feedforward network.
 		\begin{enumerate}
 			\item Define model $f_{\vectr{w}}$
 			\item Initialize parameters $\vectr{w}$
