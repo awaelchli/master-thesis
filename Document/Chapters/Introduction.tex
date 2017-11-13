@@ -251,15 +251,14 @@
 		This way we can measure how well the model generalizes.
 		It is important that the model performs well on new data because in practice we are often limited in how much data we can collect for training.
 		
-		A remark remarks on the above summary for feedforward neural networks:
+		A remark on the above summary for feedforward neural networks:
 		Training with samples that have a ground truth label is called \emph{supervised learning}.
 		It is also possible to learn from data where labels are not available.
-		Hence it is called \emph{unsupervised learning}.
+		This is called \emph{unsupervised learning}.
 		However, the focus of this thesis lies in the supervised approach.
 		
-		% Gradient computation with backpropagation
-		% 
-		% 
+
+		\todo{Gradient computation with backpropagation}\\
 		\todo{explain the term "neural"}
 	
 	\section{Recurrent Neural Networks}\label{sec:recurrent_neural_networks}
@@ -426,6 +425,12 @@
 		Finally, the output gate $\vectr{o}$ regulates the amount of information that goes to the output $\vectr{h}_t$.
 		
 	\section{Training RNNs}
+		% Intro: Two parts - optimization algorithm and how inputs/outputs are defined
+		
+		\paragraph{Optimization Procedure}
+		In order to use the loss function to update the model weights, one has to specify an optimization algorithm.
+
+		\todo{connect}
 		
 		There are several ways an RNN can be trained.
 		First of all, one can distinguish the type of input-output relationship for RNNs.

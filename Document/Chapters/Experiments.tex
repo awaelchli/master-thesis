@@ -101,34 +101,20 @@
 		\todo{need better explanation of log-likelihood loss here}
 		
 		\paragraph{The Optimization Procedure}
-%		In order to use the loss function to update the model weights, one has to specify an optimization algorithm.
-%		One of the most general purpose optimization algorithms is \emph{gradient descent}, which can find a local minimum of a function $F$ by iteratively stepping in the opposite direction of the gradient, hence the update rule
-%		\begin{equation}
-%			\vectr{w} \leftarrow 
-%			\vectr{w} - \lambda \frac{\partial F(\vectr{w})}{\partial \vectr{w}}.
-%		\end{equation}
-%		The parameter $\vectr{w}$ converges to a local minimum when a suitable learning rate $\lambda$ is chosen.
-%		
-%		In the context of this experiment, $\vectr{w}$ are the model parameters and $F$ is the loss over the training data. 
-		One possible update rule is
-		\begin{equation}
-			\vectr{w} \leftarrow 
-			\vectr{w} - \lambda 
-			\sum_{i}
-			\sum_{t = 1}^{T}
-			\frac{\partial L(f_{\vectr{w}}(\vectr{x}_t^{i}), \vectr{x}_{t - m}^{i})}{\partial \vectr{w}}, 
-		\end{equation}
-		where $\vectr{x}_t^{i}$ denotes the input at time $t$ of the $i$-th sequence.
+		\todo{rework this paragraph}
+		In order to use the loss function to update the model weights, one has to specify an optimization algorithm.
+
+		
 		Because this experiment is completely artificial, it is possible to generate as much data as needed.
-%		Instead of generating many smaller sequences, one can generate a single large sequence or sample the digits on-the-fly.
-%		In order to save memory and reduce computation, one can choose to limit the gradient computation through time.
-%		This is called \emph{truncated backpropagation through time (TBPTT)}. 
-%		Starting from the beginning of the sequence, $T$ inputs are fed to the LSTM followed by the loss computation.
-%		The gradient computation is performed for exactly $T$ steps back in time and the weights are updated accordingly. 
-%		Continuing with this pattern, the next $T$ inputs are fed for the next update and so on.
-%		In each step, the hidden state is carried over from the previous digit.
-%		This way, there is always information available from the past even though the gradients are never propagated to the very beginning of the sequence.
-%		\todo{Explain this in the theoretical section, also explain how (truncated) backpropagation works for LSTM}
+		Instead of generating many smaller sequences, one can generate a single large sequence or sample the digits on-the-fly.
+		In order to save memory and reduce computation, one can choose to limit the gradient computation through time.
+		This is called \emph{truncated backpropagation through time (TBPTT)}. 
+		Starting from the beginning of the sequence, $T$ inputs are fed to the LSTM followed by the loss computation.
+		The gradient computation is performed for exactly $T$ steps back in time and the weights are updated accordingly. 
+		Continuing with this pattern, the next $T$ inputs are fed for the next update and so on.
+		In each step, the hidden state is carried over from the previous digit.
+		This way, there is always information available from the past even though the gradients are never propagated to the very beginning of the sequence.
+		\todo{Explain this in the theoretical section, also explain how (truncated) backpropagation works for LSTM}
 		
 		\paragraph{Results for Binary Sequence}
 		Now that task, model and optimization procedure are defined, the model can be trained and evaluated.
