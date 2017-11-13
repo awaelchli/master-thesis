@@ -310,19 +310,18 @@
 		\end{equation}
 		This loss will be used to compute gradients for updating the model parameters similar to feed-forward networks.
 		
-	\section{Gradient Computation for RNNs}
-		
+	\section{Gradient Computation for RNNs}\label{sec:gradient_computation_RNN}
 		The gradient computation is almost the same as for feed-forward networks and the back-propagation algorithm can be applied by unfolding the RNN as shown in figure~\ref{fig:RNN-unrolled}.
 		However, there is a problem with the gradient computation in the above version of the RNN (\cite{pascanu2013difficulty}, \cite{bengio1994learning}).
 		For long sequences, the gradient norm can become very small and this hurts the training.
 		The RNN is not able to learn long-term dependencies when the gradient vanishes.
 		To see this, let's write down the full equation for the gradient:
-		\begin{equation}
+		\begin{equation}\label{eq:gradient_computation_RNN}
 			\frac{\partial L}{\partial \vectr{w}}
 			= \sum_{t=1}^{T} 
 				\frac{\partial L_t}{\partial \vectr{w}}
 			= \sum_{t=1}^{T} 
-				\sum_{k=0}^{t} 
+				\sum_{k=1}^{t} 
 					\frac{\partial L_t}{\partial \vectr{y}_t}
 					\frac{\partial \vectr{y}_t}{\partial \vectr{h}_t}
 					\left(
