@@ -408,21 +408,69 @@
 		Finally, the output gate $\vectr{o}$ regulates the amount of information that goes to the output $\vectr{h}_t$.
 		
 	\section{Training RNNs}
+		
 		There are several ways an RNN can be trained.
+		First of all, one can distinguish the type of input-output relationship for RNNs.
 		
-		% Many to many
-		% Many to one
-		% One to one
-		% One to many
+		\paragraph{Input to Output Mapping}
+		In section~\ref{sec:recurrent_neural_networks} it was assumed that for each time step $t$ there is an input $\vectr{x}_t$ and an output $\vectr{h}_t$.
+		This is the most general setup for an RNN and we refer to it as \emph{many-to-many}. 
 		
-		% Using end of sequence token
-		% How the hidden state is used between sequences
-		%	Carry hidden state over
-		%	Reset hidden state
-		% 
+		For some tasks, it might not be suitable to have an input at each time, or an output at each time.
+		On the other hand, the RNN is not a feedforward network in the time axis and thus does not allow a modification to remove inputs or outputs at certain time steps.
+		However, this does not mean that one has to use all outputs for computing loss and gradients.
+		For example, if we wish to predict the sentiment of a sentence, we can feed each word to the RNN and and ignore all outputs except the last one and use that for backpropagation of the gradient.
+		We refer to this method as \emph{many-to-one}.
+		If there is only one input available, but the output must a sequence (\emph{one-to-many}), one possibility is to simply feed the same input for all time steps.
+		An example for this method is image captioning, where the input is an image and the output is a description of the image in form of a sentence. \todo{reference to a work on image captioning}
+		Finally, the \emph{one-to-one} setting is a combination of the two above.
+		
+		\paragraph{Signaling Output} 
+		Instead of ignoring certain outputs and only using the ones needed, an alternative is to use a special input symbol $\vectr{e}$ to explicitly signal that an output should be written.
+		This special token has to be encoded with the same dimensionality as the other inputs. 
+		Its numerical value can be fixed before training (as a hyperparameter) or it can be part of the model parameters and be learned.
+		For example, in the sentiment analysis example from before, the token can be used as an end-of-sequence symbol to mark the end of a sentence.
+		In general, the symbol does not necessarily have to be used at the end of a sequence.
+		It can be inserted whenever an output is needed.
+		An application of this is shown in an experiment later in the thesis. 
+		\todo{Explicitly refer to the section}
+		
+		\paragraph{Truncated Backpropagation}
+		As discussed in section~\ref{sec:gradient_computation_RNN}, gradient computation over long sequences can cause vanishing or exploding values that hinder the learning process during training.
+		The LSTM was designed to addressed this issue, but backpropagation over very long sequences is still computationally expensive.
+		As a compromise, one can choose to backpropagate only a certain amount of time steps.
+		This is called \emph{truncated backpropagation through time} or TBPTT.
+		In order to save memory and reduce computation, one can choose to limit the gradient computation through time.
+		This is called \emph{truncated backpropagation through time (TBPTT)}. 
+		Say the sequences have a length of $T$ and the number of time steps to backpropagate is $\tau \leq T$.
+		To compute the gradient only back to $T - \tau$, we can replace the start indices for $t$ and $k$ in the sums of equation~\ref{eq:gradient_computation_RNN} with $T - \tau$.
+		Obviously, this is an approximation of the full gradient over all time steps.
+		The RNN is not forced to learn dependencies back in time longer than $\tau$ steps and thus we can not expect it to do so.
+		\todo{mention where this is used later in thesis}
+		
+		A specific application of TBPTT is for training on one continuous data stream instead of many shorter sequences.
+		For example, if the goal is to train an RNN to generate natural text, it needs to remember the context over multiple sentences.
+		To do this, one can concatenate the data from all text documents to one very long sequence.
+		During training, we can forward subsequences consecutively and backpropagate $\tau$ steps.
+		After each backpropagation, the hidden state $\vectr{h}_t$ (or $(\vectr{h}_t, \vectr{c}_t)$ in the case of LSTM) is carried over to the next subsequence as initial state.
+		This way, there is always information available from the past even though the gradients are never propagated to the very beginning of the sequence.
+		\todo{mention where this is used later in thesis}
+		
+		\paragraph{Ground Truth}
+		How ground truth is used depends heavily on the task at hand.
+		In the aforementioned example for generating text, the RNN predicts the next word given the current word and the context (hidden state).
+		Therefore, the ground truth data is the same as the input data except that it is shifted in time, e.g. $\vectr{y}_t = \vectr{x}_{t + 1}$.
+		In this example, not only do the input and output have the same dimensionality (words are encoded as vectors), but the semantic meaning is also the same.
+		This is of course not true for all applications of RNNs.
+		In this thesis, the inputs are camera images (thousands of color values) and the outputs are poses (usually 6D or 7D vectors).
+		The semantic gap is large since the pose is not directly encoded in the individual image, but in the motion between the frames.
+		The pose is always relative to the first frame in the sequence.
+		The RNN has to learn this directly from the ground truth, not from the input.
+		
+		
 		% How the ground truth is used
 		% 	Does ground truth have same dimensionality as input?, as hidden state?
-		%	
+		%
 		
 	\section{PyTorch}
 		PyTorch is a deep learning framework for Python that comes with a rich tensor library.
