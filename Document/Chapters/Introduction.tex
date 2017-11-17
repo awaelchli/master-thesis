@@ -172,7 +172,7 @@
 		\todo{show a figure for a feed forward network}
 		A \emph{feedforward neural network} is a function mapping an input $\vectr{x}$ to an output $\vectr{y} = f(\vectr{x})$.
 		For example, $\vectr{y} \in \{\text{dog}, \text{cat} \}$ could be the output of the function deciding whether an image $\vectr{x}$ contains a dog or a cat. 
-		The reason it is called a \emph{deep network} is because $f$ is often a long chain of function compositions, e.g. 
+		The reason it is called a \emph{deep network} is because $f$ is often a long chain of function compositions, e.g., 
 		$f = f^{(n)} \circ  \ldots  \circ f^{(2)} \circ f^{(1)}$.
 		The functions $f^{(1)}, \dots, f^{(n)}$ are called \emph{layers} and $n$ is the \emph{depth} of the network.
 		Each layer performs a computation on the output of the previous layer, hence the name \emph{feedforward}.
@@ -187,14 +187,14 @@
 		For example, the layer $i$ in the network might be a linear function $f_{}^{(i)}(\vectr{x}) = \matr{W} \vectr{x}$ where the parameters of this layer are the elements of the matrix $\matr{W}$.
 		
 		The collective of all functions in the family is called the \emph{model}.
-		To solve the task (e.g. classifying dogs and cats), one has to \emph{train} the model.
+		To solve the task, e.g., classifying dogs and cats, one has to \emph{train} the model.
 		In other words, one has to search through the space of all parameters $\vectr{w}$ to find the ones that perform the best.
 		The performance is measured with the \emph{loss function} 
 		$L(f_{\vectr{w}}(\vectr{x}), \vectr{y}) \in \R$ that compares the prediction 
 		$\vectr{\hat{y}} = f_{\vectr{w}}(\vectr{x})$ with the \emph{ground truth} $\vectr{y}$ and gives a score how close they are.
 		The ground truth comes from the dataset, which is the most important resource of knowledge for training a model.
 		The dataset contains many samples $\vectr{x}^{(1)}, \dots, \vectr{x}^{(N)}$ each with a ground truth label 
-		$\vectr{y}^{(1)}, \dots, \vectr{y}^{(N)}$, e.g. each dog image in the dataset has a label 'dog' and each image with a cat has the label 'cat'.
+		$\vectr{y}^{(1)}, \dots, \vectr{y}^{(N)}$, e.g., each dog image in the dataset has a label 'dog' and each image with a cat has the label 'cat'.
 		
 		The loss function is not only used to evaluate the performance of the model, but to find optimal parameters for the model as part of the training.
 		In general, the objective is to minimize the loss function on the data, that is
@@ -260,14 +260,16 @@
 
 		\todo{Gradient computation with backpropagation}\\
 		\todo{explain the term "neural"}
+		
+	\section{Convolutional Neural Networks}
 	
 	\section{Recurrent Neural Networks}\label{sec:recurrent_neural_networks}
 		\newcommand{\imagecourtesycolah}{Image courtesy Christopher Olah \mbox{\href{http://colah.github.io/}{(colah.github.io)}}}
 		\todo{Need references to early works on RNNs}
 		So far, we have looked at the feedforward network, which is function that maps an input $\vectr{x}$ to an output $\vectr{y} = f(\vectr{x})$.
 		It will always compute the same output for the same input, independently of the input-output pairs it has seen before.
-		Now consider a sequence $\vectr{x}_1, \dots, \vectr{x}_T$ of inputs (e.g. a sentence).
-		How can we learn to predict an attribute that depends on the whole sequence (e.g. the sentiment of the sentence)?
+		Now consider a sequence $\vectr{x}_1, \dots, \vectr{x}_T$ of inputs, e.g., a sentence.
+		How can we learn to predict an attribute that depends on the whole sequence, e.g., the sentiment of the sentence?
 		One way is to concatenate the sequence to one vector and use the feed-forward network.
 		However, this will limit the sequence length to a fixed size and potentially requires more training data.
 		\todo{need reference for this statement}.
@@ -310,7 +312,7 @@
 			\right)
 		\end{equation}
 		The weight matrix $\matr{W}$ has dimensions $d \times (n + d)$.
-		Sometimes it is desirable to have an output that has a different size than the hidden state (e.g. for classification).
+		Sometimes it is desirable to have an output that has a different size than the hidden state, e.g., as for classification.
 		In this case one can apply a second affine layer
 		\begin{equation}
 			\vectr{y}_t = \matr{V} \vectr{h}_t + \vectr{c}
@@ -482,7 +484,7 @@
 		\paragraph{Ground Truth}
 		How ground truth is used depends heavily on the task at hand.
 		In the aforementioned example for generating text, the RNN predicts the next word given the current word and the context (hidden state).
-		Therefore, the ground truth data is the same as the input data except that it is shifted in time, e.g. $\vectr{y}_t = \vectr{x}_{t + 1}$.
+		Therefore, the ground truth data is the same as the input data except that it is shifted in time, e.g., $\vectr{y}_t = \vectr{x}_{t + 1}$.
 		In this example, not only do the input and output have the same dimensionality (words are encoded as vectors), but the semantic meaning is also the same.
 		This is of course not true for all applications of RNNs.
 		In this thesis, the inputs are camera images (thousands of color values) and the outputs are poses (usually 6D or 7D vectors).
