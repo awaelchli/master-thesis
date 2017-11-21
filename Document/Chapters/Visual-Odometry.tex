@@ -8,7 +8,9 @@
 	% Describe the Task
 	% Prior Work -> Flownet, DeepVO, VINet
 	%
-	
+	The bulk of this chapter and the following experiments are based on the work of \cite{wang2017deepvo}.
+	At the time of writing this thesis, \citeauthor{wang2017deepvo} have not released the source code of their implementation.
+	Therefore, the aim of this chapter is to study and re-implement the ideas presented in their paper and to further expand on it.
 	
 	\section{Datasets}
 		\todo{intro text}
@@ -74,7 +76,7 @@
 			Instead of creating a segmentation of the dataset, this method of extracting subsequences also allows to define an overlap between sequences.
 			This is especially useful when the dataset is small, such as KITTI.
 			
-			Since the resolution and aspect ratio of the images is different between the datasets, they are first proportionally resized to a height of 320 pixels and then the center region of $448 \times 320$ pixels is extracted.
+			Since resolution and aspect ratio of the images are different between the datasets, they are first proportionally resized to a height of 320 pixels and then the center region of $448 \times 320$ pixels is extracted.
 			Fixing the input size across multiple datasets makes it possible to train the same network architecture for different data and make a more accurate comparison.
 			Due to the cropping, the left and right boundaries of the image are removed.
 			An alternative is to resize the images directly without regard to the aspect ratio.
@@ -96,18 +98,48 @@
 	\section{The Model}
 	% Figure with the entire pipeline
 	% - Figure showing optical flow ??
-		
+	% Feature extraction
+	%	- Optical flow
+	%	- features relevant for motion
+	%	- Flow alone is not enough
+	% 	- Other high-level representation
+	% Pose estimation
+	%	- LSTM transforms feature to pose
+	%	- Uses history from poses seen before to make current estimate more precise
+	%	- 
+	% Loss function and optimization
+	% mse loss on euler + translation
+	% experiments show that euler works best
+	% 
+		The main architecture is shown in figure~\ref{fig:main-architecture}.
 		\begin{figure}[t]
 			\centering
 			\includegraphics[width=\linewidth]{Images/Model/DeepVO-arch}
 			\caption[Main architecture for visual odometry]
 					{Main architecture for visual odometry.
+					 Green: Input of consecutive frames.
+					 Yellow: Feature extraction.
+					 Blue: Pose estimation with recurrent connections.
 					 \todo{ref paper for figure, or redo figure}
-					 \label{fig:main_architecture}}
+					 \label{fig:main-architecture}}
 		\end{figure}
-	
-	
-	
+		It consists of two main parts, the feature extraction and the recurrent part that estimates the pose at each time step.
+		The network takes two consecutive images as input, that is the frames at time $t$ and $t - 1$.
+		In order to estimate the camera motion, the network has to extract high-level features that are related to motion. 
+		There are a number of features that are not helpful for estimating motion, e.g. \todo{list...}.
+		
+		\emph{Optical flow} is a feature related to motion. 
+		It is defined as a vector-valued function $u(\vectr{x}) \in \R^2$ at each point $\vectr{x}$ in the image $I_{t}$ describing the translation of the point in the next frame such that
+		\begin{equation}
+			I_{t}(\vectr{x}) = I_{t + 1}(\vectr{x} + u(\vectr{x})).
+		\end{equation}
+		This property is called the \emph{brightness constancy constraint}.
+		
+		The idea is to estimate the motion of the camera from the 
+		
+		The feature extraction is done with a CNN that is based on FlowNetS by \cite{dosovitskiy2015flownet}.
+		
+		
 		\subsection{Feature Extraction}
 		% Describe flownet, what is optical flow
 		% pretrained
@@ -164,6 +196,66 @@
 	%	- Different learning rate for pretrained flownet
 	%	- Dropout Regularization
 	
+		\begin{table}[tb]
+			\small
+			\begin{center}
+				\begin{tabular}{|c|c|c||c|c|c|}
+					\hline
+					Length 	& Overlap 	& Dropout	& Total 	& Rotation	& Translation	\\ \hline
+					25		& 0			& 0			& 19.0293	& 0.4981	& 18.5312		\\ \hline
+					25		& 20		& 0			& 16.5471	& 0.3913	& 16.1558		\\ \hline
+					100		& 20		& 0			& 529.9459	& 39.8967	& 490.0493		\\ \hline
+					100 	& 5			& 0.5		& 376.7666	& 43.1578	& 333.6088		\\ \hline
+					100		& 80		& 0			& 313.1278	& 47.8437	& 265.2841		\\ \hline
+				\end{tabular}
+			\end{center}
+			\caption[Experiments on KITTI: Overlap and dropout]
+					{Experiments on KITTI: Overlap and dropout. 
+					 Shown is the test error on sequence 10 for different overlap and dropout during training.
+					 Each model was trained with default parameters for 100 epochs.
+					 \todo{also include growing sequence?}
+					 \label{tbl:kitti-overlap-and-dropout}}
+		\end{table}
+		
+		\begin{table}[tb]
+			\small
+			\begin{center}
+				\begin{tabular}{|c|c||c|c|c|}
+					\hline
+					Training length & Test length 	& Total 	& Rotation	& Translation	\\ \hline
+					25				& 25			& 16.5471	& 0.3913	& 16.1558		\\ \hline
+					25				& 100			& 1060.7528	& 37.6196	& 1023.1332		\\ \hline
+					100				& 100			& 529.9459	& 39.8967	& 490.0493		\\ \hline
+				\end{tabular}
+			\end{center}
+			\caption[Experiments on KITTI: Testing on longer sequences]
+					{Experiments on KITTI: Testing on longer sequences. 
+					 When testing on longer sequences, the error becomes extremely high compared to the model trained on 100 frames.
+					 \label{tbl:kitti-testing-on-longer-sequences}}
+		\end{table}
+	
+		\begin{figure}
+			\centering
+			\begin{subfigure}[b]{0.5\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{Images/Experiments/trained-on-25-frames}
+				\caption{
+					\label{fig:0}
+				}
+			\end{subfigure}%
+			\begin{subfigure}[b]{0.5\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{Images/Experiments/trained-on-100-frames}
+				\caption{
+					\label{fig:1}
+				}
+			\end{subfigure}%
+			\caption[Training and testing on different sequence length]
+					{Training and testing on different sequence length. 
+					 Two models tested on a KITTI subsequence of 100 frames and trained on sequences of (a) 25 frames and (b) 100 frames. 
+					 The markers in the plot are shown every ten frames.
+					 \label{fig:kitti-testing-on-longer-sequences}}
+		\end{figure}
 	
 		\begin{figure}
 			\centering

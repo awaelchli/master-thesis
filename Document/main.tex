@@ -1,8 +1,11 @@
 \documentclass[a4paper]{report}
 
 % Bibliography management
-\usepackage{natbib}
+\usepackage[square, numbers]{natbib}
+\usepackage[english]{babel}
 \bibpunct{[}{]}{,}{a}{}{;}
+%\bibliographystyle{unsrtnat}
+\bibliographystyle{abbrvnat}
 
 % IAM templates
 \usepackage{fancyheadings}
@@ -38,6 +41,12 @@
 % Colored text
 \usepackage{xcolor}
 \usepackage{soul}
+
+% Tables
+\usepackage{multirow}
+
+% svg images
+\usepackage{svg}
 
 
 % Page setup
@@ -118,7 +127,7 @@
 	\listoffigures
 	
 	\addcontentsline{toc}{chapter}{\numberline{}Bibliography}
-	\bibliographystyle{alphadin}
+	%\bibliographystyle{alphadin}
 	%\bibliographystyle{plainnat}
 	\nocite{*}
 	\bibliography{thesis}
