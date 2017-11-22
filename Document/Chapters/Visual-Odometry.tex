@@ -68,7 +68,7 @@
 		%	- weather, light, dynamic scene
 		%	- 
 		
-		\subsection{Preprocessing}
+		\subsection{Preprocessing}\label{sec:preprocessing}
 			Each dataset contains long sequences/videos of thousands of frames over several minutes of recording.
 			Due to the high memory footprint, it is unfeasible to load a complete sequence and feed it to the network.
 			Therefore the sequences are cut into subsequences of smaller sizes. 
@@ -110,8 +110,14 @@
 	% Loss function and optimization
 	% mse loss on euler + translation
 	% experiments show that euler works best
-	% 
-		The main architecture is shown in figure~\ref{fig:main-architecture}.
+	% 	
+		The model is the key to solving the task.
+		By adjusting the weights during the training phase, it learns a high-level representation of relevant information in the input that is needed to produce the desired output.
+		In the case of visual odometry, we aim to learn a representation for motion.
+		Specifically, the network has to be able to distinguish between dynamic motion in the scene and camera motion.
+		\todo{Refer to challenges/ambiguities discussed in introduction...}
+		The following two sections describe the two main parts of the model.
+		The architecture of the full model is shown in figure~\ref{fig:main-architecture}.
 		\begin{figure}[t]
 			\centering
 			\includegraphics[width=\linewidth]{Images/Model/DeepVO-arch}
@@ -123,27 +129,38 @@
 					 \todo{ref paper for figure, or redo figure}
 					 \label{fig:main-architecture}}
 		\end{figure}
-		It consists of two main parts, the feature extraction and the recurrent part that estimates the pose at each time step.
-		The network takes two consecutive images as input, that is the frames at time $t$ and $t - 1$.
-		In order to estimate the camera motion, the network has to extract high-level features that are related to motion. 
-		There are a number of features that are not helpful for estimating motion, e.g. \todo{list...}.
-		
-		\emph{Optical flow} is a feature related to motion. 
-		It is defined as a vector-valued function $u(\vectr{x}) \in \R^2$ at each point $\vectr{x}$ in the image $I_{t}$ describing the translation of the point in the next frame such that
-		\begin{equation}
-			I_{t}(\vectr{x}) = I_{t + 1}(\vectr{x} + u(\vectr{x})).
-		\end{equation}
-		This property is called the \emph{brightness constancy constraint}.
-		
-		The idea is to estimate the motion of the camera from the 
-		
-		The feature extraction is done with a CNN that is based on FlowNetS by \cite{dosovitskiy2015flownet}.
-		
 		
 		\subsection{Feature Extraction}
 		% Describe flownet, what is optical flow
 		% pretrained
 		% on what was flownet trained?
+			The purpose of the first part of the network is to extract information about motion from two consecutive frames at time $t$ and $t - 1$.
+			One way to describe motion between two images is by \emph{optical flow}.
+			It is defined as a vector-valued function $u(\vectr{x}) \in \R^2$ at each point $\vectr{x}$ in the image $I_{t}$ describing the translation of the point in the next frame such that
+			\begin{equation}\label{eq:brightness_constancy_constraint}
+				I_{t}(\vectr{x}) = I_{t + 1}(\vectr{x} + u(\vectr{x})).
+			\end{equation}
+			The property in equation~\ref{eq:brightness_constancy_constraint} is called the \emph{brightness constancy constraint}. 
+			It means that a particular point can move in the image plane but it does not change its color.
+			In general, this constraint does not hold for every point, e.g., because of occlusion introduced by motion.
+			
+			\cite{dosovitskiy2015flownet} describe a deep-learning approach for estimating optical flow.
+			They propose and study two network architectures, \emph{FlowNetS} and \emph{FlowNetC}.
+			The later is computing the inner product between patches of two input frames (correlation) followed by multiple layers of convolutions.
+			FlowNetS on the other hand is the simple version that does not have the correlation layer. 
+			Instead, it is only made of convolution layers and ReLUs.
+			In this thesis, the focus is on FlowNetS because it is the only publicly available implementation for PyTorch.\footnote{The code available on GitHub from \citet*{flownetpytorch}}
+			FlowNetS is also the choice in the work of \citeauthor{wang2017deepvo}, which is the basis of the architecture described here.
+			The FlowNetS implementation comes with pre-trained model weights.
+			It is trained on a synthetic dataset of moving chairs rendered into images that serve as a static background.
+			Although this data does not include camera motion, according to \citeauthor{wang2017deepvo} the model weights serve as a good initialization that leads to faster convergence. 
+			
+			Estimating camera motion solely based on optical flow is not very robust since scene motion is mixed into the optical flow which can significantly vary in magnitude.
+			Therefore, in order to have a more abstract representation, only the first layers up to ``conv6.1'' are used for feature extraction.
+			\todo{finish explanation of what the dropped layers are there for}
+			The remaining layers of FlowNetS are transposed convolutions that produce the high resolution flow maps.
+			
+			The exact configuration of these layers is shown in table~\ref{tbl:first_part_of_flownets}.
 			\begin{table}[tb]
 				\small
 				\begin{center}
@@ -164,32 +181,54 @@
 				\end{center}
 				\caption[Architecture of the feature extraction based on FlownetS]
 						{Architecture of the feature extraction based on FlownetS. 
-						 Each layer is followed by a rectified linear unit (ReLU).}
-				\label{tbl:first_part_of_flownets}
+						 Each layer is a convolution followed by a rectified linear unit (ReLU).
+						 \label{tbl:first_part_of_flownets}}
 			\end{table}
-		
-		\subsection{The LSTM}
+			Note that the convolutions are applied with a stride and therefore the spatial size is reduced from one layer to the next.
+			At the same time, the number of feature maps (channels) increases up to 1024 in the last layer.
+			For example, say the input images have a width and height of $448 \times 320$ pixels. 
+			Then the output tensor contains 1024 feature maps of size $7 \times 5$.
+			These activations are a coarse and abstract description of the motion seen in the input and do not directly imply the per-pixel optical flow.
+			The remaining task is now to take these coarse features and map them to the camera pose. 
+			
+		\subsection{Pose Estimation}
 		% How does LSTM use flow features 
 		% Table with fc layer and dropout
-	
-		\begin{table}[tb]
-			\small
-			\begin{center}
-				\begin{tabular}{|l|c|c|}
-					\hline
-					Layer 		& Input size 					& Output size			\\ \hline
-					lstm1 		& $1024 \cdot 5 \cdot 7$		& $1000$  				\\ \hline
-					lstm2 		& $1000$						& $1000$ 				\\ \hline
-					drop		& $1000$						& $1000$				\\ \hline
-					fc 			& $1000$						& $6$					\\ \hline
-				\end{tabular}
-			\end{center}
-			\caption[Architecture of the recurrent part of the pose network]
-					{Architecture of the recurrent part of the pose network.
-					 It consists of a two-layer LSTM with hidden size 1000, a dropout- and fully-connected layer.}
-			\label{tbl:lstm_and_fc_after_flownet}
-		\end{table}
-	\section{Experiments and Results}
+			The key component of the second part is the LSTM that maps the motion features to a hidden state.
+			Due to the recurrent connections, the hidden state does not only encode the pose at the current time step, but also a history of poses from previous time steps.
+			To be clear, it is not obvious that the LSTM will actually learn a representation for the past and use that information to estimate the pose because nothing is explicitly forcing the network to do so.
+			The question whether or not the recurrent connections make a significant contribution will be addressed in section~\ref{sec:odometry-experiments-and-results}.
+			
+			As opposed to convolution layers, the LSTM is defined in terms of matrix operations and hence the size of the input to the LSTM is not variable.
+			This also implies that there is a limit on the size of the input images.
+			As described in section~\ref{sec:preprocessing}, the images are rescaled to $448 \times 320$ pixels, which leads to a tensor of size $1024 \times 7 \times 5$ after feature extraction.
+			This tensor is then reshaped to a vector with $1024 \cdot 7 \cdot 5 = 35840$ elements and fed to the LSTM as input.
+			Although the LSTM itself applies multiple operations involving input, hidden state and gate outputs, it can be summarized as one single layer.
+			Moreover, as shown in figure~\ref{fig:main-architecture} we adopt the architecture of~\citeauthor{wang2017deepvo} and stack two LSTM layers.
+			Each of these recurrent layers has an associated hidden state of size $d = 1000$.
+			
+			The recurrent layers are followed by dropout and a fully connected layer that reduces the output size of the LSTM to a 6D vector for the pose.
+			Table~\ref{tbl:lstm_and_fc_after_flownet} summarizes the input- and output dimensions of all layers in the second component of the network.
+			\begin{table}[tb]
+				\small
+				\begin{center}
+					\begin{tabular}{|l|c|c|}
+						\hline
+						Layer 		& Input size 					& Output size			\\ \hline
+						lstm1 		& $35840$						& $1000$  				\\ \hline
+						lstm2 		& $1000$						& $1000$ 				\\ \hline
+						drop		& $1000$						& $1000$				\\ \hline
+						fc 			& $1000$						& $6$					\\ \hline
+					\end{tabular}
+				\end{center}
+				\caption[Architecture of the recurrent part of the pose network]
+						{Architecture of the recurrent part of the pose network.
+						 It consists of a two-layer LSTM with hidden size 1000, a dropout- and fully-connected layer.}
+				\label{tbl:lstm_and_fc_after_flownet}
+			\end{table}
+			
+			
+	\section{Experiments and Results}\label{sec:odometry-experiments-and-results}
 	% Ablation studies
 	% Problem with "global" pose -> incremental pose
 	% Training
