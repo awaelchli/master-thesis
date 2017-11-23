@@ -1,4 +1,4 @@
-\chapter{Experiments and Results}
+\chapter{Exploring the LSTM}
 \todo{Alternative titles: Capabilities of LSTMs, Strengths and Weaknesses of LSTM, Analysis of LSTMs, The LSTM: A Analysis}
 
 	The aim of this chapter is to develop an understanding of how the recurrent neural networks work, specifically the LSTM.
@@ -91,10 +91,10 @@
 		Next, we have to define a suitable loss function. 
 		For classification with softmax as the last layer, it is preferable to use the negative log-likelihood
 		\begin{equation}
-			L(\vectr{x}, y) = -\log\left(\vectr{x}_y\right)
+			\mathcal{L}(\vectr{x}, y) = -\log\left(\vectr{x}_y\right)
 		\end{equation}
 		as a loss function. 
-		Here, the first argument of $L$ would be replaced with the output $\vectr{p}_t$ of the network and the second argument is the ground truth label. 
+		Here, the first argument of $\mathcal{L}$ would be replaced with the output $\vectr{p}_t$ of the network and the second argument is the ground truth label. 
 		Since we are predicting the digit from $m$ time steps ago, the ground truth directly comes from the input sequence, and therefore the label $y_t$ at time $t$ is the input $\vectr{x}_{t - m}$.
 		By minimizing this loss, the probability for the correct class is maximized.
 		As described in equation~\ref{eq:loss_for_rnn}, the total loss for the entire sequence is the sum over the individual losses.

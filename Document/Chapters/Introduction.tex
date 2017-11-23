@@ -190,7 +190,7 @@
 		To solve the task, e.g., classifying dogs and cats, one has to \emph{train} the model.
 		In other words, one has to search through the space of all parameters $\vectr{w}$ to find the ones that perform the best.
 		The performance is measured with the \emph{loss function} 
-		$L(f_{\vectr{w}}(\vectr{x}), \vectr{y}) \in \R$ that compares the prediction 
+		$\mathcal{L}(f_{\vectr{w}}(\vectr{x}), \vectr{y}) \in \R$ that compares the prediction 
 		$\vectr{\hat{y}} = f_{\vectr{w}}(\vectr{x})$ with the \emph{ground truth} $\vectr{y}$ and gives a score how close they are.
 		The ground truth comes from the dataset, which is the most important resource of knowledge for training a model.
 		The dataset contains many samples $\vectr{x}^{(1)}, \dots, \vectr{x}^{(N)}$ each with a ground truth label 
@@ -201,7 +201,7 @@
 		\begin{equation}\label{eq:optimal_parameter_neural_network}
 			\vectr{w}^\ast = \argmin_{\vectr{w}} 
 			\sum_{i = 1}^{N} 
-				L(f_{\vectr{w}}(\vectr{x}^{(i)}), \vectr{y}^{(i)}).
+				\mathcal{L}(f_{\vectr{w}}(\vectr{x}^{(i)}), \vectr{y}^{(i)}).
 		\end{equation}
 		The resulting function $f_{\vectr{w}^\ast}$ is a solution that best satisfies the loss function on all the data.
 		How can $\vectr{w}^\ast$ be found?
@@ -220,7 +220,7 @@
 			\vectr{w} - \lambda 
 			\frac{\partial}{\partial \vectr{w}}
 			\sum_{i = 1}^{N} 
-				L(f_{\vectr{w}}(\vectr{x}^{(i)}), \vectr{y}^{(i)}).
+				\mathcal{L}(f_{\vectr{w}}(\vectr{x}^{(i)}), \vectr{y}^{(i)}).
 		\end{equation}
 		One parameter update with gradient descent requires the model to be evaluated for the entire dataset.
 		This is a very expensive operation and in practice it is most often unfeasible.
@@ -228,8 +228,7 @@
 		\begin{equation}\label{eq:stochastic_gradient_descent_update_rule}
 			\vectr{w} \leftarrow 
 			\vectr{w} - \lambda 
-			\frac{\partial L(f_{\vectr{w}}(\vectr{x}^{(i)}), \vectr{y}^{(i)})}{\partial \vectr{w}}
-			.
+			\frac{\partial \mathcal{L}(f_{\vectr{w}}(\vectr{x}^{(i)}), \vectr{y}^{(i)})}{\partial \vectr{w}}.
 		\end{equation}
 		The following steps describe a typical training procedure of a feedforward network.
 		\begin{enumerate}
@@ -238,7 +237,7 @@
 			\item Loop over training samples $\vectr{x}^{(i)}$ %for $i = 1, \dots, N$
 			\begin{enumerate}
 				\item Forward operation: $\vectr{\hat{y}} = f_{\vectr{w}}(\vectr{x}^{(i)})$
-				\item Compute loss $L(\vectr{\hat{y}}, \vectr{y}^{(i)})$
+				\item Compute loss $\mathcal{L}(\vectr{\hat{y}}, \vectr{y}^{(i)})$
 				\item Backward operation: Backpropagate the gradient of the loss 
 				\item Update parameters
 			\end{enumerate}
@@ -322,10 +321,11 @@
 		
 		Training an RNN is not much different from a feed-forward network.
 		The weights $\vectr{W}, \vectr{V}, \vectr{b}$ and $\vectr{c}$ are updated in the same fashion as for feed-forward networks using gradient descent on the loss function.
-		Say we define a criterion $L_t(\vectr{y}_t, \vectr{\hat{y}}_t)$ for the loss between prediction and ground-truth at each time step $t$.
+		Say we define a criterion $\mathcal{L}_t(\vectr{y}_t, \vectr{\hat{y}}_t)$ for the loss between prediction and ground-truth at each time step $t$.
 		Then, the total loss for the sequence is simply 
 		\begin{equation}\label{eq:loss_for_rnn}
-			L(\{\vectr{y}_1, \dots \vectr{y}_T\}, \{\vectr{\hat{y}}_1, \dots \vectr{\hat{y}}_T\}) = \sum_{t=1}^{T} L_t(\vectr{y}_t, \vectr{\hat{y}}_t).
+			\mathcal{L}(\{\vectr{y}_1, \dots \vectr{y}_T\}, \{\vectr{\hat{y}}_1, \dots \vectr{\hat{y}}_T\}) = 
+			\sum_{t=1}^{T} \mathcal{L}_t(\vectr{y}_t, \vectr{\hat{y}}_t).
 		\end{equation}
 		This loss will be used to compute gradients for updating the model parameters similar to feed-forward networks.
 		
@@ -336,12 +336,12 @@
 		The RNN is not able to learn long-term dependencies when the gradient vanishes.
 		To see this, let's write down the full equation for the gradient:
 		\begin{equation}\label{eq:gradient_computation_RNN}
-			\frac{\partial L}{\partial \vectr{w}}
+			\frac{\partial \mathcal{L}}{\partial \vectr{w}}
 			= \sum_{t=1}^{T} 
-				\frac{\partial L_t}{\partial \vectr{w}}
+				\frac{\partial \mathcal{L}_t}{\partial \vectr{w}}
 			= \sum_{t=1}^{T} 
 				\sum_{k=1}^{t} 
-					\frac{\partial L_t}{\partial \vectr{y}_t}
+					\frac{\partial \mathcal{L}_t}{\partial \vectr{y}_t}
 					\frac{\partial \vectr{y}_t}{\partial \vectr{h}_t}
 					\left(
 						\prod_{j=k+1}^{t} \frac{\partial \vectr{h}_j}{\partial \vectr{h}_{j-1}}
