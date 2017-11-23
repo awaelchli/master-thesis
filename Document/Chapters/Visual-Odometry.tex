@@ -130,10 +130,7 @@
 					 \label{fig:main-architecture}}
 		\end{figure}
 		
-		\subsection{Feature Extraction}
-		% Describe flownet, what is optical flow
-		% pretrained
-		% on what was flownet trained?
+		\subsection{Part 1: Feature Extraction}
 			The purpose of the first part of the network is to extract information about motion from two consecutive frames at time $t$ and $t - 1$.
 			One way to describe motion between two images is by \emph{optical flow}.
 			It is defined as a vector-valued function $u(\vectr{x}) \in \R^2$ at each point $\vectr{x}$ in the image $I_{t}$ describing the translation of the point in the next frame such that
@@ -149,18 +146,20 @@
 			The later is computing the inner product between patches of two input frames (correlation) followed by multiple layers of convolutions.
 			FlowNetS on the other hand is the simple version that does not have the correlation layer. 
 			Instead, it is only made of convolution layers and ReLUs.
-			In this thesis, the focus is on FlowNetS because it is the only publicly available implementation for PyTorch.\footnote{The code available on GitHub from \citet*{flownetpytorch}}
+			The first half of FlowNetS are strided convolutions that gradually increase the number of feature maps. 
+			The second half, called refinement, consists of transposed convolution layers that, in reverse, increase the spatial dimension to form the high resolution optical flow maps.
+			In addition, both FlowNet versions make use of skip-connections that allow the features from earlier layers to be added as input to layers in the second half by concatenating the tensors along the feature channel dimension. 
+			
+			In this thesis, the focus is on FlowNetS because it is the only publicly available implementation for PyTorch.\footnote{\citet*{flownetpytorch} has the source code available on GitHub.}
 			FlowNetS is also the choice in the work of \citeauthor{wang2017deepvo}, which is the basis of the architecture described here.
 			The FlowNetS implementation comes with pre-trained model weights.
 			It is trained on a synthetic dataset of moving chairs rendered into images that serve as a static background.
 			Although this data does not include camera motion, according to \citeauthor{wang2017deepvo} the model weights serve as a good initialization that leads to faster convergence. 
 			
 			Estimating camera motion solely based on optical flow is not very robust since scene motion is mixed into the optical flow which can significantly vary in magnitude.
-			Therefore, in order to have a more abstract representation, only the first layers up to ``conv6.1'' are used for feature extraction.
-			\todo{finish explanation of what the dropped layers are there for}
-			The remaining layers of FlowNetS are transposed convolutions that produce the high resolution flow maps.
-			
-			The exact configuration of these layers is shown in table~\ref{tbl:first_part_of_flownets}.
+			In order to have a more abstract representation, only the layers in the first half up to ``conv6.1'' are used for feature extraction.
+			All layers in the second half of FlowNetS are dropped.
+			The exact configuration of the remaining layers is shown in table~\ref{tbl:first_part_of_flownets}.
 			\begin{table}[tb]
 				\small
 				\begin{center}
@@ -186,12 +185,14 @@
 			\end{table}
 			Note that the convolutions are applied with a stride and therefore the spatial size is reduced from one layer to the next.
 			At the same time, the number of feature maps (channels) increases up to 1024 in the last layer.
-			For example, say the input images have a width and height of $448 \times 320$ pixels. 
+			Say the input images have a width and height of $448 \times 320$ pixels, for example. 
 			Then the output tensor contains 1024 feature maps of size $7 \times 5$.
 			These activations are a coarse and abstract description of the motion seen in the input and do not directly imply the per-pixel optical flow.
+			To emphasize again, we do not directly make use of optical flow since we are interested in separating camera motion from scene motion.
+			This has to be done on a higher level of abstraction.
 			The remaining task is now to take these coarse features and map them to the camera pose. 
 			
-		\subsection{Pose Estimation}
+		\subsection{Part 2: Pose Estimation}
 		% How does LSTM use flow features 
 		% Table with fc layer and dropout
 			The key component of the second part is the LSTM that maps the motion features to a hidden state.
@@ -226,6 +227,24 @@
 						 It consists of a two-layer LSTM with hidden size 1000, a dropout- and fully-connected layer.}
 				\label{tbl:lstm_and_fc_after_flownet}
 			\end{table}
+		
+		\subsection{Loss Function}
+			At each time step $t = 1, \dots, T$ the LSTM outputs a pose estimate 
+			$\vectr{\hat{y}}_t = \left[ \, \vectr{\hat{p}}_t,  \vectr{\hat{\varphi}}_t \right]$.
+			The quality of this estimate is compared against the ground truth pose 
+			$\vectr{y}_t = \left[ \, \vectr{p}_t,  \vectr{\varphi}_t \right]$
+			with the loss function
+			\begin{equation}\label{eq:euler_pose_loss_function_t}
+				\mathcal{L}_t(\vectr{y}_t, \vectr{\hat{y}}_t) = 
+				%\sum_{t=1}^{T} 
+					\lVert \vectr{p}_t - \vectr{\hat{p}}_t \rVert_2^2 + 
+					\beta \lVert \vectr{\varphi}_t - \vectr{\hat{\varphi}}_t \rVert_2^2.
+			\end{equation}
+			This loss function balances the squared error of position and Euler angles with a factor $\beta$.
+			The scale of positional change is usually higher than the angular changes for rotation, but in general, the scale depends on the ground truth provided in the dataset, e.g., the unit of measurements used or the speed of the camera motion.
+			The balance factor $\beta$ is part of the hyper parameters and has to be fixed before training. 
+			\todo{Mention choice of beta in experiments section}
+			
 			
 			
 	\section{Experiments and Results}\label{sec:odometry-experiments-and-results}
