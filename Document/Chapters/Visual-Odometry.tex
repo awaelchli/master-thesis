@@ -1,4 +1,4 @@
-\chapter{Full Visual Odometry}
+\chapter{Visual Odometry with RNN}
 % Title ideas: 
 % Visual Odometry with Deep Learning
 % Visual Odometry
@@ -224,7 +224,8 @@
 				\end{center}
 				\caption[Architecture of the recurrent part of the pose network]
 						{Architecture of the recurrent part of the pose network.
-						 It consists of a two-layer LSTM with hidden size 1000, a dropout- and fully-connected layer.}
+						 It consists of a two-layer LSTM with hidden size 1000, a dropout- and fully-connected layer.
+						 \todo{also include num parameters?}}
 				\label{tbl:lstm_and_fc_after_flownet}
 			\end{table}
 		
@@ -247,169 +248,19 @@
 			\cite{kendall2017geometric} find that $\beta$ requires significant tuning to get acceptable results.
 			Moreover, as an alternative they propose a loss based on the reprojection error of the 3D points that naturally balances rotation and translation and therefore the need for manual balancing is eliminated.
 			However, this thesis does not explore a geometric loss function of this type.
-			The balance value in equation~\ref{eq:euler_pose_loss_function_t} is manually chosen and set to $\beta = 10$ by default.
+			The balance value in equation~\ref{eq:euler_pose_loss_function_t} is manually chosen and set to $\beta = 10$ by default for training.
+			For evaluation on the test set in all experiments that follow, we use $\beta = 1$.
+			Furthermore, the two terms 
+			$\lVert \vectr{p}_t - \vectr{\hat{p}}_t \rVert_2^2$ and 
+			$\lVert \vectr{\varphi}_t - \vectr{\hat{\varphi}}_t \rVert_2^2$
+			in equation~\ref{eq:euler_pose_loss_function_t} are referred to as the translation- and rotation error respectively.
 			
 			\todo{Mention choice of beta in experiments section}
 			
 			For training, the Adam optimizer is used with default settings and initial learning rates $\lambda_1 = 10^{-4}$ and $\lambda_2 = 10^{-3}$ for each part of the network.
 			$\lambda_1$ is the learning rate for the part that is initialized with weights from a pre-trained FlowNetS.
-			It is chosen to be smaller because the transferred weights are expected to be already close to optimal values and can be fine-tuned with a smaller learning rate.
+			It is chosen to be smaller than $\lambda_2$ because the transferred weights are expected to be already close to optimal values and can be fine-tuned with a smaller learning rate.
+			\todo{Mention (maybe in discussion) the difference of this training technique to deepvo paper.}
 			
 			
-	\section{Experiments and Results}\label{sec:odometry-experiments-and-results}
-	% Ablation studies
-	% Problem with "global" pose -> incremental pose
-	% Training
-	%	- Different learning rate for pretrained flownet
-	%	- Dropout Regularization
-		This section presents all experiments conducted on the deep learning model described above.
-		The results shown here give useful insights that supplement the work of \cite{wang2017deepvo}.
-		
-		\subsection{Dataset Size and Dropout}
-			We start by training the proposed model on the KITTI dataset on small subsequences of 25 frames. 
-			Initially, the sequences are divided without overlap, that is, each video frame is part of exactly one subsequence.
-			
-			\begin{table}[tb]
-				\small
-				\begin{center}
-					\begin{tabular}{|c|c|c||c|c|c|}
-						\hline
-						Length 	& Overlap 	& Dropout	& Total 	& Rotation	& Translation	\\ \hline
-						25		& 0			& 0			& 19.0293	& 0.4981	& 18.5312		\\ \hline
-						25		& 20		& 0			& 16.5471	& 0.3913	& 16.1558		\\ \hline
-						100		& 20		& 0			& 529.9459	& 39.8967	& 490.0493		\\ \hline
-						100 	& 5			& 0.5		& 376.7666	& 43.1578	& 333.6088		\\ \hline
-						100		& 80		& 0			& 313.1278	& 47.8437	& 265.2841		\\ \hline
-					\end{tabular}
-				\end{center}
-				\caption[Experiments on KITTI: Overlap and dropout]
-						{Experiments on KITTI: Overlap and dropout. 
-						 Shown is the test error on sequence 10 for different overlap and dropout during training.
-						 Each model was trained with default parameters for 100 epochs.
-						 \todo{also include growing sequence?}
-						 \label{tbl:kitti-overlap-and-dropout}}
-			\end{table}
-		
-		
-		\subsection{The Problem on Long Sequences}
-		
-		
-			\begin{table}[tb]
-				\small
-				\begin{center}
-					\begin{tabular}{|c|c||c|c|c|}
-						\hline
-						Training length & Test length 	& Total 	& Rotation	& Translation	\\ \hline
-						25				& 25			& 16.5471	& 0.3913	& 16.1558		\\ \hline
-						25				& 100			& 1060.7528	& 37.6196	& 1023.1332		\\ \hline
-						100				& 100			& 529.9459	& 39.8967	& 490.0493		\\ \hline
-					\end{tabular}
-				\end{center}
-				\caption[Experiments on KITTI: Testing on longer sequences]
-						{Experiments on KITTI: Testing on longer sequences. 
-						 When testing on longer sequences, the error becomes extremely high compared to the model trained on 100 frames.
-						 \label{tbl:kitti-testing-on-longer-sequences}}
-			\end{table}
-	
-			\begin{figure}
-				\centering
-				\begin{subfigure}[b]{0.5\linewidth}
-					\centering
-					\includegraphics[width=\linewidth]{Experiments/trained-on-25-frames}
-					\caption{
-						\label{fig:0}
-					}
-				\end{subfigure}%
-				\begin{subfigure}[b]{0.5\linewidth}
-					\centering
-					\includegraphics[width=\linewidth]{Experiments/trained-on-100-frames}
-					\caption{
-						\label{fig:1}
-					}
-				\end{subfigure}%
-				\caption[Training and testing on different sequence length]
-						{Training and testing on different sequence length. 
-						 Two models tested on a KITTI subsequence of 100 frames and trained on sequences of (a) 25 frames and (b) 100 frames. 
-						 The markers in the plot are shown every ten frames.
-						 \label{fig:kitti-testing-on-longer-sequences}}
-			\end{figure}
-	
-	
-		\subsection{Training with Incremental Poses}
-	
-			\begin{figure}
-				\centering
-				\begin{subfigure}[b]{\linewidth}
-					\centering
-					\includegraphics[width=0.45\linewidth]{example-image-a}
-					\includegraphics[width=0.45\linewidth]{example-image-a}
-					\caption{
-						Long, curve
-						\label{fig:0}
-					}
-				\end{subfigure}%
-				\\
-				\begin{subfigure}[b]{\linewidth}
-					\centering
-					\includegraphics[width=0.45\linewidth]{example-image-b}
-					\includegraphics[width=0.45\linewidth]{example-image-b}
-					\caption{
-						Short
-						\label{fig:0}
-					}
-				\end{subfigure}%
-				\\
-				\begin{subfigure}[b]{\linewidth}
-					\centering
-					\includegraphics[width=0.45\linewidth]{example-image-c}
-					\includegraphics[width=0.45\linewidth]{example-image-c}
-					\caption{
-						\label{fig:0}
-					}
-				\end{subfigure}%
-				\caption[Qualitative results for motion estimation on KITTI]
-						{Qualitative results for motion estimation on KITTI.
-						 Left column: Visualization of the estimated and true path.
-						 Right column: Plot of each coordinate axis.
-						 Markers are shown for every \todo{xx} frames.
-						\label{fig:0}}
-			\end{figure}
-	
-	
-			\begin{figure}
-				\centering
-				\begin{subfigure}[b]{\linewidth}
-					\centering
-					\includegraphics[width=0.45\linewidth]{example-image-a}
-					\includegraphics[width=0.45\linewidth]{example-image-a}
-					\caption{
-						Long, curve
-						\label{fig:0}
-					}
-				\end{subfigure}%
-				\\
-				\begin{subfigure}[b]{\linewidth}
-					\centering
-					\includegraphics[width=0.45\linewidth]{example-image-b}
-					\includegraphics[width=0.45\linewidth]{example-image-b}
-					\caption{
-						Short
-						\label{fig:0}
-					}
-				\end{subfigure}%
-				\\
-				\begin{subfigure}[b]{\linewidth}
-					\centering
-					\includegraphics[width=0.45\linewidth]{example-image-c}
-					\includegraphics[width=0.45\linewidth]{example-image-c}
-					\caption{
-						\label{fig:0}
-					}
-				\end{subfigure}%
-				\caption[Qualitative results for motion estimation on VIPER]
-						{Qualitative results for motion estimation on VIPER.
-						 \label{fig:0}}
-			\end{figure}
-		
-	\section{Discussion}
-	\section{Conclusion}
+
