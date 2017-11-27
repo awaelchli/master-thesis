@@ -1,4 +1,4 @@
-\chapter{Experiments And Results}\label{sec:odometry-experiments-and-results}
+\chapter{Experiments And Results}\label{chp:experiments-and-results}
 	
 %\section{Experiments and Results}
 % Ablation studies
@@ -6,7 +6,7 @@
 % Training
 %	- Different learning rate for pretrained flownet
 %	- Dropout Regularization
-	This section presents all experiments conducted on the deep learning model described above.
+	This chapter presents all experiments conducted on the deep learning model that was introduced in chapter~\ref{chp:the_model}.
 	The results shown here give useful insights that supplement the work of \cite{wang2017deepvo}.
 	
 	\section{Dataset Size and Dropout}
@@ -31,6 +31,7 @@
 			\caption[Experiments on KITTI: Overlap and dropout]
 					{Experiments on KITTI: Overlap and dropout. 
 				 Shown is the test error on sequence 10 for different overlap and dropout during training.
+				 The evaluation on the test set is performed on sequences of the same size as seen during training, and without overlap.
 				 Each model was trained with default parameters for 100 epochs.
 				 \todo{also include growing sequence?}
 				 \label{tbl:kitti-overlap-and-dropout}}
@@ -40,8 +41,20 @@
 		% Total error decreases by about 40\%.
 		The translation error decreases by almost 46\%, however, the rotation loss increases.
 		A similar observation can be made when using dropout on the LSTM output (before the fully-connected layer), as seen in the last row of table~\ref{tbl:kitti-overlap-and-dropout}.
-		From these experiments, we can conclude that sequence overlap and dropout have a positive impact on the generalization of translation estimates.
+		\todo{Describe how numbers in table are not very insightful, show plot}
 		
+		From these experiments, we can conclude that sequence overlap and dropout have a positive impact on the generalization of translation estimates.
+		Especially when training data is scarce, the overlap method can be utilized to artificially increase the dataset and reduce the error on the test data.
+		
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.7\linewidth]{Python-Plots/deepvo-KITTI/relative-rotation-and-translation-error-along-path-overlap80}
+			\caption[Experiments on KITTI: Average rotation- and translation error vs. path distance]
+					{Experiments on KITTI: Average rotation- and translation error vs. path distance.
+					 The relative rotation- and translation error is evaluated at equal intervals along the subsequences of KITTI sequence 10.
+					 The errors at the same distance are averaged over all sequences of that length.
+					 \label{fig:kitti-avg-rotation-translation-error-vs-path-distance}}
+		\end{figure}
 		
 	
 	\section{The Problem on Long Sequences}

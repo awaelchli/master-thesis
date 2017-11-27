@@ -1,4 +1,4 @@
-\chapter{Visual Odometry with RNN}
+\chapter{Visual Odometry with RNN}\label{chp:the_model}
 % Title ideas: 
 % Visual Odometry with Deep Learning
 % Visual Odometry
@@ -8,7 +8,7 @@
 	% Describe the Task
 	% Prior Work -> Flownet, DeepVO, VINet
 	%
-	The bulk of this chapter and the following experiments are based on the work of \cite{wang2017deepvo}.
+	The bulk of this chapter and the experiments that follow in chapter~\ref{chp:experiments-and-results} are based on the work of \cite{wang2017deepvo}.
 	At the time of writing this thesis, \citeauthor{wang2017deepvo} have not released the source code of their implementation.
 	Therefore, the aim of this chapter is to study and re-implement the ideas presented in their paper and to further expand on it.
 	
@@ -253,7 +253,7 @@
 			Furthermore, the two terms 
 			$\lVert \vectr{p}_t - \vectr{\hat{p}}_t \rVert_2^2$ and 
 			$\lVert \vectr{\varphi}_t - \vectr{\hat{\varphi}}_t \rVert_2^2$
-			in equation~\ref{eq:euler_pose_loss_function_t} are referred to as the translation- and rotation error respectively.
+			in equation~\ref{eq:euler_pose_loss_function_t} are referred to as the translation- and rotation errors respectively.
 			
 			\todo{Mention choice of beta in experiments section}
 			
