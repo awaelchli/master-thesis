@@ -1,8 +1,69 @@
 \chapter{Introduction}
-
-	\section{Problem Statement}
 	
+	Since the beginning, we humans have examined the world around us. 
+	There is a certain urge to explore, build and shape the environment we live in.
+	One thing that we have learned long ago is that every object, place, person changes its shape and appearance, the way it behaves and feels like. Sooner or later, everything ages, breaks and vanishes as it contributes to the increase of entropy in our universe.
+	Often we wish to stop this process and capture a moment in time, forever and unchanged, so that we can go back and re-experience.
+	Of course, with the technology we have today it is impossible to instantly capture and store every piece of information about a place or an object on a subatomic level.
+	The complexity of such a measurement process is simply too high.
+	However, we do have devices that allow us to record a sparse subset of all the information.
+	One such device is the digital camera.
+	It captures the light in the same fashion as the human eye.
+	The camera has an image sensor that accumulates the energy from light rays entering through the aperture.
+	The image that forms on the sensor is a perspective projection of the 3D world onto a 2D plane.
+	We humans have two eyes that allow us to recover depth information by exploiting the displacement in the 2D projections of each eye.
+	The same applies to a pair of cameras displaced along a horizontal baseline.
+	A single 3D point in front of the cameras projects to a different 2D location on the two sensors.
+	The resulting shift is called \emph{disparity}.
+	It is inversely proportional to depth, i.e., a small disparity is the result of a point far away from the camera.
+	Therefore, a stereo image pair allows us to get the depth values for each pixel.
+	
+	Although the depth reconstruction from stereo vision has many practical applications, it does not give a full 3D geometry of the observed scene, since a camera can only capture the visible parts.
+	It is therefore not possible to reconstruct the 3D of surfaces that are occluded or outside the field of view. 
+	In order to obtain a full 3D reconstruction of a static object or scene, images have to be taken from many positions and angles.
+	The technique of recovering the 3D geometry from multiple images is called \emph{structure from motion (SfM)}.
+	Through the motion of the camera, in a continuous fashion new 2D measurements of points are obtained that would otherwise be occluded from a single viewing direction.
+	In the typical SfM pipeline the input is a set of images and the output consists of two things.
+	The first is the set of 3D coordinates of all points seen in the camera images.
+	The second output is the camera pose associated with each input image.
+	
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.3\linewidth]{example-image-a}
+		\caption{\label{fig:sfm-example}}
+	\end{figure}
+		
 	\section{Motivation}
+		The term \emph{structure from motion} refers to the observation of 2D motion in a series of images that can be used to recover 3D information.
+		The camera motion and 3D geometry are by itself completely independent components, but the observed images are only fully determined by the combination of the two.
+		%The motion of the camera has to be determined simultaneously with structure, because only both components together fully determine the observed projections.
+		When the desire is to only reconstruct the 3D, e.g. scanning a 3D model of a vase, the camera parameters can be seen as a by-product of the SfM algorithm. 
+		After the point cloud is recovered, new views can be rendered on the fly without the need of the original camera poses.
+		On the other hand, when the interest lies in only recovering the camera path, then SfM produces the point cloud as a by-product.
+		In SfM, camera parameters and 3D are solved jointly in an iterative manner.
+		This process has a high computational cost.
+		It is often not suited for real-time mobile applications where reconstruction from hundreds and thousands of video frames is desired.
+		Another limitation is that SfM requires the observed scene to be static.
+		It means that the motion observed in the images can only come from the camera, and not from moving objects in the scene.
+		Otherwise, the reconstruction problem is ambiguous.
+		
+		In practice, SfM algorithms are designed and tuned to work optimally in their application domain.
+		This requires a significant amount of manual intervention and prior knowledge.
+		
+		
+		The interest of this thesis lies in recovering the camera parameters, i.e., the position and orientation.
+		
+		%We try to precisely describe our ever-changing world we live in. 
+	
+	---
+	The pose of the camera is defined by a position and an orientation.
+	The orientation defines the viewing direction, which can be in 360 degrees around the point.
+	We can observe the scene from many different angles and take pictures, at many positions in a room 
+	
+	\section{Visual Odometry by Deep Learning}
+	
+	
 	
 	\section{Challenges}
 	
