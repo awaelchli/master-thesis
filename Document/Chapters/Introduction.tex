@@ -21,12 +21,16 @@
 	Although the depth reconstruction from stereo vision has many practical applications, it does not give a full 3D geometry of the observed scene, since a camera can only capture the visible parts.
 	It is therefore not possible to reconstruct the 3D of surfaces that are occluded or outside the field of view. 
 	In order to obtain a full 3D reconstruction of a static object or scene, images have to be taken from many positions and angles.
-	The technique of recovering the 3D geometry from multiple images is called \emph{structure from motion (SfM)}.
 	Through the motion of the camera, in a continuous fashion new 2D measurements of points are obtained that would otherwise be occluded from a single viewing direction.
-	In the typical SfM pipeline the input is a set of images and the output consists of two things.
-	The first is the set of 3D coordinates of all points seen in the camera images.
-	The second output is the camera pose associated with each input image.
-	
+	The technique of recovering the 3D geometry from multiple images is called \emph{structure from motion (SfM)}.
+	In the typical SfM pipeline the input is a ordered or unordered list of images and the output consists of the camera poses and the 3D point cloud.
+%	The SfM pipeline can be summarized in three basic steps:
+%	\begin{enumerate}
+%		\item Feature detection, extraction and matching
+%		\item Camera motion estimation
+%		\item Recovery of the 3D structure
+%	\end{enumerate}
+
 	
 	\begin{figure}
 		\centering
@@ -35,10 +39,46 @@
 	\end{figure}
 		
 	\section{Motivation}
+		% Visual odometry, special case of structure from motion
+		% SfM expensive (bundle adjustment, refinement step)
+		
+		Building and programming a robot that interacts with and learns from its environment is not easy.
+		Usually the robot is built to solve a specific task that requires some form of interaction with objects and the environment they occupy.
+		Some robots require navigation to complete their task, e.g., a self-driving car that has to maneuver into a parking space.
+		The robot has to determine its position and orientation in the world with respect to some coordinate system.
+		Furthermore, it may be required to detect and prevent imminent collisions, which requires sensing the distance to nearby objects.
+		One possible way to tackle the navigation problem is to use one or more cameras mounted to the robot.
+		In order for the robot to determine its location, it has to analyze the motion in the input image sequence coming from the video camera.
+		To avoid collisions or allow interaction, the 3D structure of the surrounding world and objects has to be reconstructed from the camera input.
+		
+		\emph{Visual Odometry (VO)} \todo{reference} addresses the problem of recovering the ego-motion from a video input in real-time. 
+		An extension of VO called \emph{Structure from Motion (SfM)} \todo{reference} additionally recovers the 3D structure from the video input.
+		Although these methods have many practical applications not only in robotics, they have some limitations.
+		First of all, both VO and SfM rely on robust feature detection and matching between images in order to accurately estimate motion.
+		The algorithms to extract these informations from images are hand-designed and tuned to work well in specific domains and environments.
+		They often rely on strong assumptions about the observed scene, lighting conditions or type of motions involved.
+		These assumptions are made to avoid possible ambiguities arising from, e.g., dynamic motion in the scene or specular reflections.
+		Furthermore, classic VO and SfM do not leverage high-level information about the image content that could be used to eliminate and resolve these conflicts.
+		
+		\todo{Better Transition}
+		Very quickly after birth, we humans learn to develop a complex understanding of three-dimensional world around us. 
+		The emphasis here is on \emph{learning}.
+		There is no external force or teacher that predetermines how the network of neurons in our brain develops and grows.
+		It is the continuous loop of information retrieval (seeing, feeling), action (body movement) that determines reward or penalty (walking or falling).
+		
+		
+		
+		Among others, the visual input from one or more cameras is 
+		There are many sensors that can be employed to make navigation possible. 
+		
+		A robot can be built in form of a human, a car or a flying drone.
+		
+		In order to do so, it has one or more sensors, such as cameras
+		
 		The term \emph{structure from motion} refers to the observation of 2D motion in a series of images that can be used to recover 3D information.
 		The camera motion and 3D geometry are by itself completely independent components, but the observed images are only fully determined by the combination of the two.
 		%The motion of the camera has to be determined simultaneously with structure, because only both components together fully determine the observed projections.
-		When the desire is to only reconstruct the 3D, e.g. scanning a 3D model of a vase, the camera parameters can be seen as a by-product of the SfM algorithm. 
+		When the desire is to only reconstruct the 3D, e.g. obtaining a 3D model of a vase, the camera parameters can be seen as a by-product of the SfM algorithm. 
 		After the point cloud is recovered, new views can be rendered on the fly without the need of the original camera poses.
 		On the other hand, when the interest lies in only recovering the camera path, then SfM produces the point cloud as a by-product.
 		In SfM, camera parameters and 3D are solved jointly in an iterative manner.
@@ -50,6 +90,7 @@
 		
 		In practice, SfM algorithms are designed and tuned to work optimally in their application domain.
 		This requires a significant amount of manual intervention and prior knowledge.
+		
 		
 		
 		The interest of this thesis lies in recovering the camera parameters, i.e., the position and orientation.
