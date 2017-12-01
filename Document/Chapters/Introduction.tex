@@ -82,7 +82,18 @@
 		% 
 		% 
 		The problem of Visual Odometry is simple to formulate.
-		Given a sequence of temporally ordered images, i.e. a video, the objective is to compute a sequence of camera poses corresponding to the images.
+		Given a sequence of temporally ordered images, i.e. a video, the objective is to compute the camera pose at each frame.
+		The camera pose is the location and orientation of the camera in the world coordinate system.
+		It describes the change of coordinates from the local- to the world reference frame in form of a rotation and translation, each having three degrees of freedom.
+		Without loss of generality it is assumed that the world coordinate system coincides with reference frame of the first image in the sequence.
+		
+		
+		\begin{figure}
+			\centering
+			%\def\svgwidth{\columnwidth}
+			\includegraphics[width=7cm]{"Introduction/Problem Overview/overview"}
+			\caption{\label{fig:overview-visual-odometry}}
+		\end{figure}
 		
 		
 		The pose of the camera is defined by a position and an orientation.
