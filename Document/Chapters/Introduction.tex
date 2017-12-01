@@ -1,36 +1,7 @@
 \chapter{Introduction}
 	
-	Since the beginning, we humans have examined the world around us. 
-	There is a certain urge to explore, build and shape the environment we live in.
-	One thing that we have learned long ago is that every object, place, person changes its shape and appearance, the way it behaves and feels like. Sooner or later, everything ages, breaks and vanishes as it contributes to the increase of entropy in our universe.
-	Often we wish to stop this process and capture a moment in time, forever and unchanged, so that we can go back and re-experience.
-	Of course, with the technology we have today it is impossible to instantly capture and store every piece of information about a place or an object on a subatomic level.
-	The complexity of such a measurement process is simply too high.
-	However, we do have devices that allow us to record a sparse subset of all the information.
-	One such device is the digital camera.
-	It captures the light in the same fashion as the human eye.
-	The camera has an image sensor that accumulates the energy from light rays entering through the aperture.
-	The image that forms on the sensor is a perspective projection of the 3D world onto a 2D plane.
-	We humans have two eyes that allow us to recover depth information by exploiting the displacement in the 2D projections of each eye.
-	The same applies to a pair of cameras displaced along a horizontal baseline.
-	A single 3D point in front of the cameras projects to a different 2D location on the two sensors.
-	The resulting shift is called \emph{disparity}.
-	It is inversely proportional to depth, i.e., a small disparity is the result of a point far away from the camera.
-	Therefore, a stereo image pair allows us to get the depth values for each pixel.
 	
-	Although the depth reconstruction from stereo vision has many practical applications, it does not give a full 3D geometry of the observed scene, since a camera can only capture the visible parts.
-	It is therefore not possible to reconstruct the 3D of surfaces that are occluded or outside the field of view. 
-	In order to obtain a full 3D reconstruction of a static object or scene, images have to be taken from many positions and angles.
-	Through the motion of the camera, in a continuous fashion new 2D measurements of points are obtained that would otherwise be occluded from a single viewing direction.
-	The technique of recovering the 3D geometry from multiple images is called \emph{structure from motion (SfM)}.
-	In the typical SfM pipeline the input is a ordered or unordered list of images and the output consists of the camera poses and the 3D point cloud.
-%	The SfM pipeline can be summarized in three basic steps:
-%	\begin{enumerate}
-%		\item Feature detection, extraction and matching
-%		\item Camera motion estimation
-%		\item Recovery of the 3D structure
-%	\end{enumerate}
-
+	
 	
 	\begin{figure}
 		\centering
@@ -42,14 +13,14 @@
 		% Visual odometry, special case of structure from motion
 		% SfM expensive (bundle adjustment, refinement step)
 		
-		Building and programming a robot that interacts with and learns from its environment is not easy.
+		Building and programming a robot that interacts with and learns from its environment is challenging.
 		Usually the robot is built to solve a specific task that requires some form of interaction with objects and the environment they occupy.
 		Some robots require navigation to complete their task, e.g., a self-driving car that has to maneuver into a parking space.
 		The robot has to determine its position and orientation in the world with respect to some coordinate system.
 		Furthermore, it may be required to detect and prevent imminent collisions, which requires sensing the distance to nearby objects.
 		One possible way to tackle the navigation problem is to use one or more cameras mounted to the robot.
-		In order for the robot to determine its location, it has to analyze the motion in the input image sequence coming from the video camera.
-		To avoid collisions or allow interaction, the 3D structure of the surrounding world and objects has to be reconstructed from the camera input.
+		In order for the robot to determine its location, it has to intelligently analyze the motion in the input image sequence coming from the video camera.
+		To avoid collisions or allow interaction, the 3D structure of the surrounding world and objects has to be reconstructed from the camera input or measured by other sensors.
 		
 		\emph{Visual Odometry (VO)} \todo{reference} addresses the problem of recovering the ego-motion from a video input in real-time. 
 		An extension of VO called \emph{Structure from Motion (SfM)} \todo{reference} additionally recovers the 3D structure from the video input.
@@ -64,49 +35,66 @@
 		Very quickly after birth, we humans learn to develop a complex understanding of three-dimensional world around us. 
 		The emphasis here is on \emph{learning}.
 		There is no external force or teacher that predetermines how the network of neurons in our brain develops and grows.
-		It is the continuous loop of information retrieval (seeing, feeling), action (body movement) that determines reward or penalty (walking or falling).
+		It is the continuous loop of information retrieval (e.g. seeing, feeling) and action (e.g. body movement) that determines reward or penalty (e.g. walking or falling) which then influences the development of connections in the brain.
+		\todo{Example removing vision of newborn}
+		Recent advances in \emph{Deep Learning} have shown that machines are able to learn and identify patterns in data and use them to solve complex problems that also humans are faced with everyday, e.g., recognizing a persons face or solving puzzle games.
+		In recent years, Deep Learning has had a significant impact on Computer Vision and is under rapid development, becoming more popular every year.
+		
+		The potential and recent successes of Deep Learning motivate an alternative approach to the classic VO and SfM algorithms.
+		Learning a powerful representation of camera motion from a large dataset of image sequences could help overcome some of the aforementioned challenges in SfM as well as reduce the computational cost to provide real-time mobile applications.
 		
 		
 		
-		Among others, the visual input from one or more cameras is 
-		There are many sensors that can be employed to make navigation possible. 
 		
-		A robot can be built in form of a human, a car or a flying drone.
+		%Among others, the visual input from one or more cameras is 
+		%There are many sensors that can be employed to make navigation possible. 
+		%A robot can be built in form of a human, a car or a flying drone.
+		%In order to do so, it has one or more sensors, such as cameras
 		
-		In order to do so, it has one or more sensors, such as cameras
+%		The term \emph{structure from motion} refers to the observation of 2D motion in a series of images that can be used to recover 3D information.
+%		The camera motion and 3D geometry are by itself completely independent components, but the observed images are only fully determined by the combination of the two.
+%		%The motion of the camera has to be determined simultaneously with structure, because only both components together fully determine the observed projections.
+%		When the desire is to only reconstruct the 3D, e.g. obtaining a 3D model of a vase, the camera parameters can be seen as a by-product of the SfM algorithm. 
+%		After the point cloud is recovered, new views can be rendered on the fly without the need of the original camera poses.
+%		On the other hand, when the interest lies in only recovering the camera path, then SfM produces the point cloud as a by-product.
+%		In SfM, camera parameters and 3D are solved jointly in an iterative manner.
+%		This process has a high computational cost.
+%		It is often not suited for real-time mobile applications where reconstruction from hundreds and thousands of video frames is desired.
+%		Another limitation is that SfM requires the observed scene to be static.
+%		It means that the motion observed in the images can only come from the camera, and not from moving objects in the scene.
+%		Otherwise, the reconstruction problem is ambiguous.
 		
-		The term \emph{structure from motion} refers to the observation of 2D motion in a series of images that can be used to recover 3D information.
-		The camera motion and 3D geometry are by itself completely independent components, but the observed images are only fully determined by the combination of the two.
-		%The motion of the camera has to be determined simultaneously with structure, because only both components together fully determine the observed projections.
-		When the desire is to only reconstruct the 3D, e.g. obtaining a 3D model of a vase, the camera parameters can be seen as a by-product of the SfM algorithm. 
-		After the point cloud is recovered, new views can be rendered on the fly without the need of the original camera poses.
-		On the other hand, when the interest lies in only recovering the camera path, then SfM produces the point cloud as a by-product.
-		In SfM, camera parameters and 3D are solved jointly in an iterative manner.
-		This process has a high computational cost.
-		It is often not suited for real-time mobile applications where reconstruction from hundreds and thousands of video frames is desired.
-		Another limitation is that SfM requires the observed scene to be static.
-		It means that the motion observed in the images can only come from the camera, and not from moving objects in the scene.
-		Otherwise, the reconstruction problem is ambiguous.
-		
-		In practice, SfM algorithms are designed and tuned to work optimally in their application domain.
-		This requires a significant amount of manual intervention and prior knowledge.
-		
+		%In practice, SfM algorithms are designed and tuned to work optimally in their application domain.
+		%This requires a significant amount of manual intervention and prior knowledge.
 		
 		
-		The interest of this thesis lies in recovering the camera parameters, i.e., the position and orientation.
+		
+		
 		
 		%We try to precisely describe our ever-changing world we live in. 
-	
-	---
-	The pose of the camera is defined by a position and an orientation.
-	The orientation defines the viewing direction, which can be in 360 degrees around the point.
-	We can observe the scene from many different angles and take pictures, at many positions in a room 
-	
+		
+		
 	\section{Visual Odometry by Deep Learning}
-	
+		% A model with deep learning (supervised)
+		% Mapping sequences to sequences
+		% Learning from the past: Recurrence
+		% Need large dataset with ground truth
+		% 
+		% 
+		The problem of Visual Odometry is simple to formulate.
+		Given a sequence of temporally ordered images, i.e. a video, the objective is to compute a sequence of camera poses corresponding to the images.
+		
+		
+		The pose of the camera is defined by a position and an orientation.
+		The orientation defines the viewing direction, which can be in 360 degrees around the point.
+		We can observe the scene from many different angles and take pictures, at many positions in a room 
+		
+		The interest of this thesis lies in recovering the camera parameters, i.e., the position and orientation.
 	
 	
 	\section{Challenges}
+		% Getting the sequences wth ground truth pose
+		% 
 	
 	\section{Contribution}
 	
