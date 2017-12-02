@@ -23,7 +23,7 @@
 		To avoid collisions or allow interaction, the 3D structure of the surrounding world and objects has to be reconstructed from the camera input or measured by other sensors.
 		
 		\emph{Visual Odometry (VO)} \todo{reference} addresses the problem of recovering the ego-motion from a video input in real-time. 
-		An extension of VO called \emph{Structure from Motion (SfM)} \todo{reference} additionally recovers the 3D structure from the video input.
+		\emph{Structure from Motion (SfM)} \todo{reference}, an extension of VO, additionally recovers the 3D structure from the video input.
 		Although these methods have many practical applications not only in robotics, they have some limitations.
 		First of all, both VO and SfM rely on robust feature detection and matching between images in order to accurately estimate motion.
 		The algorithms to extract these informations from images are hand-designed and tuned to work well in specific domains and environments.
@@ -88,17 +88,14 @@
 		Without loss of generality it is assumed that the world coordinate system coincides with reference frame of the first image in the sequence.
 		
 		
-		\begin{figure}
+		\begin{figure}[t]
 			\centering
-			%\def\svgwidth{\columnwidth}
 			\includegraphics[width=7cm]{"Introduction/Problem Overview/overview"}
-			\caption{\label{fig:overview-visual-odometry}}
+			\caption[Description of the Visual Odometry problem]
+					{Overview of the Visual Odometry problem.
+					 The input video (left) is mapped to a sequence of poses (right) describing the path of the camera.
+					 \label{fig:overview-visual-odometry}}
 		\end{figure}
-		
-		
-		The pose of the camera is defined by a position and an orientation.
-		The orientation defines the viewing direction, which can be in 360 degrees around the point.
-		We can observe the scene from many different angles and take pictures, at many positions in a room 
 		
 		The interest of this thesis lies in recovering the camera parameters, i.e., the position and orientation.
 	
