@@ -1,8 +1,5 @@
 \chapter{Introduction}
 	
-	
-	
-	
 	\begin{figure}
 		\centering
 		\includegraphics[width=0.3\linewidth]{example-image-a}
@@ -10,15 +7,13 @@
 	\end{figure}
 		
 	\section{Motivation}
-		% Visual odometry, special case of structure from motion
-		% SfM expensive (bundle adjustment, refinement step)
 		
 		Building and programming a robot that interacts with and learns from its environment is challenging.
-		Usually the robot is built to solve a specific task that requires some form of interaction with objects and the environment they occupy.
+		Usually the robot is designed to solve a specific task that requires some form of interaction with objects and the environment they occupy.
 		Some robots require navigation to complete their task, e.g., a self-driving car that has to maneuver into a parking space.
 		The robot has to determine its position and orientation in the world with respect to some coordinate system.
 		Furthermore, it may be required to detect and prevent imminent collisions, which requires sensing the distance to nearby objects.
-		One possible way to tackle the navigation problem is to use one or more cameras mounted to the robot.
+		One possible way to tackle the navigation problem is to use one or more cameras mounted to the body of the robot.
 		In order for the robot to determine its location, it has to intelligently analyze the motion in the input image sequence coming from the video camera.
 		To avoid collisions or allow interaction, the 3D structure of the surrounding world and objects has to be reconstructed from the camera input or measured by other sensors.
 		
@@ -32,13 +27,13 @@
 		Furthermore, classic VO and SfM do not leverage high-level information about the image content that could be used to eliminate and resolve these conflicts.
 		
 		\todo{Better Transition}
-		Very quickly after birth, we humans learn to develop a complex understanding of three-dimensional world around us. 
+		Very quickly after birth, we humans learn to develop a complex understanding of the three-dimensional world around us. 
 		The emphasis here is on \emph{learning}.
 		There is no external force or teacher that predetermines how the network of neurons in our brain develops and grows.
 		It is the continuous loop of information retrieval (e.g. seeing, feeling) and action (e.g. body movement) that determines reward or penalty (e.g. walking or falling) which then influences the development of connections in the brain.
 		\todo{Example removing vision of newborn}
-		Recent advances in \emph{Deep Learning} have shown that machines are able to learn and identify patterns in data and use them to solve complex problems that also humans are faced with everyday, e.g., recognizing a persons face or solving puzzle games.
-		In recent years, Deep Learning has had a significant impact on Computer Vision and is under rapid development, becoming more popular every year.
+		Recent advances in Deep Learning have shown that machines are able to learn and identify patterns in data and use them to solve complex problems that also humans are faced with everyday, e.g., recognizing a persons face or solving puzzle games.
+		Deep Learning has had a significant impact on Computer Vision and is under rapid development, becoming more popular every year.
 		
 		The potential and recent successes of Deep Learning motivate an alternative approach to the classic VO and SfM algorithms.
 		Learning a powerful representation of camera motion from a large dataset of image sequences could help overcome some of the aforementioned challenges in SfM as well as reduce the computational cost to provide real-time mobile applications.
@@ -78,16 +73,13 @@
 		% A model with deep learning (supervised)
 		% Mapping sequences to sequences
 		% Learning from the past: Recurrence
-		% Need large dataset with ground truth
-		% 
-		% 
+		
+		%The interest of this thesis lies in recovering the camera parameters, i.e., the position and orientation.
 		The problem of Visual Odometry is simple to formulate.
 		Given a sequence of temporally ordered images, i.e. a video, the objective is to compute the camera pose at each frame.
 		The camera pose is the location and orientation of the camera in the world coordinate system.
 		It describes the change of coordinates from the local- to the world reference frame in form of a rotation and translation, each having three degrees of freedom.
-		Without loss of generality it is assumed that the world coordinate system coincides with reference frame of the first image in the sequence.
-		
-		
+		Figure~\ref{fig:overview-visual-odometry} shows an overview of the VO problem.
 		\begin{figure}[t]
 			\centering
 			\includegraphics[width=7cm]{"Introduction/Problem Overview/overview"}
@@ -97,12 +89,24 @@
 					 \label{fig:overview-visual-odometry}}
 		\end{figure}
 		
-		The interest of this thesis lies in recovering the camera parameters, i.e., the position and orientation.
-	
-	
+		%Without loss of generality it is assumed that the world coordinate system coincides with reference frame of the first image in the sequence.
+		There are three main problems that need to be addressed by the proposed solution for VO:
+		First, one needs to specify a suitable reference frame and representation for the camera poses.
+		Second, the system has to be designed in a way that it can handle a video input of variable length and frame rate.
+		Third, it should be robust to noise in form of scene dynamics, lighting changes, camera shake or blur.
+		Furthermore, the system must support any camera model without the need for manual calibration.
+		
+		In this thesis, we explore a Deep Learning approach to the VO problem.
+		It involves training an artificial neural network on a large number of videos in a supervised fashion.
+		Supervised learning requires that the true camera poses are known during the learning phase.% for continuous performance evaluation.
+		In order for the network to learn a useful mapping from input to output, it is crucial that the collected data has accurate pose labels for each video frame.
+		The first two of the aforementioned problems are addressed by the architectural choices for the neural network, and the robustness depends, for the most part, on the quality and quantity of the available data for learning.
+		
+		
 	\section{Challenges}
-		% Getting the sequences wth ground truth pose
+		% Getting the sequences wth ground truth pose (using gps, IMU, synthetic)
 		% 
+		
 	
 	\section{Contribution}
 	
