@@ -82,7 +82,7 @@
 		Figure~\ref{fig:overview-visual-odometry} shows an overview of the VO problem.
 		\begin{figure}[t]
 			\centering
-			\includegraphics[width=7cm]{"Introduction/Problem Overview/overview"}
+			\includegraphics[width=\linewidth]{"Introduction/Problem Overview/overview"}
 			\caption[Description of the Visual Odometry problem]
 					{Overview of the Visual Odometry problem.
 					 The input video (left) is mapped to a sequence of poses (right) describing the path of the camera.
@@ -90,7 +90,7 @@
 		\end{figure}
 		
 		%Without loss of generality it is assumed that the world coordinate system coincides with reference frame of the first image in the sequence.
-		There are three main problems that need to be addressed by the proposed solution for VO:
+		There are three main problems that need to be addressed by the proposed solution for VO.
 		First, one needs to specify a suitable reference frame and representation for the camera poses.
 		Second, the system has to be designed in a way that it can handle a video input of variable length and frame rate.
 		Third, it should be robust to noise in form of scene dynamics, lighting changes, camera shake or blur.
@@ -98,7 +98,8 @@
 		
 		In this thesis, we explore a Deep Learning approach to the VO problem.
 		It involves training an artificial neural network on a large number of videos in a supervised fashion.
-		Supervised learning requires that the true camera poses are known during the learning phase.% for continuous performance evaluation.
+		Supervised learning requires that the true camera poses are known during the learning phase.
+		% for continuous performance evaluation.
 		In order for the network to learn a useful mapping from input to output, it is crucial that the collected data has accurate pose labels for each video frame.
 		The first two of the aforementioned problems are addressed by the architectural choices for the neural network, and the robustness depends, for the most part, on the quality and quantity of the available data for learning.
 		
@@ -107,6 +108,12 @@
 		% Getting the sequences wth ground truth pose (using gps, IMU, synthetic)
 		% 
 		
+		Training a neural network requires a large dataset with realistic data.
+		Collecting the video data is time consuming, but the challenge lies in the collection of the ground truth, i.e., the camera pose.
+		The accelerometers and gyroscopes in consumer cameras are not accurate enough to capture the pose of the device over a long period of time as they experience large measurement drift.
+		GPS may be used to determine the horizontal location within a few meters depending on the signal strength, but this makes it impossible for indoor navigation.
+		An alternative way to obtain precise camera pose is by generating it synthetically.
+		However, the challenge here is to generate photo-realistic data with much variation.
 	
 	\section{Contribution}
 		% mention the deepVO paper, based on this work
@@ -124,7 +131,8 @@
 			
 			\item Chapter 4 is a detailed description of the proposed deep learning model for Visual Odometry.
 			
-			\item Chapter 5 documents the experiments and results that show the strengths and weaknesses of the proposed model.
+			\item Chapter 5 documents the experiments and results on real and synthetic datasets.
+			It also shows the strengths and weaknesses of the system.
 			
 			\item Chapter 6 concludes the thesis with a discussion of the results and improvements for future work.
 		\end{itemize}
