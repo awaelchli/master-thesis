@@ -90,15 +90,26 @@
 			%\todo{numerical issues, 5 point algorithm}
 			%\todo{explain what F is used for}
 			
-		\subsection{Feature Detection and Matching}
+		\subsection{Feature Extraction and Matching}
 			% methods: SURF, ORB, SIFT
 			The Eight Point Algorithm is not the only method that requires accurate correspondences across image pairs.
 			All SfM algorithms depend on a robust feature detection and matching to solve the correspondence problem between two or more images.
 			Two keypoints with associated feature descriptors, one in each image, are considered a corresponding pair if the feature descriptions are equal.
 			A reasonable feature descriptor should be invariant to rotation and scale, illumination changes and noise.
 			One of the descriptors that addresses these concerns is the \emph{Scale Invariant Feature Transform (SIFT)} introduced by~\cite{lowe1999object}.
+			In the first step, the feature detection, SIFT identifies patterns that are distinctive from their neighborhood by finding edges, corners and blobs in the image.
+			The second step transforms these patterns (in form of image patches) into a scale-invariant representation by convolving with multiple Difference of Gaussian (DoG) kernels at different scales of the image (via down-sampling).
+			At this stage, one of the candidate scales is selected based on contrast and edge response.
+			In this way, the same pattern in two different images at different scales will be transformed to the same scale in the feature space and therefore invariance is satisfied.
+			In the third step, rotation invariance is achieved by computing a dominant orientation of the patch based on local gradients.
+			The patch is then further subdivided into subregions where a histogram of gradients (HOG) is computed.
+			All of this information is then encoded into a 128 dimensional vector describing a single feature.
 			
-			
+			The extraction of these features works the same for every image, and the features descriptors can be compared directly to find correspondence candidates.
+			Although SIFT has proven to be very robust, the computation of the features is expensive, especially the scale-invariant part.
+			Subsequent works have proposed improved variants of SIFT such as PCA-SIFT (\cite{ke2004pca}) or SURF (\cite{bay2006surf}).
+			Despite the successes of these methods in many applications, e.g. object recognition or panorama stitching, they rely on hand-crafted functions that are empirically derived.
+			Furthermore, SIFT is defined based on very low-level image characteristics, which is contrary to how the human brain, the most-sophisticated system for vision we know, works.
 			
 	\subsection{Factorization Methods}
 		The factorization method can be used to recover camera motion and 3D shape simultaneously (step 2 and 3).
