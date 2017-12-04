@@ -1,10 +1,4 @@
 \chapter{Introduction}
-	
-	\begin{figure}
-		\centering
-		\includegraphics[width=0.3\linewidth]{example-image-a}
-		\caption{\label{fig:sfm-example}}
-	\end{figure}
 		
 	\section{Motivation}
 		
@@ -79,16 +73,7 @@
 		Given a sequence of temporally ordered images, i.e. a video, the objective is to compute the camera pose at each frame.
 		The camera pose is the location and orientation of the camera in the world coordinate system.
 		It describes the change of coordinates from the local- to the world reference frame in form of a rotation and translation, each having three degrees of freedom.
-		Figure~\ref{fig:overview-visual-odometry} shows an overview of the VO problem.
-		\begin{figure}[t]
-			\centering
-			\includegraphics[width=\linewidth]{"Introduction/Problem Overview/overview"}
-			\caption[Description of the Visual Odometry problem]
-					{Overview of the Visual Odometry problem.
-					 The input video (left) is mapped to a sequence of poses (right) describing the path of the camera.
-					 \label{fig:overview-visual-odometry}}
-		\end{figure}
-		
+
 		%Without loss of generality it is assumed that the world coordinate system coincides with reference frame of the first image in the sequence.
 		There are three main problems that need to be addressed by the proposed solution for VO.
 		First, one needs to specify a suitable reference frame and representation for the camera poses.
@@ -97,6 +82,15 @@
 		Furthermore, the system must support any camera model without the need for manual calibration.
 		
 		In this thesis, we explore a Deep Learning approach to the VO problem.
+		Figure~\ref{fig:overview-visual-odometry} presents a high-level overview of the VO problem.
+		\begin{figure}[t]
+			\centering
+			\includegraphics[width=\linewidth]{"Introduction/Problem Overview/overview"}
+			\caption[Description of the Visual Odometry problem]
+					{Overview of the Visual Odometry problem.
+					 The neural network learns to map the input video (left) to the desired output sequence of poses (right) that describe the path of the camera.
+					 \label{fig:overview-visual-odometry}}
+		\end{figure}
 		It involves training an artificial neural network on a large number of videos in a supervised fashion.
 		Supervised learning requires that the true camera poses are known during the learning phase.
 		% for continuous performance evaluation.
@@ -114,12 +108,32 @@
 		GPS may be used to determine the horizontal location within a few meters depending on the signal strength, but this makes it impossible for indoor navigation.
 		An alternative way to obtain precise camera pose is by generating it synthetically.
 		However, the challenge here is to generate photo-realistic data with much variation.
+		
+		Another challenge lies in the design of the architecture of the neural network.
+		It may be problematic to properly separate the motion into rotation and translation, as small rotational changes may be confused with translation.
+		Furthermore, it is unclear how one should design the system to be able to resolve ambiguity.
+		For example, the projection of an arbitrary object is the same when the object is moved twice as far away from the camera and its physical size is doubled.
+		\todo{more challenges}
+		
 	
 	\section{Contribution}
 		% mention the deepVO paper, based on this work
 		% supplemental insight, reverse engineer
 		% large and diverse synthetic dataset, as an extension to VIPER?
 		%
+		The contributions of this thesis are the following.
+		\begin{itemize}
+			\item A review of prior work on SfM and VO with the focus on Deep Learning oriented methods.
+			
+			\item A large synthetic dataset of labeled videos for Visual Odometry captured from the video game Grand Theft Auto V.
+			
+			\item An implementation of a VO model using a recurrent neural network architecture as presented in the paper by~\cite{wang2017deepvo}.
+			The code is written in Python with the deep learning framework PyTorch\footnote{\url{http://pytorch.org/}}.
+			
+			\item A study of the models capabilities and limitations with an analysis of hyperparameters, different pose representations and performance metrics.
+		\end{itemize}
+		The proposed system is completely end-to-end.
+		It does not require any external calibration and runs in real time after training is completed.
 	
 	\section{Structure of the Thesis}
 		The remainder of this thesis is structured as follows:
