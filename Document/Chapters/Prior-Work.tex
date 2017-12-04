@@ -52,7 +52,7 @@
 
 		\subsection{The Eight Point Algorithm}
 			Early works on SfM focused their study on the geometry between two camera views only.
-			The algorithm that emerged from this work is the \emph{The Eight Point Algorithm}, introduced by \cite{longuet1981}.
+			An important algorithm that emerged from these works is the \emph{The Eight Point Algorithm}, introduced by \cite{longuet1981}.
 			It makes use of the epipolar geometry between a pair of views in order to compute relative translation and orientation of the cameras.
 			The relationship between the two camera views is described by the so-called \emph{essential matrix}.
 			It is defined as 
@@ -61,6 +61,7 @@
 			\end{equation}
 			where $\left[ \vectr{t} \right]_\times$ is the matrix that computes the cross-product between $\vectr{t}$ and an arbitrary vector.
 			The essential matrix describes the relationship between corresponding points in the image planes of the two cameras.
+			A pair of 3D coordinates, one in each camera view, is called \emph{corresponding} if they depict the projection of the same 3D point.
 			When $\matr{R}$ and $\vectr{t}$ are unknown, it is possible to compute the essential matrix using known corresponding points.
 			The epipolar constraint is formulated as 
 			\begin{equation}\label{eq:epipolar_constraint}
@@ -87,8 +88,10 @@
 			\end{equation}
 			The same way as for the essential matrix, $\matr{F}$ can be computed using the Eight Point Algorithm although the fundamental matrix is less useful than the essential matrix because it is not anymore possible to uniquely recover $\matr{R}$ and $\matr{t}$ in the uncalibrated case.
 			Nonetheless, it can still be used to find more correspondences in the image pair since it defines the epipolar constraint as seen in equation~\ref{eq:fundamental_matrix_epipolar_constraint}.
+			
+			%The Eight Point Algorithm depends on a selection of pairs of coordinates, each pair representing the same 3D point in the two images respectively.
+			%A manual selection of these correspondences is unpractical, hence the need for an automated system arises. 
 			%\todo{numerical issues, 5 point algorithm}
-			%\todo{explain what F is used for}
 			
 		\subsection{Feature Extraction and Matching}
 			% methods: SURF, ORB, SIFT
@@ -109,9 +112,14 @@
 			Although SIFT has proven to be very robust, the computation of the features is expensive, especially the scale-invariant part.
 			Subsequent works have proposed improved variants of SIFT such as PCA-SIFT (\cite{ke2004pca}) or SURF (\cite{bay2006surf}).
 			Despite the successes of these methods in many applications, e.g. object recognition or panorama stitching, they rely on hand-crafted functions that are empirically derived.
-			Furthermore, SIFT is defined based on very low-level image characteristics, which is contrary to how the human brain, the most-sophisticated system for vision we know, works.
+			Furthermore, SIFT is defined based on very low-level image characteristics, which is contrary to the workings of the human brain, the most-sophisticated system for vision we know.
+			As we will see in section~\ref{sec:learning_based_methods}, neural networks can be designed to automatically learn useful features without the need for manual intervention and tuning.
+			It is shown that these features are more powerful than SIFT features for many computer vision tasks.
 			
-	\subsection{Factorization Methods}
+			
+	\subsection{The Factorization Method}
+		So far, we have seen a method for estimating the relative camera pose based on two images by solving the epipolar constraint with matched feature points.
+		\todo{continue transition}
 		The factorization method can be used to recover camera motion and 3D shape simultaneously (step 2 and 3).
 		A first method was introduced by \cite{tomasi1992factorization} that works with an orthographic camera model.
 		It uses the so called \emph{measurement matrix} $W \in \R^{2n \times m}$ which is defined as
@@ -164,6 +172,8 @@
 		
 	
 	\section{Learning-Based Methods}
+	\label{sec:learning_based_methods}
+	
 	\subsection{2015 - PoseNet}
 		The PoseNet, as proposed by \cite{kendall2015posenet}, is a CNN that performs regression for the location and orientation of the camera given a single image as input.
 		It outputs a 7D vector that describes the pose $p = [x, q]^\top$ as the camera location $x$ (3D) and orientation $q$ (4D quaternion).
