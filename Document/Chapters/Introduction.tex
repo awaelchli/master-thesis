@@ -100,7 +100,7 @@
 		
 	\section{Challenges}
 		% Getting the sequences wth ground truth pose (using gps, IMU, synthetic)
-		% 
+		% Aperture problem?
 		
 		Training a neural network requires a large dataset with realistic data.
 		Collecting the video data is time consuming, but the challenge lies in the collection of the ground truth, i.e., the camera pose.
@@ -110,7 +110,7 @@
 		However, the challenge here is to generate photo-realistic data with much variation.
 		
 		Another challenge lies in the design of the architecture of the neural network.
-		It may be problematic to properly separate the motion into rotation and translation, as small rotational changes may be confused with translation.
+		It may be problematic to properly separate the motion into rotation and translation, as small rotational changes could be confused with translation.
 		Furthermore, it is unclear how one should design the system to be able to resolve ambiguity.
 		For example, the projection of an arbitrary object is the same when the object is moved twice as far away from the camera and its physical size is doubled.
 		\todo{more challenges}

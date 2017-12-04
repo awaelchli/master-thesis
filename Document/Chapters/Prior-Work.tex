@@ -1,11 +1,9 @@
 \chapter{Prior Work}
 	
-	\todo{Add text that introduces the chapter} \\
 	\todo{Find good structure/order to present the different works} \\
 	\todo{Better point out differences and similarities} \\
 	\todo{Typeset vectors/matrices with custom commands}
 	
-	---
 	Since the beginning, we humans have examined the world around us. 
 	There is a certain urge to explore, build and shape the environment we live in.
 	One thing that we have learned long ago is that every object, place, person changes its shape and appearance, the way it behaves and feels like. Sooner or later, everything ages, breaks and vanishes as it contributes to the increase of entropy in our universe.
@@ -28,70 +26,81 @@
 	It is therefore not possible to reconstruct the 3D of surfaces that are occluded or outside the field of view. 
 	In order to obtain a full 3D reconstruction of a static object or scene, images have to be taken from many positions and angles.
 	Through the motion of the camera, in a continuous fashion new 2D measurements of points are obtained that would otherwise be occluded from a single viewing direction.
-	The technique of recovering the 3D geometry from multiple images is called \emph{structure from motion (SfM)}.
-	In the typical SfM pipeline the input is a ordered or unordered list of images and the output consists of the camera poses and the 3D point cloud.
-	%	The SfM pipeline can be summarized in three basic steps:
-	%	\begin{enumerate}
-	%		\item Feature detection, extraction and matching
-	%		\item Camera motion estimation
-	%		\item Recovery of the 3D structure
-	%	\end{enumerate}
-	
-	---
-	---
-	
-	
-	\noindent
-	Possible definition of structure from motion by \cite{survey2017}:
-	
-	\say{The structure from motion (SfM) problem in computer vision is the problem of recovering the three-dimensional (3D) structure of a stationary scene from a set of projective measurements, represented as a collection of two-dimensional (2D) images, via estimation of motion of the cameras corresponding to these images.}
-	
-	One can define the three basic steps of SfM as:
+	The technique of recovering the 3D geometry from multiple images is called \emph{Structure from Motion (SfM)}.
+	In the typical SfM pipeline the input is an ordered or unordered list of images and the output consists of the camera poses and the 3D point cloud.
+	The typical SfM pipeline can be summarized in three basic steps:
 	\begin{enumerate}
 		\item Feature detection, extraction and matching
 		\item Camera motion estimation
-		\item Recovery of 3D structure
+		\item Recovery of the 3D structure
 	\end{enumerate}
 	This chapter presents the prior work that focuses on one or multiple of these steps.
 	
-	\section{Feature-based methods SURF, ORB, SIFT}
-	
+%	\noindent
+%	Possible definition of structure from motion by \cite{survey2017}:
+%	
+%	\say{The structure from motion (SfM) problem in computer vision is the problem of recovering the three-dimensional (3D) structure of a stationary scene from a set of projective measurements, represented as a collection of two-dimensional (2D) images, via estimation of motion of the cameras corresponding to these images.}
+%	
+%	One can define the three basic steps of SfM as:
+%	\begin{enumerate}
+%		\item Feature detection, extraction and matching
+%		\item Camera motion estimation
+%		\item Recovery of 3D structure
+%	\end{enumerate}
 
-	\section{The Eight Point Algorithm}
-		The eight point algorithm, as introduced by \cite{longuet1981}, makes use of the epipolar geometry between a pair of views in order to compute relative translation and orientation of the cameras.
-		The relationship between the two camera views is described by the so-called \emph{essential matrix}.
-		It is defined as 
-		\begin{equation}\label{eq:essential_matrix}
-			E = \left[ t \right]_\times \! R,
-		\end{equation}
-		where $\left[ t \right]_\times$ is the matrix that computes the cross-product between $t$ and an arbitrary vector.
-		It describes the relationship between corresponding points in the image planes of the two cameras.
-		When $R$ and $t$ are unknown, it is possible to compute the essential matrix using known corresponding points.
-		The epipolar constraint is formulated as 
-		\begin{equation}\label{eq:epipolar_constraint}
-			\hat{x}_1^\top E \hat{x}_0 = 0,
-		\end{equation}
-		where $\hat{x}_0$ and $\hat{x}_1$ are the corresponding points in image one and two respectively.
-		The unknown elements of the essential matrix can be determined using this system of equations.
-		It requires eight equations for eight elements of the matrix and one element has to be fixed because any scaling of the true matrix satisfies the epipolar constraint.
-		After estimating $E$, the rotation and translation can be recovered from it up to some ambiguities.
-		
-		In practice, there are some problems that need to be addressed.
-		First, the corresponding points are usually not known and must be found using a feature detection and matching technique (SfM step 1).
-		This then can lead to outliers which are wrong correspondences.
-		In this case, {RANSAC} is applied to select the best eight points among many possible choices.
-		Second, the selected points are usually not exact and contain noise that lead to a rank three estimate of $E$ instead of rank two.
-		The singular value decomposition is used to discard the component with the smallest singular value.
-		\todo{numerical issues, 5 point algorithm}
-		Third, in some cases the calibration matrices $K_0$ and $K_1$ are unknown.
-		This means that the normalized coordinates $\hat{x}_j = K_j^{-1} x_j$ are no longer available and only the image coordinates $x_j$ are known.
-		This results in the so called \emph{fundamental matrix} $F$ in the epipolar constraint:
-		\begin{equation}
-			\hat{x}_1^\top E \hat{x}_0 = x_1^\top K_1^{-\top} E K_0^{-1} x_0 = x_1^\top F x_0 = 0.
-		\end{equation}
-		\todo{explain what F is used for}
-		
-	\section{Factorization Methods}
+	\section{Classic Methods}
+
+		\subsection{The Eight Point Algorithm}
+			Early works on SfM focused their study on the geometry between two camera views only.
+			The algorithm that emerged from this work is the \emph{The Eight Point Algorithm}, introduced by \cite{longuet1981}.
+			It makes use of the epipolar geometry between a pair of views in order to compute relative translation and orientation of the cameras.
+			The relationship between the two camera views is described by the so-called \emph{essential matrix}.
+			It is defined as 
+			\begin{equation}\label{eq:essential_matrix}
+				\matr{E} = \left[ \vectr{t} \right]_\times \! \matr{R},
+			\end{equation}
+			where $\left[ \vectr{t} \right]_\times$ is the matrix that computes the cross-product between $\vectr{t}$ and an arbitrary vector.
+			The essential matrix describes the relationship between corresponding points in the image planes of the two cameras.
+			When $\matr{R}$ and $\vectr{t}$ are unknown, it is possible to compute the essential matrix using known corresponding points.
+			The epipolar constraint is formulated as 
+			\begin{equation}\label{eq:epipolar_constraint}
+				\vectr{\hat{x}}_1^\top \matr{E} \, \vectr{\hat{x}}_0 = 0,
+			\end{equation}
+			where $\vectr{\hat{x}}_0$ and $\vectr{\hat{x}}_1$ are the corresponding points in image one and two respectively.
+			The unknown elements of the essential matrix can be determined using this system of equations.
+			It requires eight equations for eight elements of the matrix and one element has to be fixed because any scaling of the true matrix satisfies the epipolar constraint.
+			After estimating $\matr{E}$, the rotation and translation can be uniquely recovered from it up to an unknown scaling of the translation.
+			
+			In practice, there are a few problems that need to be addressed.
+			First, the corresponding points are usually not known and must be found using a feature detection and matching technique (SfM step 1, more on this later).
+			This then can lead to outliers, which are incorrectly assigned correspondences.
+			In this case, {RANSAC} (\cite{fischler1981random}) is applied to select the best eight points among many possible choices.
+			Second, the selected coordinates are usually not exact and contain noise that lead to a rank three estimate of $\matr{E}$ instead of rank two.
+			The singular value decomposition is used to discard the component with the smallest singular value.
+			Third, in some cases the camera calibration matrices $\matr{K}_0$ and $\matr{K}_1$ are unknown.
+			This means that the normalized coordinates $\vectr{\hat{x}}_j = \matr{K}_j^{-1} \vectr{x}_j$ are no longer available and only the image coordinates $\vectr{x}_j$ are known.
+			This results in the so called \emph{fundamental matrix} $\matr{F}$ in the epipolar constraint:
+			\begin{equation}\label{eq:fundamental_matrix_epipolar_constraint}
+				\vectr{\hat{x}}_1^\top \matr{E} \vectr{\hat{x}}_0 = 
+				\vectr{x}_1^\top \matr{K}_1^{-\top} \matr{E} \matr{K}_0^{-1} \vectr{x}_0 = 
+				\vectr{x}_1^\top \matr{F} \vectr{x}_0 = 0.
+			\end{equation}
+			The same way as for the essential matrix, $\matr{F}$ can be computed using the Eight Point Algorithm although the fundamental matrix is less useful than the essential matrix because it is not anymore possible to uniquely recover $\matr{R}$ and $\matr{t}$ in the uncalibrated case.
+			Nonetheless, it can still be used to find more correspondences in the image pair since it defines the epipolar constraint as seen in equation~\ref{eq:fundamental_matrix_epipolar_constraint}.
+			%\todo{numerical issues, 5 point algorithm}
+			%\todo{explain what F is used for}
+			
+		\subsection{Feature Detection and Matching}
+			% methods: SURF, ORB, SIFT
+			The Eight Point Algorithm is not the only method that requires accurate correspondences across image pairs.
+			All SfM algorithms depend on a robust feature detection and matching to solve the correspondence problem between two or more images.
+			Two keypoints with associated feature descriptors, one in each image, are considered a corresponding pair if the feature descriptions are equal.
+			A reasonable feature descriptor should be invariant to rotation and scale, illumination changes and noise.
+			One of the descriptors that addresses these concerns is the \emph{Scale Invariant Feature Transform (SIFT)} introduced by~\cite{lowe1999object}.
+			
+			
+			
+	\subsection{Factorization Methods}
 		The factorization method can be used to recover camera motion and 3D shape simultaneously (step 2 and 3).
 		A first method was introduced by \cite{tomasi1992factorization} that works with an orthographic camera model.
 		It uses the so called \emph{measurement matrix} $W \in \R^{2n \times m}$ which is defined as
@@ -120,7 +129,7 @@
 		The works of \cite{sturm1996factorization} and \cite{christy1996euclidean} have extended the factorization method for perspective projection using an iterative process.
 		Second, in order for the factorization method to work, all points of the shape must be visible in every frame, i.e., to obtain the measurement matrix one needs to find the correspondences across all frames.
 		
-	\section{Bundle Adjustment} 
+	\subsection{Bundle Adjustment} 
 		Another method to solve multi-view SfM is the method of \emph{bundle adjustment}.
 		It is the most general technique for simultaneously recovering 3D shape and camera pose, but it is also computationally expensive.
 		The bundle adjustment technique aims to minimize the re-projection error of the unknown 3D points and camera matrices.
@@ -143,7 +152,8 @@
 		One approach to find a better local minimum is to initialize using an other SfM algorithm such as the factorization method.
 		
 	
-	\section{2015 - PoseNet}
+	\section{Learning-Based Methods}
+	\subsection{2015 - PoseNet}
 		The PoseNet, as proposed by \cite{kendall2015posenet}, is a CNN that performs regression for the location and orientation of the camera given a single image as input.
 		It outputs a 7D vector that describes the pose $p = [x, q]^\top$ as the camera location $x$ (3D) and orientation $q$ (4D quaternion).
 		They simultaneously learn location and orientation with the euclidean loss
@@ -174,11 +184,11 @@
 		\todo{connection to other work?}
 		
 		
-	\section{04/2016 - 3d-r2n2: A unified approach for single and multi-view 3d object reconstruction}
+	\subsection{04/2016 - 3d-r2n2: A unified approach for single and multi-view 3d object reconstruction}
 		
 		\cite{choy20163d}
 		
-	\section{07/2016 - Unsupervised CNN for Single View Depth Estimation}
+	\subsection{07/2016 - Unsupervised CNN for Single View Depth Estimation}
 		
 		The work of \cite{garg2016} implements a autoencoder on stereo pair images to predict depth from a single image.
 		Their architecture consist of the following parts.
@@ -205,7 +215,7 @@
 		The dataset they use is {KITTI} \cite{Geiger2012KITTI} which they augment by random crops, color channel scaling, and flipping the images.
 		
 	
-	\section{04/2017 - SfM-Net}
+	\subsection{04/2017 - SfM-Net}
 		
 		\cite{SFMNET} implement a deep learning approach to structure from motion. 
 		Their architecture consists of two subnetworks:
@@ -256,7 +266,7 @@
 			They evaluate the quality of the object motion mask by intersection over union (IoU).
 		\end{itemize}
 		
-	\section{04/2017 - Unsupervised Learning of Depth and Ego-Motion from Video}
+	\subsection{04/2017 - Unsupervised Learning of Depth and Ego-Motion from Video}
 		
 		This work from \cite{zhou2017unsupervised} is concurrent to the SfM-Net by \cite{SFMNET}.
 		Both works share a similar concept.
@@ -282,7 +292,7 @@
 		To do this, the network is forced to additionally learn a per-pixel mask for each target-source pair.
 		They add a regularization term to force the mask to have non-zero values.
 		
-	\section{04/2017 - DeMoN: Depth and Motion Network for Learning Monocular Stereo}
+	\subsection{04/2017 - DeMoN: Depth and Motion Network for Learning Monocular Stereo}
 		
 		\cite{ummenhofer2016demon} propose a network architecture to learn depth, motion as well as optical flow and surface normals from two images.
 		The network architecture consists of three subnetworks in sequence:
@@ -311,7 +321,7 @@
 		The results show that estimating normals and flow in addition to depth and motion slightly improves the performance of the system.
 		Compared to works for depth from a single image, their results demonstrate that the network learns to use motion parallax from the stereo images to generalize better to scenes that heavily differ from the examples seen during training.
 		
-	\section{05/2017 - Relative Camera Pose Estimation Using Convolutional Neural Networks}
+	\subsection{05/2017 - Relative Camera Pose Estimation Using Convolutional Neural Networks}
 	
 		\cite{melekhov2017poseCNN} propose a CNN architecture to estimate the relative pose between two cameras.
 		Similar to PoseNet \cite{kendall2015posenet}, they estimate the 7D vector of pose by a quaternion and a translation vector.
