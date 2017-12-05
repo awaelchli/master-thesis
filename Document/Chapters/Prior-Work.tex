@@ -49,8 +49,36 @@
 %	\end{enumerate}
 
 	\section{Classic Methods}
+	
+		\subsection{Feature Extraction and Matching}
+			% methods: SURF, ORB, SIFT
+			%The Eight Point Algorithm is not the only method that requires accurate correspondences across image pairs.
+			All SfM algorithms depend on a robust feature detection and matching to solve the correspondence problem between two or more images.
+			It is usually the first step in the SfM pipeline.
+			A pair of 3D coordinates, one in each camera view, is called \emph{corresponding} if they depict the projection of the same 3D point.
+			In this case, the feature description in the local area of these keypoints matches.
+			%Two keypoints with associated feature descriptors, one in each image, are considered a corresponding pair if the feature descriptions are equal.
+			A reasonable feature descriptor should be invariant to rotation, scale, illumination changes and noise.
+			One of the descriptors that addresses these concerns is the \emph{Scale Invariant Feature Transform (SIFT)} introduced by~\cite{lowe1999object}.
+			In the first step, the feature detection, SIFT identifies patterns that are distinctive from their neighborhood by finding edges, corners and blobs in the image.
+			The second step transforms these patterns (in form of image patches) into a scale-invariant representation by convolving with multiple Difference of Gaussian (DoG) kernels at different scales of the image (via down-sampling).
+			At this stage, one of the candidate scales is selected based on contrast and edge response.
+			In this way, the same pattern in two different images at different scales will be transformed to the same scale in the feature space and therefore invariance is satisfied.
+			In the third step, rotation invariance is achieved by computing a dominant orientation of the patch based on local gradients.
+			The patch is then further subdivided into subregions where a histogram of gradients (HOG) is computed.
+			All of this information is then encoded into a 128-dimensional vector describing a single feature.
+			
+			The extraction of these features works the same for every image, and the features descriptors can be compared directly to find correspondence candidates.
+			Although SIFT has proven to be very robust, the computation of the features is expensive, especially the scale-invariant part.
+			Subsequent works have proposed improved variants of SIFT such as PCA-SIFT (\cite{ke2004pca}) or SURF (\cite{bay2006surf}).
+			Despite the successes of these methods in many applications, e.g. object recognition or panorama stitching, they rely on hand-crafted functions that are empirically derived.
+			Furthermore, SIFT is defined based on very low-level image characteristics, which is contrary to the workings of the human brain, the most-sophisticated system for vision we know.
+			
+			As we will see in section~\ref{sec:learning_based_methods}, neural networks can be designed to automatically learn useful features without the need for manual intervention and tuning.
+			These networks are built in an intuitive way.
+			It is often easier and faster to train a neural network instead of manually adapting features to a new domain.
 
-		\subsection{The Eight Point Algorithm}
+		\subsection{Structure and Motion from Two Images}
 			Early works on SfM focused their study on the geometry between two camera views only.
 			An important algorithm that emerged from these works is the \emph{The Eight Point Algorithm}, introduced by \cite{longuet1981}.
 			It makes use of the epipolar geometry between a pair of views in order to compute relative translation and orientation of the cameras.
@@ -61,7 +89,6 @@
 			\end{equation}
 			where $\left[ \vectr{t} \right]_\times$ is the matrix that computes the cross-product between $\vectr{t}$ and an arbitrary vector.
 			The essential matrix describes the relationship between corresponding points in the image planes of the two cameras.
-			A pair of 3D coordinates, one in each camera view, is called \emph{corresponding} if they depict the projection of the same 3D point.
 			When $\matr{R}$ and $\vectr{t}$ are unknown, it is possible to compute the essential matrix using known corresponding points.
 			The epipolar constraint is formulated as 
 			\begin{equation}\label{eq:epipolar_constraint}
@@ -73,7 +100,7 @@
 			After estimating $\matr{E}$, the rotation and translation can be uniquely recovered from it up to an unknown scaling of the translation.
 			
 			In practice, there are a few problems that need to be addressed.
-			First, the corresponding points are usually not known and must be found using a feature detection and matching technique (SfM step 1, more on this later).
+			First, the corresponding points are usually not known and must be found using a feature detection and matching technique (SfM step 1), e.g. SIFT.
 			This then can lead to outliers, which are incorrectly assigned correspondences.
 			In this case, {RANSAC} (\cite{fischler1981random}) is applied to select the best eight points among many possible choices.
 			Second, the selected coordinates are usually not exact and contain noise that lead to a rank three estimate of $\matr{E}$ instead of rank two.
@@ -87,89 +114,78 @@
 				\vectr{x}_1^\top \matr{F} \vectr{x}_0 = 0.
 			\end{equation}
 			The same way as for the essential matrix, $\matr{F}$ can be computed using the Eight Point Algorithm although the fundamental matrix is less useful than the essential matrix because it is not anymore possible to uniquely recover $\matr{R}$ and $\matr{t}$ in the uncalibrated case.
-			Nonetheless, it can still be used to find more correspondences in the image pair since it defines the epipolar constraint as seen in equation~\ref{eq:fundamental_matrix_epipolar_constraint}.
+			Nonetheless, $\matr{F}$ defines the epipolar constraint and therefore can be used to find more correspondences in the image pair.
 			
+			\todo{3D reconstruction from Essential matrix via triangulation}
 			%The Eight Point Algorithm depends on a selection of pairs of coordinates, each pair representing the same 3D point in the two images respectively.
 			%A manual selection of these correspondences is unpractical, hence the need for an automated system arises. 
 			%\todo{numerical issues, 5 point algorithm}
 			
-		\subsection{Feature Extraction and Matching}
-			% methods: SURF, ORB, SIFT
-			The Eight Point Algorithm is not the only method that requires accurate correspondences across image pairs.
-			All SfM algorithms depend on a robust feature detection and matching to solve the correspondence problem between two or more images.
-			Two keypoints with associated feature descriptors, one in each image, are considered a corresponding pair if the feature descriptions are equal.
-			A reasonable feature descriptor should be invariant to rotation and scale, illumination changes and noise.
-			One of the descriptors that addresses these concerns is the \emph{Scale Invariant Feature Transform (SIFT)} introduced by~\cite{lowe1999object}.
-			In the first step, the feature detection, SIFT identifies patterns that are distinctive from their neighborhood by finding edges, corners and blobs in the image.
-			The second step transforms these patterns (in form of image patches) into a scale-invariant representation by convolving with multiple Difference of Gaussian (DoG) kernels at different scales of the image (via down-sampling).
-			At this stage, one of the candidate scales is selected based on contrast and edge response.
-			In this way, the same pattern in two different images at different scales will be transformed to the same scale in the feature space and therefore invariance is satisfied.
-			In the third step, rotation invariance is achieved by computing a dominant orientation of the patch based on local gradients.
-			The patch is then further subdivided into subregions where a histogram of gradients (HOG) is computed.
-			All of this information is then encoded into a 128 dimensional vector describing a single feature.
+
 			
-			The extraction of these features works the same for every image, and the features descriptors can be compared directly to find correspondence candidates.
-			Although SIFT has proven to be very robust, the computation of the features is expensive, especially the scale-invariant part.
-			Subsequent works have proposed improved variants of SIFT such as PCA-SIFT (\cite{ke2004pca}) or SURF (\cite{bay2006surf}).
-			Despite the successes of these methods in many applications, e.g. object recognition or panorama stitching, they rely on hand-crafted functions that are empirically derived.
-			Furthermore, SIFT is defined based on very low-level image characteristics, which is contrary to the workings of the human brain, the most-sophisticated system for vision we know.
-			As we will see in section~\ref{sec:learning_based_methods}, neural networks can be designed to automatically learn useful features without the need for manual intervention and tuning.
-			It is shown that these features are more powerful than SIFT features for many computer vision tasks.
+		\subsection{Multi-View Structure from Motion}
+		%\subsection{The Factorization Method}
+			So far, we have seen a method for estimating the relative camera pose \todo{and structure} based on two images by solving the epipolar constraint with matched feature points.
+			The next step is the reconstruction from multiple camera views.
+			The factorization method can be used to recover motion and 3D shape simultaneously for all cameras (step 2 and 3).
+			A first method was introduced by \cite{tomasi1992factorization} that works with an orthographic camera model.
+			It uses the so called \emph{measurement matrix} $\matr{W} \in \R^{2n \times m}$ which is defined as
+			\begin{equation}\label{eq:measurement_matrix}
+				\matr{W} =
+				\begin{bmatrix}
+					x_{11} & \cdots & x_{1m} \\ 
+					\vdots & \ddots & \vdots \\ 
+					x_{n1} & \cdots & x_{nm} \\ 
+					y_{11} & \cdots & y_{1m} \\ 
+					\vdots & \ddots & \vdots \\ 
+					y_{n1} & \cdots & y_{nm}
+				\end{bmatrix}. 
+			\end{equation}
+			It contains the 2D coordinates of the $m$ orthographically projected 3D points for each of the $n$ cameras.
+			Under the assumption that the origin of global coordinate system is located at the centroid of the point cloud, the matrix $W$ can be factorized into
+			\begin{equation}\label{eq:factorization_method}
+				\matr{W} = \matr{M} \matr{S},
+			\end{equation}
+			where $\matr{M} \in \R^{2n \times 3}$ contains the $2 \times 3$ projection matrices of each camera and $\matr{S} \in \R^{3 \times m}$  are the points of the observed 3D shape.
+			As described by \cite{tomasi1992factorization}, this factorization can be achieved using the singular value decomposition (SVD) as $\matr{W} = \matr{U} \matr{\varSigma} \matr{V}^\top$ and deriving $\matr{M}$ and $\matr{S}$ from $\matr{U}$, $\matr{V}$ and $\matr{\varSigma}$.
+			\todo{Add more details? Less details?}
+			
+			This simple factorization method has some disadvantages.
+			First, it can not be applied to the commonly used perspective projection model, although it is approximated by the orthographic model for distant objects.
+			One reason for this is the ambiguity that comes with the projective camera model.
+			Applying a projective distortion $\matr{Q} \in \R^{4 \times 4}$ to the scene and inverting it by multiplying the inverse transformation to the camera matrix, the projection is exactly the same, i.e., 
+			\begin{equation}
+				\matr{P} \vectr{x} = (\matr{P} \matr{Q}^{-1}) (\matr{Q} \vectr{x}).
+			\end{equation}
+			Without any constraints on the projection matrices, the factorization would be ambiguous.
+			
+			The works of \cite{sturm1996factorization} and \cite{christy1996euclidean} have extended the factorization method for perspective projection using an iterative process.
+			Second, in order for the factorization method to work, all points of the shape must be visible in every frame, i.e., to obtain the measurement matrix one needs to find the correspondences across all frames.
 			
 			
-	\subsection{The Factorization Method}
-		So far, we have seen a method for estimating the relative camera pose based on two images by solving the epipolar constraint with matched feature points.
-		\todo{continue transition}
-		The factorization method can be used to recover camera motion and 3D shape simultaneously (step 2 and 3).
-		A first method was introduced by \cite{tomasi1992factorization} that works with an orthographic camera model.
-		It uses the so called \emph{measurement matrix} $W \in \R^{2n \times m}$ which is defined as
-		\begin{equation}\label{eq:measurement_matrix}
-			W =
-			\begin{bmatrix}
-				x_{11} & \cdots & x_{1m} \\ 
-				\vdots & \ddots & \vdots \\ 
-				x_{n1} & \cdots & x_{nm} \\ 
-				y_{11} & \cdots & y_{1m} \\ 
-				\vdots & \ddots & \vdots \\ 
-				y_{n1} & \cdots & y_{nm}
-			\end{bmatrix}. 
-		\end{equation}
-		It contains the 2D coordinates of the $m$ orthographically projected 3D points for each of the $n$ cameras.
-		Under the assumption that the origin of global coordinate system is located at the centroid of the point cloud, the matrix $W$ can be factorized into
-		\begin{equation}\label{eq:factorization_method}
-			W = MS,
-		\end{equation}
-		where $M \in \R^{2n \times 3}$ contains the $2 \times 3$ projection matrices of each camera and $S \in \R^{3 \times m}$  are the points of the observed 3D shape.
-		As described by \cite{tomasi1992factorization}, this factorization can be achieved using the singular value decomposition (SVD) as $W = U \varSigma V^\top$ and deriving $M$ and $S$ from $U$, $V$ and $\varSigma$.
-		\todo{Add more details? Less details?}
-		
-		This factorization method has some disadvantages.
-		First, it can not be applied to the commonly used perspective projection model, although it is approximated by the orthographic model for distant objects.
-		The works of \cite{sturm1996factorization} and \cite{christy1996euclidean} have extended the factorization method for perspective projection using an iterative process.
-		Second, in order for the factorization method to work, all points of the shape must be visible in every frame, i.e., to obtain the measurement matrix one needs to find the correspondences across all frames.
-		
-	\subsection{Bundle Adjustment} 
-		Another method to solve multi-view SfM is the method of \emph{bundle adjustment}.
-		It is the most general technique for simultaneously recovering 3D shape and camera pose, but it is also computationally expensive.
-		The bundle adjustment technique aims to minimize the re-projection error of the unknown 3D points and camera matrices.
-		The re-projection error is formulated as the euclidean distance between the known image coordinates and the projection of the unknown points using the unknown camera matrices.
-		
-		More formally, let 
-			$\left \lbrace C_j \right \rbrace_{j = 1}^{m}$ 
-		be the (unknown) camera matrices that encode location, rotation and intrinsic parameters, let 
-			$\left \lbrace p_i \right \rbrace_{i = 1}^{n}$ 
-		denote the (unknown) 3D points and let $x_{ij}$ be the (known) observed 2D coordinates of the point $p_i$ in camera $j$.
-		Then, the objective of bundle adjustment is defined as
-		\begin{equation}\label{eq:bundle_adjustment}
-			\begin{aligned}
-				& \underset{\left\lbrace p_i \right\rbrace, \left\lbrace C_j \right\rbrace}{\text{min}}
-				& & \sum_{i = 1}^{n} \sum_{j = 1}^{m} v(i, j) \left\| P(C_j, p_i) - x_{ij} \right\|_2 ,
-			\end{aligned}
-		\end{equation}
-		where $v(i, j)$ denotes the visibility of point $i$ in camera $j$ and $P$ is the projection operation with homogeneous division.
-		This optimization problem is non-convex and as explained by \cite{survey2017} na\"ive optimization algorithms achieve only a poor local minimum.
-		One approach to find a better local minimum is to initialize using an other SfM algorithm such as the factorization method.
-		
+			
+		%\subsection{Bundle Adjustment} 
+			Another method to solve multi-view SfM is the method of \emph{bundle adjustment}.
+			It is the most general technique for simultaneously recovering 3D shape and camera pose, but it is also computationally expensive.
+			The bundle adjustment technique aims to minimize the re-projection error of the unknown 3D points and camera matrices.
+			The re-projection error is formulated as the euclidean distance between the known image coordinates and the projection of the unknown points using the unknown camera matrices.
+			
+			More formally, let 
+				$\left \lbrace C_j \right \rbrace_{j = 1}^{m}$ 
+			be the (unknown) camera matrices that encode location, rotation and intrinsic parameters, let 
+				$\left \lbrace p_i \right \rbrace_{i = 1}^{n}$ 
+			denote the (unknown) 3D points and let $x_{ij}$ be the (known) observed 2D coordinates of the point $p_i$ in camera $j$.
+			Then, the objective of bundle adjustment is defined as
+			\begin{equation}\label{eq:bundle_adjustment}
+				\begin{aligned}
+					& \underset{\left\lbrace p_i \right\rbrace, \left\lbrace C_j \right\rbrace}{\text{min}}
+					& & \sum_{i = 1}^{n} \sum_{j = 1}^{m} v(i, j) \left\| P(C_j, p_i) - x_{ij} \right\|_2 ,
+				\end{aligned}
+			\end{equation}
+			where $v(i, j)$ denotes the visibility of point $i$ in camera $j$ and $P$ is the projection operation with homogeneous division.
+			This optimization problem is non-convex and as explained by \cite{survey2017} na\"ive optimization algorithms achieve only a poor local minimum.
+			One approach to find a better local minimum is to initialize using an other SfM algorithm such as the factorization method.
+			
 	
 	\section{Learning-Based Methods}
 	\label{sec:learning_based_methods}
