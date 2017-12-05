@@ -35,6 +35,7 @@
 		\item Recovery of the 3D structure
 	\end{enumerate}
 	This chapter presents the prior work that focuses on one or multiple of these steps.
+	Although the topic of this thesis is Visual Odometry, the discussion of prior works includes recovery of 3D structure to give a better overview since the two research areas are closely related. 
 	
 %	\noindent
 %	Possible definition of structure from motion by \cite{survey2017}:
@@ -154,39 +155,39 @@
 			First, it can not be applied to the commonly used perspective projection model, although it is approximated by the orthographic model for distant objects.
 			One reason for this is the ambiguity that comes with the projective camera model.
 			Applying a projective distortion $\matr{Q} \in \R^{4 \times 4}$ to the scene and inverting it by multiplying the inverse transformation to the camera matrix, the projection is exactly the same, i.e., 
-			\begin{equation}
+			\begin{equation}\label{eq:projective_ambiguity}
 				\matr{P} \vectr{x} = (\matr{P} \matr{Q}^{-1}) (\matr{Q} \vectr{x}).
 			\end{equation}
 			Without any constraints on the projection matrices, the factorization would be ambiguous.
 			
-			The works of \cite{sturm1996factorization} and \cite{christy1996euclidean} have extended the factorization method for perspective projection using an iterative process.
+			The works of \cite{sturm1996factorization} and \cite{christy1996euclidean} have extended the factorization method for perspective projection using an iterative process by first recovering the projective depth using the fundamental matrices between successive pairs of images.
 			Second, in order for the factorization method to work, all points of the shape must be visible in every frame, i.e., to obtain the measurement matrix one needs to find the correspondences across all frames.
-			
-			
+			This is a serious limitation makes the factorization method less usable in practice.
 			
 		%\subsection{Bundle Adjustment} 
-			Another method to solve multi-view SfM is the method of \emph{bundle adjustment}.
+			An alternative method to solve multi-view SfM is the \emph{bundle adjustment} technique.
 			It is the most general technique for simultaneously recovering 3D shape and camera pose, but it is also computationally expensive.
 			The bundle adjustment technique aims to minimize the re-projection error of the unknown 3D points and camera matrices.
 			The re-projection error is formulated as the euclidean distance between the known image coordinates and the projection of the unknown points using the unknown camera matrices.
 			
 			More formally, let 
-				$\left \lbrace C_j \right \rbrace_{j = 1}^{m}$ 
+			$\left \lbrace \matr{C}_j \right \rbrace_{j = 1}^{m}$ 
 			be the (unknown) camera matrices that encode location, rotation and intrinsic parameters, let 
-				$\left \lbrace p_i \right \rbrace_{i = 1}^{n}$ 
-			denote the (unknown) 3D points and let $x_{ij}$ be the (known) observed 2D coordinates of the point $p_i$ in camera $j$.
-			Then, the objective of bundle adjustment is defined as
+			$\left \lbrace \vectr{p}_i \right \rbrace_{i = 1}^{n}$ 
+			denote the (unknown) 3D points and let $\vectr{x}_{ij}$ be the (known) observed 2D coordinates of the point $\vectr{p}_i$ in camera $j$.
+			Then, the objective of bundle adjustment is defined as the optimization problem 
 			\begin{equation}\label{eq:bundle_adjustment}
 				\begin{aligned}
-					& \underset{\left\lbrace p_i \right\rbrace, \left\lbrace C_j \right\rbrace}{\text{min}}
-					& & \sum_{i = 1}^{n} \sum_{j = 1}^{m} v(i, j) \left\| P(C_j, p_i) - x_{ij} \right\|_2 ,
+					& \underset{\left\lbrace \vectr{p}_i \right\rbrace, \left\lbrace \matr{C}_j \right\rbrace}{\text{min}}
+					& & \sum_{i = 1}^{n} \sum_{j = 1}^{m} v(i, j) \left\| P(\matr{C}_j, \vectr{p}_i) - \vectr{x}_{ij} \right\|_2 ,
 				\end{aligned}
 			\end{equation}
 			where $v(i, j)$ denotes the visibility of point $i$ in camera $j$ and $P$ is the projection operation with homogeneous division.
 			This optimization problem is non-convex and as explained by \cite{survey2017} na\"ive optimization algorithms achieve only a poor local minimum.
 			One approach to find a better local minimum is to initialize using an other SfM algorithm such as the factorization method.
+			Since bundle adjustment is very computationally expensive for many cameras, it is often used as a refinement step.
 			
-	
+			
 	\section{Learning-Based Methods}
 	\label{sec:learning_based_methods}
 	
