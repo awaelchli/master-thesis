@@ -1,7 +1,4 @@
 \chapter{Prior Work}
-	
-	\todo{Find good structure/order to present the different works} \\
-	\todo{Better point out differences and similarities} \\
 	\todo{Typeset vectors/matrices with custom commands}
 	
 	Since the beginning, we humans have examined the world around us. 
@@ -203,7 +200,7 @@
 	
 			The PoseNet, as proposed by \cite{kendall2015posenet}, is a CNN that performs regression for the location and orientation of the camera given a single image as input.
 			It outputs a 7D vector that describes the camera pose $\vectr{p} = [\vectr{x}, \vectr{q}]^\top$ with a location $\vectr{x}$ and orientation $\vectr{q}$ as a quaternion.
-			They simultaneously learn the quantities with the euclidean loss.
+			%They simultaneously learn the quantities with the euclidean loss.
 	%		\begin{equation}
 	%			\mathcal{L}(I) = 
 	%			\left\|
@@ -229,8 +226,7 @@
 			
 			For the most part, the objective of PoseNet is very different from the objective of this thesis.
 			It estimates the camera parameters only based on one input image and in an absolute coordinate system.
-			This means that network is specifically trained for a small number of scenes, e.g., the Cambridge landmarks, and it is not intended to generalize to other scenes and settings.
-			
+			This means that network is specifically trained for a small number of scenes, e.g., the Cambridge landmarks, and it is not intended to generalize to other scenes and settings. 
 			Nonetheless, the work of \citeauthor{kendall2015posenet} shows that transfer-learning can be used for pose estimation when a large labeled dataset for training is not available and that the pre-trained network can aid to learn pose information despite being trained for pose-invariant outputs.
 			
 		%\subsection{05/2017 - Relative Camera Pose Estimation Using Convolutional Neural Networks}
@@ -259,31 +255,86 @@
 			\cite{wang2017deepvo} add a new component to the past deep learning approaches for VO, the recurrent neural network (RNN).
 			The RNN differs from a regular neural network in the sense that it is designed to learn dependencies over a variable amount of time.
 			This makes it suitable for problems that involve a sequence of inputs with temporal dependency, as in a video.
-			The idea is that the information learned in the past (e.g. from earlier video frames) provides the \emph{context} for the current input.
-			\citeauthor{wang2017deepvo} also use a pre-trained CNN architecture for feature extraction.
-			However, as opposed to previous works, it is not initialized with weights from motion-invariant tasks. 
+			The idea is that the information learned in the past (e.g. from earlier video frames) provides the \emph{context} for the present input.
+			\citeauthor{wang2017deepvo} also use a pre-trained CNN architecture for feature extraction, followed by the RNN for pose regression.
+			However, as opposed to previous works, the CNN is not initialized with weights from motion-invariant tasks. 
+			It is a modified version of FlowNet (\cite{dosovitskiy2015flownet}) pre-trained on the synthetic \emph{Flying Chairs} dataset.
+			Although this data does not include camera motion, \citeauthor{wang2017deepvo} show that it still serves as a good initialization for the VO problem.
+			Their paper was released concurrently to this thesis and both share the same ideas, hence this thesis can be seen as a study and supplement to the original work.
 			
-			but on FlowNet (\cite{dosovitskiy2015flownet}).
+			There is an alternative approach by the same authors (\cite{clark2017vinet}) that tackles the problem of Visual-\emph{Inertial} Odometry.
+			The interesting part of their architecture called VINet is that they provide pose measurements from an inertial measurement unit (IMU) as input to the network, in addition to the video.
+			The IMU is a physical device that consists of accelerometers and gyroscopes which are used to derive position and orientation of the device.
+			The measurement accuracy of the IMU suffers from accumulated error over time, so-called ``drift''.
+			Therefore the input to VINet is not the true camera pose, but a noisy measurement of it.
+			\citeauthor{clark2017vinet} use two separate RNNs, one for the visual signal (the video input) and one for the pose stream (from the IMU).
+			The idea behind this setup is that the combined input of both the visual features and the noisy pose measurements improve the networks ability to output a more accurate ego-motion estimate.
+			In theory, the additional pose input should help the network handle scene dynamics and the recovery of scale.
+			Although the work demonstrates that RNNs are useful for combining information of multiple streams of data, the aim of this thesis is pure VO with only the video input as resource for ego-motion.
 			
 			
+			\todo{Summarize, trend etc.}
 			
-		% vi-net
-		% DeepVO
-		
-		
+			
 	%\subsection{04/2016 - 3d-r2n2: A unified approach for single and multi-view 3d object reconstruction}
 		
 		%\cite{choy20163d}
 		
-	%\subsection{07/2016 - Unsupervised CNN for Single View Depth Estimation}
-	
+		
 		\subsection{Learning Structure and Motion}
+			The previous subsection has given an overview of recent works for learning ego-motion from video.
+			In theory, all the presented networks have to learn a weak representation of 3D structure even though they are never asked to output depth.
+			This is because motion and depth are two highly coupled quantities that both contribute to the optical flow in the observed image sequence.
+			
+			\cite{SFMNET} implement a deep learning approach to SfM that supports various types of supervision. 
+			Their architecture consists of two subnetworks, one for motion and one for structure.
+			The former takes a pair of consecutive video frames as input and computes a fixed number of segmentation masks for moving objects. 
+			Using these masks, each pixel is assigned to an object-specific transformation by a learned rotation and a translation.
+			In addition, camera rotation and translation are regressed using the features from intermediate layers.
+			The second subnetwork estimates depth from a single input image (the left image of the pair in the motion network). 
+			The output is a cloud of 3D points, one for each pixel coordinate in the input image.
+			
+			In total, the network estimates relative camera motion, per-object transformations with motion masks, and a point cloud.
+			Using the camera and object transforms, the point cloud can be re-projected into the two camera views to obtain the optical flow.
+			This then presents two options for supervision.
+			One is self-supervision with a brightness-constancy criterion between the two input frames using the optical flow.
+			The other option is to supervise all components individually, i.e. camera motion, depth and optical flow.
+			Their results show typical failure cases in the self-supervised setting where shadows and occlusions break the brightness-consistency criterion, which hinders the network to properly separate object and camera motion.
+			However, the self-supervised approach still opens the possibility to use it as an initialization process for a supervised training on smaller datasets.
 		
-		
-		
+			In a concurrent work, \cite{zhou2017unsupervised} share a similar concept of camera pose and depth estimation.
+			
+			----------------
+			Both works share a similar concept.
+			However, \cite{zhou2017unsupervised} focus on unsupervised training and do not explicitly model scene dynamics.
+			Similar to SfM-Net, their architecture consists of two jointly trained networks, one for learning depth from a single image (Depth-CNN), and another for learning camera motion from two frames (Pose-CNN).
+			
+			The key difference to SfM-Net is that they train with an image sequence $I_1, \dots, I_N$ with one image being the target image $I_t$.
+			The task for the motion network is to synthesize the target image from two nearby views $I_{t - 1}$ and $I_{t + 1}$.
+			\begin{itemize}
+				\item \textbf{Depth-CNN}
+				\\
+				Takes the target image $I_t$ as input and predicts a per-pixel depth map $\hat{D}_t$.
+				\item \textbf{Pose-CNN}
+				\\
+				Uses two source images $I_{t - 1}$ and $I_{t + 1}$ as input and predicts relative camera poses $\hat{T}_{t \rightarrow t - 1}$ and $\hat{T}_{t \rightarrow t + 1}$. 
+				These transformations are then used to synthesize the target image.
+			\end{itemize}
+			Using both the estimated depth and pose matrix as well as the intrinsic matrix of the camera, the coordinate frame of the source images is warped to the coordinate frame of the target image.
+			To transfer the color information from one frame to the other, bilinear interpolation is used.
+			The general term for this is \emph{differentiable image warping}.
+			
+			When working with realistic data, it is important to make the model robust to non-static objects in the scenes, occlusions and non-Lambertian surfaces.
+			To do this, the network is forced to additionally learn a per-pixel mask for each target-source pair.
+			They add a regularization term to force the mask to have non-zero values.
+			
+			
 		------------------------------------
 		
-		The work of \cite{garg2016} implements a autoencoder on stereo pair images to predict depth from a single image.
+		\iffalse
+		
+		\subsection{07/2016 - Unsupervised CNN for Single View Depth Estimation}
+		The work of \cite{garg2016} implements an autoencoder on stereo pair images to predict depth from a single image.
 		Their architecture consist of the following parts.
 		\begin{itemize}
 			\item \textbf{Encoder}
@@ -413,6 +464,8 @@
 		They evaluate the performance of the network on various datasets: {SUN3D}, {RGB-D SLAM}, {MVS}, {Scenes11}, and {NYUv2}.
 		The results show that estimating normals and flow in addition to depth and motion slightly improves the performance of the system.
 		Compared to works for depth from a single image, their results demonstrate that the network learns to use motion parallax from the stereo images to generalize better to scenes that heavily differ from the examples seen during training.
+		
+		\fi
 		
 	
 		
