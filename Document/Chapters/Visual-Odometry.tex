@@ -42,13 +42,13 @@
 			KITTI from Karlsruhe Institute of Technology \cite{geiger2013vision} is a dataset that contains many video frames captured from the roof of a driving car.
 			Each video frame is labeled with ground truth data such as camera pose and 3D points from a velodyne laser scanner.
 			The camera pose was obtained by combining the data from GPS and an IMU (inertial measurement unit) that was mounted to the car.
-			The dataset has around 23k stereo pairs of images with size $1226 \times 370$ pixels captured at a frame rate of [FPS]\todo{find frame rate}.
+			The dataset has around 43k stereo pairs of images with size $1226 \times 370$ pixels captured at a frame rate of [FPS]\todo{find frame rate}.
 			For the experiments in this thesis, only the images from the left camera are used.
 			The dataset is divided into 22 sequences, each captured at a different location in the metropolitan area of Karlsruhe, Germany.
 			For the public, the ground truth is only available for the first 11 sequences.
 			The rest of the data is intended to be used for submissions to the KITTI Vision Benchmark Suite\footnote{\url{http://www.cvlibs.net/datasets/kitti/eval_odometry.php}} 
 			online.
-			In the experiments here, only the sequences 0 to 10 are used and divided into training- and test sets.
+			In the experiments here, only the sequences 0 to 10 are used and divided into training- and test sets, which amounts to around 23k images.
 		
 		\subsection{VIPER}
 			The VIPER dataset from \cite{richter2017playing} contains a mix of car driving and walking sequences, but all data was generated synthetically from the video game Grand Theft Auto 5 released in April 2015.
