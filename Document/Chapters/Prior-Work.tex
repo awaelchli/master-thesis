@@ -246,11 +246,25 @@
 			\citeauthor{melekhov2017poseCNN} apply SPP in the representation part in order to overcome the limitation in the input size due to the fully-connected layers.
 			This allows for a larger size of input images for the network to be able to extract more structural information that helps reconstructing the pose.
 			The dataset used for training is a crowd-sourced image collection with ground truth pose from a SfM pipeline based on local feature matching.
-			For testing and comparison with other works they use the {DTU} dataset where the exact pose is obtained from a robotic arm that moves the camera.
+			For testing and comparison with other works they use the \emph{DTU} dataset where the exact pose is obtained from a robotic arm that moves the camera.
 			
 			The difference to PoseNet is that the estimated camera pose is relative, and the aim is to learn a representation for motion between frames instead of absolute localization.
 			This is a more general approach, with a clear separation of concerns, i.e., the feature extraction (representation part) and pose estimation (regression part).
 			It could be directly applied for Visual Odometry by computing the relative pose between subsequent pairs of images in the video. 
+			In fact, \cite{mohanty2016deepvo} have exactly followed this idea.
+			Their model has a very similar architecture as \citeauthor{melekhov2017poseCNN}.
+			What stands out is their experiment where prior knowledge is supplied to the CNN by an additional input of features from the FAST corner detector (\cite{rosten2006machine}).
+			They find that the CNN learns to extract similar features to FAST that work better compared to their initial experiments using a pre-trained AlexNet.
+			
+			\cite{wang2017deepvo} add a new component to the past deep learning approaches for VO, the recurrent neural network (RNN).
+			The RNN differs from a regular neural network in the sense that it is designed to learn dependencies over a variable amount of time.
+			This makes it suitable for problems that involve a sequence of inputs with temporal dependency, as in a video.
+			The idea is that the information learned in the past (e.g. from earlier video frames) provides the \emph{context} for the current input.
+			\citeauthor{wang2017deepvo} also use a pre-trained CNN architecture for feature extraction.
+			However, as opposed to previous works, it is not initialized with weights from motion-invariant tasks. 
+			
+			but on FlowNet (\cite{dosovitskiy2015flownet}).
+			
 			
 			
 		% vi-net
