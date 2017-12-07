@@ -8,7 +8,7 @@
 	% Third part: Toy examples for RNN
 
 	
-	\section{Camera Pose and Transformations}
+	\section{Transforming Camera Pose}
 		The camera pose, also known as the \emph{extrinsic parameters}, is a combination of position and orientation.
 		Together, they define a coordinate transformation from the camera coordinate frame to the world coordinate frame.
 		Such a transformation is commonly represented by a translation vector $\vectr{t} \in \R^3$ and a rotation matrix $\matr{R} \in SO(3)$. 
@@ -23,30 +23,34 @@
 		\end{equation}
 		\todo{Insert a figure showing: world coordinate frame, camera coordinate frame, transformation matrix}
 		
-		In Structure from Motion, there is not only one camera, but many cameras with different transformations.
-		This is also the case in this work, but the sequence of transformations is ordered according to the path of the camera motion. 
+		In Structure from Motion (SfM), there is not only one camera, but many cameras with different transformations.
+		This is also the case in Visual Odometry (VO), but the sequence of transformations is ordered according to the path of the camera motion. 
 		Specifically, we deal with a sequence of rotations $\matr{R}_1, \dots, \matr{R}_n$ and translations $\vectr{t}_1, \dots, \vectr{t}_n$. 
 		Depending on how the poses are obtained, they are all relative to a common (world) coordinate frame.
-		Sometimes it is useful to have the coordinate frame of the first camera transform be the common frame for all transformations.
+		Sometimes it is necessary or useful to have all transformations relative to a new coordinate system.
 		This can be achieved by applying the transformations
-		\begin{align}\label{eq:relative_rotation_conversion}
+		\begin{align}\label{eq:relative_rotation_conversion_general}
 			\begin{split}
-				\matr{R}_{i}^\prime 	&= \matr{R}_{1}^{\top} \matr{R}_{i} \\
-				\vectr{t}_{i}^\prime 	&= \matr{R}_{1}^{\top} (\vectr{t}_i - \vectr{t}_1)
+				\matr{R}_{i \rightarrow j} 		&= \matr{R}_{j}^{\top} \matr{R}_{i} \\
+				\vectr{t}_{i \rightarrow j} 	&= \matr{R}_{j}^{\top} (\vectr{t}_i - \vectr{t}_j)
 			\end{split}
 		\end{align}
-%		\begin{equation}
-%			\matr{R}_{i \rightarrow 1} 	= \matr{R}_{\text{w} \rightarrow 1} \matr{R}_{i \rightarrow \text{w}}
-%										= \matr{R}_{1 \rightarrow \text{w}}^{-1} \matr{R}_{i \rightarrow \text{w}}
-%										= \matr{R}_{1 \rightarrow \text{w}}^{\top} \matr{R}_{i \rightarrow \text{w}}
-%		\end{equation}
-%		\begin{equation}
-%		\vectr{t}_{i \rightarrow 1} = \matr{R}_{1 \rightarrow \text{w}}^{\top} (\vectr{t}_i - \vectr{t}_1)
-%		\end{equation}
-		to get the new relative rotation $\matr{R}_{i}^\prime$ and relative translation $\vectr{t}_{i}^\prime$.
-		Note that for $i = 1$ we obtain $\matr{R}_{1}^\prime = \matr{I}$ and $\vectr{t}_{1}^\prime = \vectr{0}$.
+		to get the new relative rotation 
+		$\matr{R}_{i \rightarrow j}$ and relative translation $\vectr{t}_{i \rightarrow j}$.
+		The arrow notation $i \rightarrow j$ denotes that the $i$-th transformation is in coordinates of system $j$.
+		Note that for $i = j$ we obtain 
+		$\matr{R}_{i \rightarrow j} = \matr{I}$ 
+		and 
+		$\vectr{t}_{i \rightarrow j} = \vectr{0}$.
 		
-		\noindent\rule{2cm}{0.4pt}
+		The formulas in equation~\ref{eq:relative_rotation_conversion_general} can be applied to every transformation in the sequence for $i = 1, \dots, n$ and having $j$ fixed, e.g. $j = 1$ would make all transformations relative to the first camera coordinate system.
+		In the remainder of this thesis we refer to the camera pose in this format as the \emph{global pose}, where the first pose in the sequence always represents the coordinate system of all other poses.
+		An alternative choice is $j = i - 1$.
+		We refer to this special setting as the \emph{incremental pose}, since all transformations are relative to the previous video frame, i.e. we have 
+		$\matr{R}_{i \rightarrow i - 1}$ and $\vectr{t}_{i \rightarrow i - 1}$
+		for $i = 2, \dots, n$.
+		
+	\section{Representations for Pose}
 		\todo{make good transition}
 		
 		So far, we have seen rotations represented as matrices. 
@@ -58,26 +62,27 @@
 		\begin{table}
 			\small
 			\begin{center}
-				\begin{tabular}{|l|p{2.5cm}|p{2.5cm}|p{2.5cm}|p{2.5cm}|}
-					\hline
-					& Euler angles & Matrix & Axis-angle & Unit quaternion \\ \hline
-					Typical use case & Robotics, Avionics & Computer Graphics, Physics & Intermediate representation & Computer Graphics, Physics \\ \hline
-					Constraint & None & Orthonormality & Unit norm axis & 4D unit sphere \\ \hline
-					Disadvantage & Gimbal lock & Numerically unstable & & Less intuitive \\ \hline
-					Interpolation & hard & hard & hard & easy \\ \hline
-					Identity rotation & ambiguous & unique & ambiguous &unique \\ 
-					\hline
+				\begin{tabular}{llll}
+					% Typical use case & Robotics, Avionics & Computer Graphics, Physics & Intermediate representation & Computer Graphics,
+					\toprule
+					Representation	& Constraint 		& Problems 				& Identity			\\
+					\midrule
+					Euler angles 	& None 				& Gimbal lock 			& ambiguous 		\\
+					Axis-angle 		& Unit norm axis 	& 						& ambiguous 		\\
+					Matrix 			& Orthonormality 	& Numerical instability	& unique 			\\
+					Unit Quaternion & 4D unit sphere 	& Less intuitive 		& unique			\\
+					\bottomrule
 				\end{tabular}
 			\end{center}
 			\caption[A comparison of representations for rotations]
-					{A comparison of representations for rotations.}
-			\label{tbl:comparison_representations_of_rotations}
+					{A comparison of representations for rotations.
+					 \label{tbl:comparison_representations_of_rotations}}
 		\end{table}
 		
 		\paragraph{Euler Angles}
 %		The fact that rotations in 3D have three degrees of freedom means there are only three coordinates needed to identify a rotation. 
 %		Euler angles are one such choice of coordinates.
-		The Euler angles represent a rotation with three numbers 
+		The Euler angles represent any rotation with three numbers 
 		$\alpha, \beta, \gamma \in \left[0, 2\pi\right)$.
 		There are many different conventions and definitions of these three angles and how they are applied.
 		In this thesis, we apply the rotations in the following order. 
