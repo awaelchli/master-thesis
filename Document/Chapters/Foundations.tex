@@ -13,7 +13,7 @@
 		Together, they define a coordinate transformation from the camera coordinate frame to the world coordinate frame.
 		Such a transformation is commonly represented by a translation vector $\vectr{t} \in \R^3$ and a rotation matrix $\matr{R} \in SO(3)$. 
 		Together, they describe a rigid transformation which can also be written as a $4 \times 4$ matrix of the form
-		\begin{equation}
+		\begin{equation}\label{eq:pose_representation_se3}
 			\matr{T} = 
 			\begin{bmatrix}
 				\matr{R} 	& \vectr{t} \\
@@ -51,13 +51,20 @@
 		for $i = 2, \dots, n$.
 		
 	\section{Representations for Pose}
-		\todo{make good transition}
 		
-		So far, we have seen rotations represented as matrices. 
-		However, it is redundant to describe rotations with nine numbers when in fact there are only three degrees of freedom for a three-dimensional rotation, i.e., two degrees for the orientation of the axis and one for the angle of rotation around the axis.
-		It is also not straightforward to interpolate rotations in $SO(3)$, or to find the best approximation for a matrix that lies outside of $SO(3)$.\todo{citation needed}
+		So far, we have seen the camera pose represented as a $4 \times 4$ transformation matrix with a rotational and translational part (equation~\ref{eq:pose_representation_se3}).
+		In a system for VO we could, for example, aim to compute the rotation and translation separately and then plug them together into a transformation matrix.
+		For the translation, the system would need to estimate the three components in X-, Y- and Z-direction.
+		However, it is unclear how the system should be designed to output the elements of a rotation matrix, since it is constrained to be in 
+		$SO(3)$, which is the group of matrices with determinant equal to one and for which the transpose is equal to the inverse.
+		%$SO(3) = \lbrace \matr{A} \in \R^{3 \times 3} \mid \matr{A}^{-1} = \matr{A}^\top \land \det(\matr{A}) = 1 \rbrace$.
+		A constraint like this is difficult to enforce directly.
 		
-		Below we discuss and compare three other popular representations used to describe rotations.
+		Actually, it is redundant to describe rotations with nine numbers when in fact there are only three degrees of freedom for a rotation in 3D, i.e., two degrees are needed for the orientation of the axis and one for the angle of rotation around the axis.
+		It is also not straightforward to interpolate rotations in $SO(3)$, or to find the best approximation for a matrix that lies outside of $SO(3)$.
+		The later is definitely useful when numerical errors occur in computations involving the rotation.
+		
+		What follows is a discussion and comparison of three other popular representations used to describe rotations.
 		A brief overview is also shown in table~\ref{tbl:comparison_representations_of_rotations}.
 		\begin{table}
 			\small
@@ -65,12 +72,12 @@
 				\begin{tabular}{llll}
 					% Typical use case & Robotics, Avionics & Computer Graphics, Physics & Intermediate representation & Computer Graphics,
 					\toprule
-					Representation	& Constraint 		& Problems 				& Identity			\\
+					Representation	& Constraint 			& Problems 				& Identity			\\
 					\midrule
-					Euler angles 	& None 				& Gimbal lock 			& ambiguous 		\\
-					Axis-angle 		& Unit norm axis 	& 						& ambiguous 		\\
-					Matrix 			& Orthonormality 	& Numerical instability	& unique 			\\
-					Unit Quaternion & 4D unit sphere 	& Less intuitive 		& unique			\\
+					Euler angles 	& None 					& Gimbal lock 			& ambiguous 		\\
+					Axis-angle 		& Unit-norm axis 		& Missing algebraic structure						& ambiguous 		\\
+					Matrix 			& Must be in $SO(3)$ 	& Numerical instability	& unique 			\\
+					Unit quaternion & 4D unit sphere 		& Less intuitive 		& unique			\\
 					\bottomrule
 				\end{tabular}
 			\end{center}
@@ -78,15 +85,15 @@
 					{A comparison of representations for rotations.
 					 \label{tbl:comparison_representations_of_rotations}}
 		\end{table}
-		
+	
 		\paragraph{Euler Angles}
 %		The fact that rotations in 3D have three degrees of freedom means there are only three coordinates needed to identify a rotation. 
 %		Euler angles are one such choice of coordinates.
-		The Euler angles represent any rotation with three numbers 
-		$\alpha, \beta, \gamma \in \left[0, 2\pi\right)$.
+		The Euler angles represent a rotation with three numbers 
+		$\alpha, \beta, \gamma \in \left[0, 2\pi\right)$, which are also known as \emph{pitch}, \emph{roll} and \emph{yaw}.
 		There are many different conventions and definitions of these three angles and how they are applied.
 		In this thesis, we apply the rotations in the following order. 
-		The initial coordinate frame shall be denoted by $(x, y, z)$.
+		The initial canonical coordinate frame shall be denoted by $(x, y, z)$.
 		\begin{enumerate}
 			\item The coordinate frame is rotated around the $x$-axis with angle $\alpha$. 
 			This results in a new coordinate frame $(x^\prime, y^\prime, z^\prime)$.
@@ -96,29 +103,78 @@
 		\end{enumerate}
 		Altogether these steps can be formalized by a multiplication of three matrices that define the rotations around the different axes. 
 		The result is a rotation matrix
-		\begin{equation}
+		\begin{equation}\label{eq:euler_angles_rotation_matrix_arbitrary_axis}
 			\matr{R}(\alpha, \beta, \gamma) =
 			\matr{R}_{z^{\prime\prime}}^\gamma
 			\matr{R}_{y^\prime}^\beta
 			\matr{R}_{x}^\alpha
 		\end{equation}
 		defined by the Euler angles. 
-		It can be shown that this representation covers all 3D rotations. \todo{citation needed}
-		However, the Euler angle representation also comes with drawbacks.
-%		For example, a linear interpolation in the Euler domain between two points $(\alpha_1, \beta_1, \gamma_1)$ and $(\alpha_2, \beta_2, \gamma_2)$ by varying a parameter $\lambda \in [0, 1]$ gives 
-%		\begin{equation}
-%			(\alpha, \beta, \gamma) = (1 - \lambda) (\alpha_1, \beta_1, \gamma_1) + \lambda (\alpha_2, \beta_2, \gamma_2).
-%		\end{equation}
-%		The rotations associated with the angles $(\alpha, \beta, \gamma)$ is not an optimal choice for an 
+		Although the above description of how the rotations are applied is more or less intuitive, the computation of rotation matrices around arbitrary axes in equation~\ref{eq:euler_angles_rotation_matrix_arbitrary_axis} is a bit complicated.
+		Fortunately, it can be shown that 
+		\begin{equation}\label{eq:euler_angles_rotation_matrix_global_axis}
+			\matr{R}(\alpha, \beta, \gamma) =
+			\matr{R}_{x}^\alpha \,
+			\matr{R}_{y}^\beta \,
+			\matr{R}_{z}^\gamma,
+		\end{equation}
+		where 
+		\begin{align}
+			\begin{split}
+				\matr{R}_{x}^\alpha &= 
+				\begin{bmatrix}
+					1 & 0 				& 0 			\\
+					0 & \cos(\alpha) 	& -\sin(\alpha) \\
+					0 & \sin(\alpha) 	& \cos(\alpha)
+				\end{bmatrix}
+				\\
+				\matr{R}_{y}^\beta &= 
+				\begin{bmatrix}
+					\cos(\beta) 	& 0 	& \sin(\beta) 	\\
+					0 				& 1 	& 0 			\\
+					-\sin(\beta) 	& 0 	& \cos(\beta)
+				\end{bmatrix}
+				\\
+				\matr{R}_{z}^\gamma &=  
+				\begin{bmatrix}
+					\cos(\gamma) 	& -\sin(\gamma) 	& 0 \\
+					\sin(\gamma) 	& \cos(\gamma) 		& 0 \\
+					0 				& 0 				& 1 
+				\end{bmatrix}
+			\end{split}
+		\end{align}
+		are simple rotations around the axes of the initial (canonical) coordinate system $(x, y, z)$.
+		Further, it can be shown that this representation covers all 3D rotations, and in reverse, every rotation matrix $\matr{R} \in SO(3)$ can be decomposed into the form in equation~\ref{eq:euler_angles_rotation_matrix_global_axis}, e.g. to extract the Euler angles.
 		
+		Unfortunately, the Euler angle representation comes with some limitations.
+		There are special configurations of angles that can lead to a loss in the degrees of freedom for the rotation. 
+		For example, if we fix $\beta = \frac{\pi}{2}$, any choice of values for the other angles results in a matrix where the first row is always the same.
+		Therefore, one degree of freedom for rotation is lost.
+		This unavoidable problem is also known as \emph{gimbal lock} and it is inherent to the way Euler angles are defined.
+		A second limitation worth mentioning is the fact that interpolation between two rotations in Euler form is not intuitive and quite complicated.
+		It is better to convert to a different representation and perform the interpolation there, e.g., with quaternions.
 		
-		\paragraph{Axis-Angle}\todo{TODO}
+		\paragraph{Axis-Angle}
+		Every rotation in three-dimensional space can be defined by an angle 
+		$\theta \in \R$ and a vector 
+		$\vectr{a} \in \R^3$ for the axis of rotation.
+		We denote it by the tuple $(\vectr{a}, \theta)$.
+		The axis can be thought of as the normal vector on the plane in which the rotation takes place.
+		The axis itself has three degrees of freedom, but for the rotation, only two of these matter.
+		Therefore the axis is often assumed to be normalized, i.e. $\lVert \vectr{a} \rVert = 1$.
+		There are two main limitations to the axis-angle, which often make it only usable as an intermediate representation.
+		One is the missing algebraic structure to directly concatenate several rotations.
+		Second, the representation is ambiguous.
+		We have that $(\vectr{a}, \theta)$ represents the same rotation as $(-\vectr{a}, -\theta)$ for all possible axes and angles, and the identity rotation can be represented by any axis-angle $(\vectr{a}, 2 \pi k)$ for $k \in \Z$.
 		
-		\paragraph{Quaternions}
+		This ambiguity and the unit-norm axis constraint make the axis-angle representation less useful for this work.
+		Especially for supervised training of artificial neural networks, it is best to eliminate as many ambiguities as possible to avoid confusion.
+		
+		\paragraph{Unit Quaternions}
 		Quaternions are four-dimensional numbers.
-		They are an extension of the complex numbers\footnote{A more appropriate name is \emph{compound numbers}.\todo{disputable}}.
+		They are an extension of the complex numbers. %\footnote{A more appropriate name is \emph{compound numbers}.\todo{disputable}}.
 		Formally, a quaternion is defined as $\vectr{q} = w + \vectr{i}x + \vectr{j}y + \vectr{k}z$ where $w, x, y, z \in \R$ and $\vectr{i},\vectr{j}$ and $\vectr{k}$ are the basis elements of the quaternion space.
-		The quaternion can also be written as a tuple $\vectr{q} = (w, x, y, z) \in \R^4$ by using the notation
+		The quaternion can also be written as a tuple $\vectr{q} = (w, x, y, z) \in \R^4$ by introducing the notation
 		\begin{equation}
 			\vectr{1} = 
 			\begin{bmatrix}
@@ -160,7 +216,7 @@
 			\lVert \vectr{q} \rVert = \sqrt{w^2 + x^2 + y^2 + z^2}.
 		\end{equation}
 		
-		In this thesis, we are particularly interested in the subset of quaternions called the \emph{unit quaternions}. These are all the quaternions with unit norm, i.e. $\lVert \vectr{q} \rVert = 1$. 
+		In this thesis, we are particularly interested in the subset of quaternions called the \emph{unit quaternions}. These are all the quaternions with unit norm, i.e., $\lVert \vectr{q} \rVert = 1$. 
 		The quaternions of this form describe 3D rotations and can be parameterized by
 		\begin{equation}
 			\vectr{q} = 
@@ -168,7 +224,9 @@
 			\sin\left(\tfrac{\theta}{2}\right) \left(a_1 \vectr{i} + a_2 \vectr{j} + a_3 \vectr{k}\right),
 		\end{equation}
 		where $\theta \in \R$ is the angle of rotation around a unit-length axis $\vectr{a} = (a_1, a_2, a_3) \in \R^3$.
-		\todo{explain that quaternions are not unique representation of rotations, and that negative axis-angle is represented by the same quaternion}
+		The parameterization makes use of the axis-angle representation, however, quaternions are more powerful in the sense that rotations can be concatenated via multiplication, i.e., $\vectr{q}_2 \vectr{q}_1$ represents the compound rotation of $\vectr{q}_1$ followed by $\vectr{q}_2$.
+		One drawback of the quaternion is that it is a double cover of the space of rotations, meaning that $\vectr{q}$ and $-\vectr{q}$ represent the same rotation.
+		\todo{transition: unit constraint, neural networks...}
 	
 	\section{Deep Feedforward Neural Networks}
 		\todo{This summary is based on the deep learning book}
