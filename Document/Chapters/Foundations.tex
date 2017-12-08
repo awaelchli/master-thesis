@@ -6,7 +6,11 @@
 	% 	Representation for pose in sequences: Figure
 	% Second part: Deep Learning
 	% Third part: Toy examples for RNN
-
+	This chapter presents the necessary theoretical background for the thesis.
+	The first part is about the representation of the camera pose, which is ultimately the output of a system for Visual Odometry.
+	In the second part, it follows a very brief review of Deep Learning.
+	In particular, the recurrent neural network, an important building block for the Visual Odometry model in this thesis, is introduced.
+	For a more comprehensive insight into Deep Learning, the reader is advised to consult \cite{goodfellow2016deep}.
 	
 	\section{Transforming Camera Pose}
 		The camera pose, also known as the \emph{extrinsic parameters}, is a combination of position and orientation.
@@ -235,8 +239,6 @@
 		We now continue with a brief review on artificial neural networks and machine learning.
 		
 	\section{Deep Feedforward Neural Networks}
-		\todo{This summary is based on the deep learning book}
-		\todo{show a figure for a feed forward network}
 		
 		A \emph{feedforward neural network} is a function mapping an input $\vectr{x}$ to an output $\vectr{y} = f(\vectr{x})$.
 		For instance, $\vectr{y} \in \{\text{dog}, \text{cat} \}$ could be the output of the function deciding whether an image $\vectr{x}$ contains a dog or a cat. 
@@ -252,13 +254,16 @@
 					 Each layer (blue) operates on the outputs of previous layers, where $x$ is the input and $y$ is the output.
 					 \label{fig:example_feed_forward_network}}
 		\end{figure}
-		A feedforward network is best visualized as a graph\footnote{More precisely it is a DAG (directed acyclic graph). It does not allow loops.}, the so-called \emph{computational graph}.
+		A feedforward network is best visualized as a graph%
+		\footnote{More precisely it is a DAG (directed acyclic graph). It does not allow loops.}, 
+		the so-called \emph{computational graph}.
+		Figure~\ref{fig:example_feed_forward_network} shows an example of a small feedforward network.
 		A node in the graph represents an output- or input variable to one of the functions $f^{(i)}$, and the collection of all output nodes for one function is called a \emph{layer}. 
 		The edges between nodes represent information flow, i.e., which outputs of layer $j$ depend on the outputs of layer $i$.
 		
-		These networks build the foundation of deep learning.
+		Feedforward networks build the foundation of deep learning.
 		Why?
-		Because in general $f$ is unknown and must be learned to solve a specific task.
+		Because in general, $f$ is unknown and must be learned to solve a specific task.
 		The practical approach to finding a suitable $f$ is to consider a family of functions $f_{\vectr{w}}$ defined by the \emph{parameters} $\vectr{w}$, also called \emph{weights}.
 		For example, the layer $i$ in the network might be a linear function $f_{}^{(i)}(\vectr{x}) = \matr{W} \vectr{x}$ where the parameters of this layer are the elements of the matrix $\matr{W}$.
 		
@@ -270,7 +275,7 @@
 		$\vectr{\hat{y}} = f_{\vectr{w}}(\vectr{x})$ with the \emph{ground truth} $\vectr{y}$ and gives a score how close they are.
 		The ground truth comes from the dataset, which is the most important resource of knowledge for training a model.
 		The dataset contains many samples $\vectr{x}^{(1)}, \dots, \vectr{x}^{(N)}$ each with a ground truth label 
-		$\vectr{y}^{(1)}, \dots, \vectr{y}^{(N)}$, e.g., each dog image in the dataset has a label 'dog' and each image with a cat has the label 'cat'.
+		$\vectr{y}^{(1)}, \dots, \vectr{y}^{(N)}$, e.g., each dog image in the dataset has a label ``dog" and each image with a cat has the label ``cat".
 		
 		The loss function is not only used to evaluate the performance of the model, but to find optimal parameters for the model as part of the training.
 		In general, the objective is to minimize the loss function on the data, that is
@@ -288,7 +293,7 @@
 			\vectr{w} \leftarrow 
 			\vectr{w} - \lambda \frac{\partial F(\vectr{w})}{\partial \vectr{w}}.
 		\end{equation}
-		The parameters $\vectr{w}$ converge close to a local minimum when a suitable learning rate $\lambda$ is chosen. \todo{citation needed / is "converge" the right word to use here?}
+		The parameters $\vectr{w}$ approach a local minimum when a suitable learning rate $\lambda$ is chosen.
 		In the context of deep learning, $F$ is the loss function evaluated over the training data.
 		More precisely, the update rule is
 		\begin{equation}\label{eq:gradient_descent_update_rule}
@@ -325,23 +330,23 @@
 		After training it is a good practice to evaluate the model on new data, the test set.
 		This way we can measure how well the model generalizes.
 		It is important that the model performs well on new data because in practice we are often limited in how much data we can collect for training.
+		A model that does not generalize well is not very useful.
 		
-		A remark on the above summary for feedforward neural networks:
-		Training with samples that have a ground truth label is called \emph{supervised learning}.
+		Some remarks on the above summary for feedforward neural networks:
+		First, training with samples that have a ground truth label is called \emph{supervised learning}.
 		It is also possible to learn from data where labels are not available.
 		This is called \emph{unsupervised learning}.
 		However, the focus of this thesis lies in the supervised approach.
-		
-
-		\todo{Gradient computation with backpropagation}\\
-		\todo{explain the term "neural"}
+		Second, since the feedforward network is a composition of functions, gradient computation involves the chain rule for differentiation.
+		The \emph{backpropagation} algorithm is an efficient implementation for the chain rule that avoids computing the same subexpressions multiple times.
+		It is the preferred method to compute gradients in a neural network.
 		
 	\section{Convolutional Neural Networks}
 	
 	\section{Recurrent Neural Networks}\label{sec:recurrent_neural_networks}
-		\newcommand{\imagecourtesycolah}{Image courtesy Christopher Olah \mbox{\href{http://colah.github.io/}{(colah.github.io)}}}
+		\newcommand{\imagecourtesycolah}{Image courtesy Christopher Olah \mbox{\href{http://colah.github.io/}{(colah.github.io)}}.}
 		\todo{Need references to early works on RNNs}
-		So far, we have looked at the feedforward network, which is function that maps an input $\vectr{x}$ to an output $\vectr{y} = f(\vectr{x})$.
+		So far, we have looked at the feedforward network, which is a function that maps an input $\vectr{x}$ to an output $\vectr{y} = f(\vectr{x})$.
 		It will always compute the same output for the same input, independently of the input-output pairs it has seen before.
 		Now consider a sequence $\vectr{x}_1, \dots, \vectr{x}_T$ of inputs, e.g., a sentence.
 		How can we learn to predict an attribute that depends on the whole sequence, e.g., the sentiment of the sentence?
@@ -403,14 +408,14 @@
 			\mathcal{L}(\{\vectr{y}_1, \dots \vectr{y}_T\}, \{\vectr{\hat{y}}_1, \dots \vectr{\hat{y}}_T\}) = 
 			\sum_{t=1}^{T} \mathcal{L}_t(\vectr{y}_t, \vectr{\hat{y}}_t).
 		\end{equation}
-		This loss will be used to compute gradients for updating the model parameters similar to feed-forward networks.
+		This loss will be used to compute gradients for updating the model parameters similar to feedforward networks.
 		
 	\section{Gradient Computation for RNNs}\label{sec:gradient_computation_RNN}
-		The gradient computation is almost the same as for feed-forward networks and the back-propagation algorithm can be applied by unfolding the RNN as shown in figure~\ref{fig:RNN-unrolled}.
+		The gradient computation is almost the same as for feed-forward networks and the backpropagation algorithm can be applied by unfolding the RNN as shown in figure~\ref{fig:RNN-unrolled}.
 		However, there is a problem with the gradient computation in the above version of the RNN (\cite{pascanu2013difficulty}, \cite{bengio1994learning}).
 		For long sequences, the gradient norm can become very small and this hurts the training.
 		The RNN is not able to learn long-term dependencies when the gradient vanishes.
-		To see this, let's write down the full equation for the gradient:
+		To see this, we can write down the full equation for the gradient:
 		\begin{equation}\label{eq:gradient_computation_RNN}
 			\frac{\partial \mathcal{L}}{\partial \vectr{w}}
 			= \sum_{t=1}^{T} 
