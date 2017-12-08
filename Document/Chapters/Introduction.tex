@@ -17,14 +17,14 @@
 		First of all, both VO and SfM rely on robust feature detection and matching between images in order to accurately estimate motion.
 		The algorithms to extract these informations from images are hand-designed and tuned to work well in specific domains and environments.
 		They often rely on strong assumptions about the observed scene, lighting conditions or type of motions involved.
-		These assumptions are made to avoid possible ambiguities arising from, e.g., dynamic motion in the scene or specular reflections.
+		These assumptions are made to avoid possible ambiguities arising from, e.g., dynamic motion in the scene or non-Lambertian surfaces.
 		Furthermore, classic VO and SfM do not leverage high-level information about the image content that could be used to eliminate and resolve these conflicts.
 		
 		\todo{Better Transition}
 		Very quickly after birth, we humans learn to develop a complex understanding of the three-dimensional world around us. 
 		The emphasis here is on \emph{learning}.
 		There is no external force or teacher that predetermines how the network of neurons in our brain develops and grows.
-		It is the continuous loop of information retrieval (e.g. seeing, feeling) and action (e.g. body movement) that determines reward or penalty (e.g. walking or falling) which then influences the development of connections in the brain.
+		It is the continuous loop of information retrieval (e.g.\@ seeing, feeling) and action (e.g.\@ body movement) that determines reward or penalty (e.g.\@ walking or falling) which then influences the development of connections in the brain.
 		\todo{Example removing vision of newborn}
 		Recent advances in Deep Learning have shown that machines are able to learn and identify patterns in data and use them to solve complex problems that also humans are faced with everyday, e.g., recognizing a persons face or solving puzzle games.
 		Deep Learning has had a significant impact on Computer Vision and is under rapid development, becoming more popular every year.
@@ -43,7 +43,7 @@
 %		The term \emph{structure from motion} refers to the observation of 2D motion in a series of images that can be used to recover 3D information.
 %		The camera motion and 3D geometry are by itself completely independent components, but the observed images are only fully determined by the combination of the two.
 %		%The motion of the camera has to be determined simultaneously with structure, because only both components together fully determine the observed projections.
-%		When the desire is to only reconstruct the 3D, e.g. obtaining a 3D model of a vase, the camera parameters can be seen as a by-product of the SfM algorithm. 
+%		When the desire is to only reconstruct the 3D, e.g.\@ obtaining a 3D model of a vase, the camera parameters can be seen as a by-product of the SfM algorithm. 
 %		After the point cloud is recovered, new views can be rendered on the fly without the need of the original camera poses.
 %		On the other hand, when the interest lies in only recovering the camera path, then SfM produces the point cloud as a by-product.
 %		In SfM, camera parameters and 3D are solved jointly in an iterative manner.
@@ -70,7 +70,7 @@
 		
 		%The interest of this thesis lies in recovering the camera parameters, i.e., the position and orientation.
 		The problem of Visual Odometry is simple to formulate.
-		Given a sequence of temporally ordered images, i.e. a video, the objective is to compute the camera pose at each frame.
+		Given a sequence of temporally ordered images, i.e.\@ a video, the objective is to compute the camera pose at each frame.
 		The camera pose is the location and orientation of the camera in the world coordinate system.
 		It describes the change of coordinates from the local- to the world reference frame in form of a rotation and translation, each having three degrees of freedom.
 

@@ -46,7 +46,7 @@
 %		\item Recovery of 3D structure
 %	\end{enumerate}
 
-	\section{Classic Methods}
+	\section{Established Methods}
 	
 		\subsection{Feature Extraction and Matching}
 			% methods: SURF, ORB, SIFT
@@ -69,7 +69,7 @@
 			The extraction of these features works the same for every image, and the features descriptors can be compared directly to find correspondence candidates.
 			Although SIFT has proven to be very robust, the computation of the features is expensive, especially the scale-invariant part.
 			Subsequent works have proposed improved variants of SIFT such as PCA-SIFT (\cite{ke2004pca}) or SURF (\cite{bay2006surf}).
-			Despite the successes of these methods in many applications, e.g. object recognition or panorama stitching, they rely on hand-crafted functions that are empirically derived.
+			Despite the successes of these methods in many applications, e.g.\@ object recognition or panorama stitching, they rely on hand-crafted functions that are empirically derived.
 			Furthermore, SIFT is defined based on very low-level image characteristics, which is contrary to the workings of the human brain, the most-sophisticated system for vision we know.
 			
 			As we will see in section~\ref{sec:learning_based_methods}, neural networks can be designed to automatically learn useful features without the need for manual intervention and tuning.
@@ -98,7 +98,7 @@
 			After estimating $\matr{E}$, the rotation and translation can be uniquely recovered from it up to an unknown scaling of the translation.
 			
 			In practice, there are a few problems that need to be addressed.
-			First, the corresponding points are usually not known and must be found using a feature detection and matching technique (SfM step 1), e.g. SIFT.
+			First, the corresponding points are usually not known and must be found using a feature detection and matching technique (SfM step 1), e.g.\@ SIFT.
 			This then can lead to outliers, which are incorrectly assigned correspondences.
 			In this case, {RANSAC} (\cite{fischler1981random}) is applied to select the best eight points among many possible choices.
 			Second, the selected coordinates are usually not exact and contain noise that lead to a rank three estimate of $\matr{E}$ instead of rank two.
@@ -254,7 +254,7 @@
 			\cite{wang2017deepvo} add a new component to the past deep learning approaches for VO, the recurrent neural network (RNN).
 			The RNN differs from a regular neural network in the sense that it is designed to learn dependencies over a variable amount of time.
 			This makes it suitable for problems that involve a sequence of inputs with temporal dependency, as in a video.
-			The idea is that the information learned in the past (e.g. from earlier video frames) provides the \emph{context} for the present input.
+			The idea is that the information learned in the past (e.g.\@ from earlier video frames) provides the \emph{context} for the present input.
 			\citeauthor{wang2017deepvo} also use a pre-trained CNN architecture for feature extraction, followed by the RNN for pose regression.
 			However, as opposed to previous works, the CNN is not initialized with weights from motion-invariant tasks. 
 			It is a modified version of FlowNet (\cite{dosovitskiy2015flownet}) pre-trained on the synthetic \emph{Flying Chairs} dataset.
@@ -273,7 +273,7 @@
 			
 			In summary, we can conclude that there are two main trends.
 			One is the use of pre-trained networks for feature extraction such as AlexNet or FlowNet to accelerate training on small datasets.
-			Second, RNNs have shown to be very powerful for solving sequence-to-sequence problems, e.g. in the text domain, speech recognition or machine translation.
+			Second, RNNs have shown to be very powerful for solving sequence-to-sequence problems, e.g.\@ in the text domain, speech recognition or machine translation.
 			They are not so well-studied in the context of image- and video domain and present many challenges and questions for future work.
 		
 		\subsection{Learning Structure and Motion}
@@ -293,12 +293,12 @@
 			Using the camera and object transforms, the point cloud can be re-projected into the two camera views to obtain the optical flow.
 			This then presents two options for supervision.
 			One is self-supervision with a brightness-constancy criterion between the two input frames using the optical flow.
-			The other option is to supervise all components individually, i.e. camera motion, depth and optical flow.
+			The other option is to supervise all components individually, i.e.\@ camera motion, depth and optical flow.
 			Their results show typical failure cases in the self-supervised setting where shadows and occlusions break the brightness-consistency criterion, which hinders the network to properly separate object and camera motion.
 			However, the self-supervised approach still opens the possibility to use it as an initialization process for a supervised training on smaller datasets.
 		
 			In a concurrent work, \cite{zhou2017unsupervised} go a step further and do completely unsupervised training for camera pose and depth.
-			However, in contrast to \citeauthor{SFMNET} they do not explicitly model the scene dynamics and assume that camera intrinsics are known in advance.
+			In contrast to \citeauthor{SFMNET} they do not explicitly model the scene dynamics and assume that camera intrinsics are known in advance.
 			Both works have in common that the depth estimation is only from a single view.
 			It is unclear how well-developed the representation is that the network learns since in both works, the subnetwork for single-view depth is separated from the motion network.
 			With a single image as input, the depth estimation is an ill-posed problem.
