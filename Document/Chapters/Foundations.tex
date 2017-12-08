@@ -215,8 +215,9 @@
 		\begin{equation}
 			\lVert \vectr{q} \rVert = \sqrt{w^2 + x^2 + y^2 + z^2}.
 		\end{equation}
-		
-		In this thesis, we are particularly interested in the subset of quaternions called the \emph{unit quaternions}. These are all the quaternions with unit norm, i.e., $\lVert \vectr{q} \rVert = 1$. 
+		One particularly interesting subset of the quaternions are those with unit norm, i.e., $\lVert \vectr{q} \rVert = 1$.
+		They are called \emph{unit quaternions}.
+%		In this thesis, we are particularly interested in the subset of quaternions called the \emph{unit quaternions}. These are all the quaternions with unit norm, i.e., $\lVert \vectr{q} \rVert = 1$. 
 		The quaternions of this form describe 3D rotations and can be parameterized by
 		\begin{equation}
 			\vectr{q} = 
@@ -226,21 +227,35 @@
 		where $\theta \in \R$ is the angle of rotation around a unit-length axis $\vectr{a} = (a_1, a_2, a_3) \in \R^3$.
 		The parameterization makes use of the axis-angle representation, however, quaternions are more powerful in the sense that rotations can be concatenated via multiplication, i.e., $\vectr{q}_2 \vectr{q}_1$ represents the compound rotation of $\vectr{q}_1$ followed by $\vectr{q}_2$.
 		One drawback of the quaternion is that it is a double cover of the space of rotations, meaning that $\vectr{q}$ and $-\vectr{q}$ represent the same rotation.
-		\todo{transition: unit constraint, neural networks...}
-	
+		\todo{mention spherical linear interpolation (Slerp)?}
+		\\
+		
+		How well a neural network can be trained to output a rotation may depend on the choice of the representation and its constraints.
+		An analysis on this matter is done in chapter~\ref{chp:experiments-and-results}.
+		We now continue with a brief review on artificial neural networks and machine learning.
+		
 	\section{Deep Feedforward Neural Networks}
 		\todo{This summary is based on the deep learning book}
 		\todo{show a figure for a feed forward network}
+		
 		A \emph{feedforward neural network} is a function mapping an input $\vectr{x}$ to an output $\vectr{y} = f(\vectr{x})$.
-		For example, $\vectr{y} \in \{\text{dog}, \text{cat} \}$ could be the output of the function deciding whether an image $\vectr{x}$ contains a dog or a cat. 
+		For instance, $\vectr{y} \in \{\text{dog}, \text{cat} \}$ could be the output of the function deciding whether an image $\vectr{x}$ contains a dog or a cat. 
 		The reason it is called a \emph{deep network} is because $f$ is often a long chain of function compositions, e.g., 
 		$f = f^{(n)} \circ  \ldots  \circ f^{(2)} \circ f^{(1)}$.
 		The functions $f^{(1)}, \dots, f^{(n)}$ are called \emph{layers} and $n$ is the \emph{depth} of the network.
 		Each layer performs a computation on the output of the previous layer, hence the name \emph{feedforward}.
+		\begin{figure}[t]
+			\centering
+			\includegraphics[width=\linewidth]{Foundations/feed-forward-neural-network-example}
+			\caption[Example of a feedforward neural network]
+					{Example of a feedforward neural network represented by a computational graph. 
+					 Each layer (blue) operates on the outputs of previous layers, where $x$ is the input and $y$ is the output.
+					 \label{fig:example_feed_forward_network}}
+		\end{figure}
+		A feedforward network is best visualized as a graph\footnote{More precisely it is a DAG (directed acyclic graph). It does not allow loops.}, the so-called \emph{computational graph}.
+		A node in the graph represents an output- or input variable to one of the functions $f^{(i)}$, and the collection of all output nodes for one function is called a \emph{layer}. 
+		The edges between nodes represent information flow, i.e., which outputs of layer $j$ depend on the outputs of layer $i$.
 		
-		A feed forward network is best visualized as a graph\footnote{More precisely it is a DAG (directed acyclic graph). It does not allow loops.}, the so-called \emph{computational graph}.
-		A node in the graph represents a single layer and the edges represent the flow of data (input/output).
-		\todo{Should explain comp. graph in terms of neurons?}
 		These networks build the foundation of deep learning.
 		Why?
 		Because in general $f$ is unknown and must be learned to solve a specific task.
