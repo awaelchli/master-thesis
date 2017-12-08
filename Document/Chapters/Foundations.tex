@@ -43,10 +43,10 @@
 		and 
 		$\vectr{t}_{i \rightarrow j} = \vectr{0}$.
 		
-		The formulas in equation~\ref{eq:relative_rotation_conversion_general} can be applied to every transformation in the sequence for $i = 1, \dots, n$ and having $j$ fixed, e.g. $j = 1$ would make all transformations relative to the first camera coordinate system.
+		The formulas in equation~\ref{eq:relative_rotation_conversion_general} can be applied to every transformation in the sequence for $i = 1, \dots, n$ and having $j$ fixed, e.g.\@ $j = 1$ would make all transformations relative to the first camera coordinate system.
 		In the remainder of this thesis we refer to the camera pose in this format as the \emph{global pose}, where the first pose in the sequence always represents the coordinate system of all other poses.
 		An alternative choice is $j = i - 1$.
-		We refer to this special setting as the \emph{incremental pose}, since all transformations are relative to the previous video frame, i.e. we have 
+		We refer to this special setting as the \emph{incremental pose}, since all transformations are relative to the previous video frame, i.e.\@ we have 
 		$\matr{R}_{i \rightarrow i - 1}$ and $\vectr{t}_{i \rightarrow i - 1}$
 		for $i = 2, \dots, n$.
 		
@@ -144,7 +144,7 @@
 			\end{split}
 		\end{align}
 		are simple rotations around the axes of the initial (canonical) coordinate system $(x, y, z)$.
-		Further, it can be shown that this representation covers all 3D rotations, and in reverse, every rotation matrix $\matr{R} \in SO(3)$ can be decomposed into the form in equation~\ref{eq:euler_angles_rotation_matrix_global_axis}, e.g. to extract the Euler angles.
+		Further, it can be shown that this representation covers all 3D rotations, and in reverse, every rotation matrix $\matr{R} \in SO(3)$ can be decomposed into the form in equation~\ref{eq:euler_angles_rotation_matrix_global_axis}, e.g.\@ to extract the Euler angles.
 		
 		Unfortunately, the Euler angle representation comes with some limitations.
 		There are special configurations of angles that can lead to a loss in the degrees of freedom for the rotation. 
@@ -161,7 +161,7 @@
 		We denote it by the tuple $(\vectr{a}, \theta)$.
 		The axis can be thought of as the normal vector on the plane in which the rotation takes place.
 		The axis itself has three degrees of freedom, but for the rotation, only two of these matter.
-		Therefore the axis is often assumed to be normalized, i.e. $\lVert \vectr{a} \rVert = 1$.
+		Therefore the axis is often assumed to be normalized, i.e.\@ $\lVert \vectr{a} \rVert = 1$.
 		There are two main limitations to the axis-angle, which often make it only usable as an intermediate representation.
 		One is the missing algebraic structure to directly concatenate several rotations.
 		Second, the representation is ambiguous.
