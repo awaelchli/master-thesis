@@ -239,7 +239,7 @@
 		We now continue with a brief review on artificial neural networks and machine learning.
 		
 	\section{Deep Feedforward Neural Networks}
-		
+	
 		A \emph{feedforward neural network} is a function mapping an input $\vectr{x}$ to an output $\vectr{y} = f(\vectr{x})$.
 		For instance, $\vectr{y} \in \{\text{dog}, \text{cat} \}$ could be the output of the function deciding whether an image $\vectr{x}$ contains a dog or a cat. 
 		The reason it is called a \emph{deep network} is because $f$ is often a long chain of function compositions, e.g., 
@@ -250,12 +250,12 @@
 			\centering
 			\includegraphics[width=\linewidth]{Foundations/feed-forward-neural-network-example}
 			\caption[Example of a feedforward neural network]
-					{Example of a feedforward neural network represented by a computational graph. 
+					{Example of a feedforward neural network represented by the computational graph. 
 					 Each layer (blue) operates on the outputs of previous layers, where $x$ is the input and $y$ is the output.
 					 \label{fig:example_feed_forward_network}}
 		\end{figure}
 		A feedforward network is best visualized as a graph%
-		\footnote{More precisely it is a DAG (directed acyclic graph). It does not allow loops.}, 
+		\footnote{More precisely, it is a DAG (directed acyclic graph). It does not allow loops.}, 
 		the so-called \emph{computational graph}.
 		Figure~\ref{fig:example_feed_forward_network} shows an example of a small feedforward network.
 		A node in the graph represents an output- or input variable to one of the functions $f^{(i)}$, and the collection of all output nodes for one function is called a \emph{layer}. 
@@ -342,7 +342,40 @@
 		It is the preferred method to compute gradients in a neural network.
 		
 	\section{Convolutional Neural Networks}
-	
+		
+		A layer in a feedforward network can theoretically depend on all the outputs of the previous layer.
+		In this case, it is called a \emph{fully connected} layer.
+		An example is the linear layer $f(\vectr{x}) = \matr{W} \vectr{x}$ with parameters $\matr{W} \in \R^{m \times n}$ that connects $n$ inputs $\vectr{x} \in \R^n$ with $m$ outputs.
+		An operation like this has a high computational cost, especially when the input is large (e.g.\@ an image).
+		The \emph{convolutional neural network (CNN)} is a special type of feedforward network that has layers where the output nodes are connected only to a few neighboring nodes from the previous layer.
+		The operation on this neighborhood is linear (or affine), and all outputs share the same weight matrix, the \emph{kernel}.
+		The number of connections in the neighborhood is defined by the \emph{kernel size}.
+		The convolution kernel is applied by sliding it over the input.
+		This makes it independent of the input size, which is a very convenient when the inputs to the network are images of varying size/resolution.
+		
+		Formally, the 2D convolution at location $(i, j)$ on an input $\matr{X}$ with $C$ channels is defined as 
+		\begin{equation}\label{eq:convolution_2D_simple}
+			\matr{Y}(i, j) = 
+			%\sum_{c = 1}^{C}
+			%\sum_{n = 1}^{N}
+			%\sum_{m = 1}^{M}
+			\sum_{c, n, m}
+				\matr{X}(c, i \cdot s - n, j \cdot s - m) \matr{K}(c, n, m), 
+		\end{equation}
+		where $\matr{K} \in \R^{C \times N \times M}$ is the kernel with size $N \times M$.
+		Usually, this size is chosen to be quadratic, i.e.\@ $N = M$.
+		Note that the convolution is only applied in the spatial dimensions, and that the weights for each channel are different.
+		The variable $s \in \N$ in equation~\ref{eq:convolution_2D_simple} is the \emph{stride}.
+		A stride greater than one means that outputs are ``skipped", i.e., the spatial size shrinks by the factor $\frac{1}{s}$.
+		%Furthermore, the number of outputs in $\matr{Y}$ changes according to the input size.
+		
+		There are a number of advantages a convolution layer has over the fully connected layer.
+		The convolution can be applied on arbitrary input sizes, it is computationally efficient due to the limited number of connections to a neighborhood (sparsity), the same kernel is applied to the whole input (weight sharing) and therefore can ``detect" a pattern in an arbitrary location (shift-invariance).
+		Lastly, a convolution layer usually applies multiple kernels on the same input, resulting in an output $\matr{Y}(l, i, j)$ with multiple channels.
+		The slices indexed by $l$ are called \emph{feature maps}.
+		
+		
+		
 	\section{Recurrent Neural Networks}\label{sec:recurrent_neural_networks}
 		\newcommand{\imagecourtesycolah}{Image courtesy Christopher Olah \mbox{\href{http://colah.github.io/}{(colah.github.io)}}.}
 		\todo{Need references to early works on RNNs}
@@ -350,13 +383,11 @@
 		It will always compute the same output for the same input, independently of the input-output pairs it has seen before.
 		Now consider a sequence $\vectr{x}_1, \dots, \vectr{x}_T$ of inputs, e.g., a sentence.
 		How can we learn to predict an attribute that depends on the whole sequence, e.g., the sentiment of the sentence?
-		One way is to concatenate the sequence to one vector and use the feed-forward network.
+		One way is to concatenate the sequence to one vector and use the feedforward network.
 		However, this will limit the sequence length to a fixed size and potentially requires more training data.
-		\todo{need reference for this statement}.
 		How do we model predictions for a variable sequence length?
-		And what if we want also the output to be a sequence? 
+		And what if we also want the output to be a sequence? 
 		What if the output sequence needs to have a different length than the input sequence, such as in machine translation? 
-		\todo{citation needed}
 		
 		This is where the recurrent neural network (RNN) comes into play.
 		It is a function that maps each vector $\vectr{x}_t \in \R^n$ from the sequence to a hidden state
@@ -379,7 +410,7 @@
 		When unfolded, one can see the information flow from one state to the next.
 		Note that it is possible to feed arbitrary sizes of sequences to the RNN.
 		
-		The simplest implementation of an RNN uses an affine transformation followed by a non-linear function:
+		The vanilla implementation of an RNN uses an affine transformation followed by a non-linear function:
 		\begin{equation}
 			\vectr{h}_t = 
 			\tanh \left(
@@ -400,18 +431,18 @@
 		to obtain the prediction $\vectr{y}_t$.
 		Otherwise we define the output as $\vectr{y}_t = \vectr{h}_t$.
 		
-		Training an RNN is not much different from a feed-forward network.
-		The weights $\vectr{W}, \vectr{V}, \vectr{b}$ and $\vectr{c}$ are updated in the same fashion as for feed-forward networks using gradient descent on the loss function.
-		Say we define a criterion $\mathcal{L}_t(\vectr{y}_t, \vectr{\hat{y}}_t)$ for the loss between prediction and ground-truth at each time step $t$.
+		Training an RNN is not much different from a feedforward network.
+		The weights $\vectr{W}, \vectr{V}, \vectr{b}$ and $\vectr{c}$ are updated in the same fashion as for feedforward networks using gradient descent on the loss function.
+		Say we define a criterion $\mathcal{L}_t(\vectr{\hat{y}}_t, \vectr{y}_t)$ for the loss between prediction and ground-truth at each time step $t$.
 		Then, the total loss for the sequence is simply 
 		\begin{equation}\label{eq:loss_for_rnn}
-			\mathcal{L}(\{\vectr{y}_1, \dots \vectr{y}_T\}, \{\vectr{\hat{y}}_1, \dots \vectr{\hat{y}}_T\}) = 
-			\sum_{t=1}^{T} \mathcal{L}_t(\vectr{y}_t, \vectr{\hat{y}}_t).
+			\mathcal{L}(\{\vectr{\hat{y}}_1, \dots \vectr{\hat{y}}_T\}, \{\vectr{y}_1, \dots \vectr{y}_T\}) = 
+			\sum_{t=1}^{T} \mathcal{L}_t(\vectr{\hat{y}}_t, \vectr{y}_t).
 		\end{equation}
-		This loss will be used to compute gradients for updating the model parameters similar to feedforward networks.
+		This loss is used to compute gradients for updating the model parameters similar to feedforward networks.
 		
 	\section{Gradient Computation for RNNs}\label{sec:gradient_computation_RNN}
-		The gradient computation is almost the same as for feed-forward networks and the backpropagation algorithm can be applied by unfolding the RNN as shown in figure~\ref{fig:RNN-unrolled}.
+		The gradient computation for the RNN is almost the same as for the feedforward network and the backpropagation algorithm can be applied by unfolding the RNN as shown in figure~\ref{fig:RNN-unrolled}.
 		However, there is a problem with the gradient computation in the above version of the RNN (\cite{pascanu2013difficulty}, \cite{bengio1994learning}).
 		For long sequences, the gradient norm can become very small and this hurts the training.
 		The RNN is not able to learn long-term dependencies when the gradient vanishes.
