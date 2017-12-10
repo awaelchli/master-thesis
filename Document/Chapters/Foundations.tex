@@ -389,7 +389,7 @@
 		And what if we also want the output to be a sequence? 
 		What if the output sequence needs to have a different length than the input sequence, such as in machine translation? 
 		
-		This is where the recurrent neural network (RNN) comes into play.
+		This is where the \emph{recurrent neural network (RNN)} comes into play.
 		It is a function that maps each vector $\vectr{x}_t \in \R^n$ from the sequence to a hidden state
 		\begin{eqnarray}
 			\vectr{h}_t = R(\vectr{x}_t, \vectr{h}_{t-1}), & &t = 1, \dots, T
@@ -411,7 +411,7 @@
 		Note that it is possible to feed arbitrary sizes of sequences to the RNN.
 		
 		The vanilla implementation of an RNN uses an affine transformation followed by a non-linear function:
-		\begin{equation}
+		\begin{equation}\label{eq:vanilla_RNN}
 			\vectr{h}_t = 
 			\tanh \left(
 			\matr{W}
@@ -444,8 +444,7 @@
 	\section{Gradient Computation for RNNs}\label{sec:gradient_computation_RNN}
 		The gradient computation for the RNN is almost the same as for the feedforward network and the backpropagation algorithm can be applied by unfolding the RNN as shown in figure~\ref{fig:RNN-unrolled}.
 		However, there is a problem with the gradient computation in the above version of the RNN (\cite{pascanu2013difficulty}, \cite{bengio1994learning}).
-		For long sequences, the gradient norm can become very small and this hurts the training.
-		The RNN is not able to learn long-term dependencies when the gradient vanishes.
+		For long sequences, the gradient norm can become very small such that the parameter updates have no influence and therefore the RNN is not able to learn long-term dependencies.
 		To see this, we can write down the full equation for the gradient:
 		\begin{equation}\label{eq:gradient_computation_RNN}
 			\frac{\partial \mathcal{L}}{\partial \vectr{w}}
@@ -462,9 +461,11 @@
 		\end{equation}
 		In the above equation, we have the product term that causes the problem when the sequence is very long.
 		Note that the partial derivatives are Jacobian matrices when we take the derivatives of a vector-valued function with respect to a vector.
-		Due to many multiplications, the gradient values drop exponentially.
-		\todo{Need a better explanation why values are <1 and drop exponentially}
-		A more complete analysis is provided in \cite{pascanu2013difficulty}.
+		Due to many multiplications, the gradient values can drop or increase exponentially.%
+		\footnote{A more complete analysis is provided in the work of \cite{pascanu2013difficulty}.}
+		The case of exploding values is less problematic since the gradient can be manually rescaled to a maximum norm.
+		However, in the case of a vanishing gradient, the problem is more serious. 
+		A rescaling would be numerically unstable due to the norm being very close to zero. 
 		
 	\section{The Long Short-Term Memory}
 		\begin{figure}[tb]
@@ -477,8 +478,8 @@
 					\imagecourtesycolah}
 			\label{fig:LSTM3-chain}
 		\end{figure}
-		The Long Short-Term Memory (LSTM) is a version of the RNN that was designed to overcome the vanishing gradient problem described above, and it is also used in this thesis.
-		As shown in figure~\ref{fig:LSTM3-chain}, it introduces four gates (in yellow) and an additional cell state variable that is carried over from one time step to the next.
+		The \emph{Long Short-Term Memory (LSTM)} is a version of the RNN that was designed to overcome the vanishing gradient problem described above, and it is also used in this thesis.
+		As shown in figure~\ref{fig:LSTM3-chain}, it has four gates (in yellow) and an additional cell state variable that is carried over from one time step to the next.
 		The recurrence can be formulated as a function 
 		% $R \colon \R^n \times \R^d \times \R^d \rightarrow \R^d \times \R^d$
 		\begin{align}\label{eq:LSTM_recurrence}
@@ -530,8 +531,8 @@
 				\vectr{W}_g
 			\end{bmatrix}
 		\end{align}
-		We can see that there are three additional gates that control information flow with a sigmoid activation.
-		If the sigmoid output is one, all information is let through, otherwise no information passes the gate. 
+		Compared to the vanilla RNN (eq.\@~\ref{eq:vanilla_RNN}), there are three additional gates that control information flow with a sigmoid activation.
+		If the sigmoid output is one, all information is let through, and if it is zero, no information passes the gate. 
 		
 		The first is the input gate $\vectr{i}$.
 		It controls how much information should be collected from the current input and hidden state.
