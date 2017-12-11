@@ -1,4 +1,4 @@
-\chapter{Foundations}
+\chapter{Foundations}\label{chp:foundations}
 
 	% Intro
 	% First part: Transformations
@@ -478,7 +478,7 @@
 					\imagecourtesycolah}
 			\label{fig:LSTM3-chain}
 		\end{figure}
-		The \emph{Long Short-Term Memory (LSTM)} is a version of the RNN that was designed to overcome the vanishing gradient problem described above, and it is also used in this thesis.
+		The \emph{Long Short-Term Memory (LSTM)} is a version of the RNN that was designed to overcome the vanishing gradient problem, and it is also used in this thesis.
 		As shown in figure~\ref{fig:LSTM3-chain}, it has four gates (in yellow) and an additional cell state variable that is carried over from one time step to the next.
 		The recurrence can be formulated as a function 
 		% $R \colon \R^n \times \R^d \times \R^d \rightarrow \R^d \times \R^d$
@@ -532,20 +532,23 @@
 			\end{bmatrix}
 		\end{align}
 		Compared to the vanilla RNN (eq.\@~\ref{eq:vanilla_RNN}), there are three additional gates that control information flow with a sigmoid activation.
-		If the sigmoid output is one, all information is let through, and if it is zero, no information passes the gate. 
+		If the sigmoid output is close to one, information is let through, and if it is close zero, no information passes the gate. 
 		
 		The first is the input gate $\vectr{i}$.
 		It controls how much information should be collected from the current input and hidden state.
 		The second is the forget gate $\vectr{f}$, which will learn what information should be discarded from the previous cell state.
 		Finally, the output gate $\vectr{o}$ regulates the amount of information that goes to the output $\vectr{h}_t$.
 		
-	\section{Training RNNs}
-		% Intro: Two parts - optimization algorithm and how inputs/outputs are defined
+		The main reason why the LSTM can counteract the gradient vanishing problem is because of the forget gate in the cell state update 
+		$\vectr{c}_t = \vectr{i} \odot \vectr{g} + \vectr{f} \odot \vectr{c}_{t-1}$ 
+		in equation~\ref{eq:Vanilla-LSTM-Definition}.
+		Note that when we take the derivative of $\vectr{c}_t$ with respect to $\vectr{c}_{t-1}$, the only term that remains is the forget gate output.
+		For each element in the cell state, the forget gate directly regulates the decay of gradient over time.
 		
-		\paragraph{Optimization Procedure}
-		In order to use the loss function to update the model weights, one has to specify an optimization algorithm.
-
-		\todo{connect}
+	\section{Training RNNs}
+		
+		%\paragraph{Optimization Procedure}
+		%In order to use the loss function to update the model weights, one has to specify an optimization algorithm.
 		
 		There are several ways an RNN can be trained.
 		First of all, one can distinguish the type of input-output relationship for RNNs.
@@ -559,7 +562,7 @@
 		However, this does not mean that one has to use all outputs for computing loss and gradients.
 		For example, if we wish to predict the sentiment of a sentence, we can feed each word to the RNN and and ignore all outputs except the last one and use that for backpropagation of the gradient.
 		We refer to this method as \emph{many-to-one}.
-		If there is only one input available, but the output must a sequence (\emph{one-to-many}), one possibility is to simply feed the same input for all time steps.
+		If there is only one input available, but the output must be a sequence (\emph{one-to-many}), one possibility is to simply feed the same input for all time steps.
 		An example for this method is image captioning, where the input is an image and the output is a description of the image in form of a sentence. \todo{reference to a work on image captioning}
 		Finally, the \emph{one-to-one} setting is a combination of the two above.
 		
@@ -571,20 +574,18 @@
 		In general, the symbol does not necessarily have to be used at the end of a sequence.
 		It can be inserted whenever an output is needed.
 		An application of this is shown in an experiment later in the thesis. 
-		\todo{Explicitly refer to the section}
+		\todo{Check again! Explicitly refer to the section}
 		
 		\paragraph{Truncated Backpropagation}
 		As discussed in section~\ref{sec:gradient_computation_RNN}, gradient computation over long sequences can cause vanishing or exploding values that hinder the learning process during training.
 		The LSTM was designed to addressed this issue, but backpropagation over very long sequences is still computationally expensive.
-		As a compromise, one can choose to backpropagate only a certain amount of time steps.
-		This is called \emph{truncated backpropagation through time} or TBPTT.
-		In order to save memory and reduce computation, one can choose to limit the gradient computation through time.
+		As a compromise, in order to save memory and reduce computation, one can choose to backpropagate only a certain amount of time steps.
 		This is called \emph{truncated backpropagation through time (TBPTT)}. 
 		Say the sequences have a length of $T$ and the number of time steps to backpropagate is $\tau \leq T$.
 		To compute the gradient only back to $T - \tau$, we can replace the start indices for $t$ and $k$ in the sums of equation~\ref{eq:gradient_computation_RNN} with $T - \tau$.
-		Obviously, this is an approximation of the full gradient over all time steps.
-		The RNN is not forced to learn dependencies back in time longer than $\tau$ steps and thus we can not expect it to do so.
-		\todo{mention where this is used later in thesis}
+		Obviously, this is only an approximation of the full gradient over all time steps.
+		The RNN is not forced to learn dependencies back in time longer than $\tau$ steps and thus we can not expect it to do so. 
+		TBPTT is used for all experiments in chapter~\ref{chp:experiments-and-results} as well as for the toy example in section~\ref{sec:toy-example-memory}.
 		
 		A specific application of TBPTT is for training on one continuous data stream instead of many shorter sequences.
 		For example, if the goal is to train an RNN to generate natural text, it needs to remember the context over multiple sentences.
@@ -603,28 +604,9 @@
 		In this thesis, the inputs are camera images (thousands of color values) and the outputs are poses (usually 6D or 7D vectors).
 		The semantic gap is large since the pose is not directly encoded in the individual image, but in the motion between the frames.
 		The pose is always relative to the first frame in the sequence.
-		The RNN has to learn this directly from the ground truth, not from the input.
-		
-		
-		% How the ground truth is used
-		% 	Does ground truth have same dimensionality as input?, as hidden state?
-		%
-		
-	\section{PyTorch}
-		PyTorch is a deep learning framework for Python that comes with a rich tensor library.
-		It differs from other libraries (TensorFlow, Caffe, Theano and more) in the sense that it builds the computational graph dynamically at runtime.
-		This flexibility allows for controlling the computational flow while training or testing the network.
-		
-		
-		
-	\section{Exploring the LSTM}
-	\todo{Alternative titles: Capabilities of LSTMs, Strengths and Weaknesses of LSTM, Analysis of LSTMs, The LSTM: A Analysis}
+		The RNN has to learn this relationship directly from the ground truth, not from the input.
 
-		The aim of this chapter is to develop an understanding of how the recurrent neural networks work, specifically the LSTM.
-		We begin with a very simple memorization task to demonstrate how an LSTM is trained on sequences of data and what effect different hyperparameters have.
-		Building on this knowledge, we explore more sophisticated tasks such as predicting the motion of a cloud of points which will finally lead into the challenging problem of visual odometry and structure from motion.
-	
-	\section{A First Toy Example: Memorizing Digits}
+	\section{A First Toy Example: Memorizing Digits}\label{sec:toy-example-memory}
 		% Capabilities of LSTM
 		% - Memory: Describe binary memory example (sequence of binary digits)
 		% - As classification, formula for cross-entropy loss
@@ -634,10 +616,19 @@
 		% - 
 		
 		%To understand how LSTMs are used to learn from sequences of data and how their memory works, we conduct a small example for demonstration. 
-		This first experiment is to show the capabilities and limitations of the LSTM.
-		Can it memorize the past and use this knowledge for future outputs?
+		
+		%The aim of this chapter is to develop an understanding of how the recurrent neural networks work, specifically the LSTM.
+		%We begin with a very simple memorization task to demonstrate how an LSTM is trained on sequences of data and what effect different hyperparameters have.
+		%Building on this knowledge, we explore more sophisticated tasks such as predicting the motion of a cloud of points which will finally lead into the challenging problem of visual odometry and structure from motion.
+		
+		The intention of this toy experiment is to familiarize the reader with the LSTM.
+		Although the following example has nothing to do with VO, it is important to understand the basic properties of the LSTM, the key building block that we will use later in a larger model for VO.
+		The section gives a rough outline of how an LSTM model is defined, trained and evaluated.
+		The main questions that are investigated are:
+		Can the LSTM memorize the past and use this knowledge for future outputs?
 		And how far back in time can it remember?
 		Does it work best for classification or regression?
+		What is the influence of the hyperparameters?
 		\todo{Regression still missing from experiments! (one fig. generated)}
 		These are the main questions that are investigated in this section.
 		
@@ -656,9 +647,7 @@
 		\end{center}
 		The first line is the input sequence and below is the desired output sequence.
 		The LSTM reads the digits one by one to store them in memory and at the same time it outputs the digit from memory at time $t - 3$ as highlighted by the colors above.
-		%How can we model and train this sequence-to-sequence problem?
-		
-		In order to tackle a machine learning problem, one needs to define three key elements:
+		In order to tackle this machine learning problem, we will define three key components:
 		\begin{enumerate}
 			\item Model
 			\item Performance measure
@@ -667,8 +656,8 @@
 	
 		\paragraph{The Model}
 		We begin by defining the model.
-		The first part of our model is the LSTM itself as it was defined in equations~\ref{eq:LSTM_recurrence} and~\ref{eq:Vanilla-LSTM-Definition}.
-		Since the output can only be two numbers (zero and one), we will treat the problem as a classification task.
+		The first part of it is the LSTM itself as it was defined in equations~\ref{eq:LSTM_recurrence} and~\ref{eq:Vanilla-LSTM-Definition}.
+		Since the output can only be two numbers (zero or one), we will treat the problem as a classification task.
 		To do this, we add an affine layer to shrink the size of the LSTM output $\vectr{h}_t$ down to a two-element vector
 		\begin{equation}
 			\vectr{z}_t = \matr{V} \vectr{h}_t + \vectr{c}.
@@ -692,18 +681,21 @@
 		\begin{table}[tb]
 			\small
 			\begin{center}
-				\begin{tabular}{|l|c|c|c|c|}
-					\hline
-					Layer 	& Variable 			& Input size 	& Output size 	& Parameters 			\\ \hline
-					LSTM 	& $\vectr{h}_t$		& 1 			& $d$ 			& $4d(d + 1) + 4d$ 		\\ \hline
-					Affine 	& $\vectr{z}_t$		& $d$ 			& 2 			& $2d + 2$ 				\\ \hline
-					Softmax & $\vectr{p}_t$		& 2 			& 2 			& 0						\\ \hline
+				\begin{tabular}{lp{0.3cm}llll}
+					\toprule
+					Layer 	& & Variable 			& Input size 	& Output size 	& Parameters 			\\
+					\midrule
+					LSTM 	& & $\vectr{h}_t$		& 1 			& $d$ 			& $4d(d + 1) + 4d$ 		\\ 
+					Affine 	& & $\vectr{z}_t$		& $d$ 			& 2 			& $2d + 2$ 				\\ 
+					Softmax & & $\vectr{p}_t$		& 2 			& 2 			& 0						\\ 
+					\bottomrule
 				\end{tabular}
 			\end{center}
 			\caption[A simple model to memorize a binary sequence]
 					{A simple model to memorize a binary sequence. 
-				 The variable $d$ is the hidden size of the LSTM.}
-			\label{tbl:model_classification_binary_digits}
+					 The variable $d$ is the hidden size of the LSTM.
+					 \label{tbl:model_classification_binary_digits}}
+			
 		\end{table}
 		
 		\paragraph{The Performance Measure}
@@ -717,28 +709,21 @@
 		Since we are predicting the digit from $m$ time steps ago, the ground truth directly comes from the input sequence, and therefore the label $y_t$ at time $t$ is the input $\vectr{x}_{t - m}$.
 		By minimizing this loss, the probability for the correct class is maximized.
 		As described in equation~\ref{eq:loss_for_rnn}, the total loss for the entire sequence is the sum over the individual losses.
-		\todo{need better explanation of log-likelihood loss here}
 		
 		\paragraph{The Optimization Procedure}
-		\todo{rework this paragraph}
-		In order to use the loss function to update the model weights, one has to specify an optimization algorithm.
-
-		
 		Because this experiment is completely artificial, it is possible to generate as much data as needed.
 		Instead of generating many smaller sequences, one can generate a single large sequence or sample the digits on-the-fly.
-		In order to save memory and reduce computation, one can choose to limit the gradient computation through time.
-		This is called \emph{truncated backpropagation through time (TBPTT)}. 
+		In order to save memory and reduce computation, we apply TBPTT.
 		Starting from the beginning of the sequence, $T$ inputs are fed to the LSTM followed by the loss computation.
 		The gradient computation is performed for exactly $T$ steps back in time and the weights are updated accordingly. 
 		Continuing with this pattern, the next $T$ inputs are fed for the next update and so on.
 		In each step, the hidden state is carried over from the previous digit.
 		This way, there is always information available from the past even though the gradients are never propagated to the very beginning of the sequence.
-		\todo{Explain this in the theoretical section, also explain how (truncated) backpropagation works for LSTM}
 		
-		\paragraph{Results for Binary Sequence}
+		\paragraph{Results for Binary Sequences}
 		Now that task, model and optimization procedure are defined, the model can be trained and evaluated.
 		For all experiments, we train the model and test on new unseen data of the same size by computing the accuracy, that is the relative frequency of correctly predicted digits.
-		First, let's train and evaluate on the simplest model possible: The LSTM has a hidden size of one ($d = 1$).
+		First, we train and evaluate on the simplest model possible: The LSTM has a hidden size of one ($d = 1$).
 		\begin{figure}[tb]
 			\centering
 			\begin{subfigure}[b]{0.5\linewidth}
@@ -772,13 +757,14 @@
 				}
 			\end{subfigure}
 			\caption[Memorizing the past with the LSTM: Binary digits]
-			{Accuracy on the test dataset for varying parameters while keeping others fixed. 
-				The parameters involved are the hidden size $d$, look-back $m$, BPTT $T$, training set size $N$ and learning rate $\lambda$. 
-				(a) The hidden size is too small.
-				(b) Effect of increasing the hidden size.
-				(c) Only increasing the hidden size is not enough.
-				(d) Increasing the amount of training data.}
-			\label{fig:ablation-study-binary-memory}
+					{Accuracy on the test dataset for varying hyperparameters while keeping others fixed. 
+					 The parameters involved are the hidden size $d$, look-back $m$, BPTT $T$, training set size $N$ and learning rate $\lambda$. 
+					 (a) The hidden size is too small.
+					 (b) Effect of increasing the hidden size.
+					 (c) Only increasing the hidden size is not enough.
+					 (d) Increasing the amount of training data.
+					 \label{fig:ablation-study-binary-memory}}
+			
 		\end{figure}
 		The result is shown in figure~\ref{fig:accuracy-vs-look-back}. 
 		We observe that the model can perfectly memorize the digit of one time step in the past ($m = 1$).
@@ -786,9 +772,9 @@
 		This problem can be fixed by increasing the hidden size as shown in~\ref{fig:accuracy-vs-hidden-size}.
 		Based on these observations, it seems that the hidden size $d$ is related to the memory capacity of the network and must always be chosen higher than the look-back $m$. 
 		But this hypothesis does not hold true when we continue to increase $m$ as demonstrated in~\ref{fig:accuracy-vs-look-back2}.
-		Figure~\ref{fig:more-training-data} shows that for higher look-back, we also need significantly more training data. 
+		Figure~\ref{fig:more-training-data} shows that for a higher look-back, we also need significantly more training data. 
 		
-		\paragraph{Extension to Multi-class}
+		\paragraph{Extension to Multiple Classes}
 		So far we have learned a binary classifier, but we can extend the task to go beyond that to make the problem harder.
 		Instead of having only two symbols 0 and 1, we can choose each digit to be a number $\vectr{x}_t \in \{1, \dots, C\}$.
 		This is essentially a classification problem with $C$ classes.
@@ -796,30 +782,32 @@
 		\begin{table}[tb]
 			\small
 			\begin{center}
-				\begin{tabular}{|l|c|c|c|c|}
-					\hline
-					Layer 	& Variable 			& Input size 	& Output size 	& Parameters 			\\ \hline
-					LSTM 	& $\vectr{h}_t$		& 1 			& $d$ 			& $4d(d + 1) + 4d$ 		\\ \hline
-					Affine 	& $\vectr{z}_t$		& $d$ 			& $C$ 			& $Cd + C$ 				\\ \hline
-					Softmax & $\vectr{p}_t$		& $C$ 			& $C$ 			& 0						\\ \hline
+				\begin{tabular}{lp{0.3cm}llll}
+					\toprule
+					Layer 	& & Variable 			& Input size 	& Output size 	& Parameters 			\\
+					\midrule 
+					LSTM 	& & $\vectr{h}_t$		& 1 			& $d$ 			& $4d(d + 1) + 4d$ 		\\ 
+					Affine 	& & $\vectr{z}_t$		& $d$ 			& $C$ 			& $Cd + C$ 				\\ 
+					Softmax & & $\vectr{p}_t$		& $C$ 			& $C$ 			& 0						\\ \bottomrule
 				\end{tabular}
 			\end{center}
 			\caption[A simple model to memorize a sequence of numbers]
 					{A simple model to memorize a sequence of numbers.
-				 This is a generalization of the binary model in table~\ref{tbl:model_classification_binary_digits} where $C = 2$.}
-			\label{tbl:model_classification_multi_class_digits}
+					 This is a generalization of the binary model in table~\ref{tbl:model_classification_binary_digits} where $C = 2$.
+					 \label{tbl:model_classification_multi_class_digits}}
+		
 		\end{table}
-		The model is trained and evaluated for each value $C \in \{1, \dots 15\}$.
+		It is trained and evaluated for each value $C \in \{1, \dots 15\}$.
 		\begin{figure}[tb]
 			\centering
 			\includegraphics[width=0.7\linewidth]{Python-Plots/memory/accuracy-vs-multiple-classes-and-layers}
 			\caption[Memorizing the past with the LSTM: Multiple classes]
-					{Memorizing multiple classes with LSTM.
-				 Performance of single layer LSTM vs. stacked LSTM.
-				 Adding more layers helps deal with the higher complexity of the output.
-				 Hyperparameters: $m = 5, d = 50, T = 50, \lambda = 0.001, N = 10^5$.
-				 }
-			\label{fig:accuracy-vs-multiple-classes-and-layers}
+					{Memorizing multiple classes with an LSTM.
+					 Performance of single layer LSTM vs. stacked LSTM.
+					 Adding more layers helps deal with the higher complexity of the output.
+					 Hyperparameters: $m = 5, d = 50, T = 50, \lambda = 0.001, N = 10^5$.
+					 \label{fig:accuracy-vs-multiple-classes-and-layers}}
+			
 		\end{figure}
 		The blue line in figure~\ref{fig:accuracy-vs-multiple-classes-and-layers} shows that the accuracy decreases the more classes are used in the sequence.
 		This is due to the more complex mapping between input and output. 
@@ -827,8 +815,10 @@
 		As shown in the red line in figure~\ref{fig:accuracy-vs-multiple-classes-and-layers}, adding a second layer boosts the performance.
 		
 		
-	\section{Tracking a Moving Point Cloud}
 		
+		
+	\section{Tracking a Moving Point Cloud}
+		\todo{INCOMPLETE}
 		Up to this point, the input to the LSTM was always one-dimensional (a number/digit).
 		But how well can it handle vectors as input?
 		This is the main question for this section.

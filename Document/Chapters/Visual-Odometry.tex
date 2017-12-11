@@ -3,57 +3,76 @@
 % Visual Odometry with Deep Learning
 % Visual Odometry
 % The Full Visual Odometry Pipeline
+	\def\CC{{C\nolinebreak[4]\hspace{-.05em}\raisebox{.4ex}{\tiny\bf ++}}}
 
 	\section{Introduction}
 	% Describe the Task
 	% Prior Work -> Flownet, DeepVO, VINet
-	%
-	The bulk of this chapter and the experiments that follow in chapter~\ref{chp:experiments-and-results} are based on the work of \cite{wang2017deepvo}.
-	At the time of writing this thesis, \citeauthor{wang2017deepvo} have not released the source code of their implementation.
-	Therefore, the aim of this chapter is to study and re-implement the ideas presented in their paper and to further expand on it.
+	% 
+		The bulk of this chapter and the experiments that follow in chapter~\ref{chp:experiments-and-results} are based on the work of \cite{wang2017deepvo}.
+		At the time of writing this thesis, they have not released the source code of their implementation.
+		Therefore, the aim of this chapter is to study and re-implement the ideas presented in their paper and to further expand on it.
+		To reiterate, the task we try to solve in this thesis is Visual Odometry (VO).
+		Given a video, the output of the system should be a sequence of poses describing the camera motion in the video.
+		\citeauthor{wang2017deepvo} propose a Deep Learning approach that makes use of an RNN to handle a video of arbitrary length.
+		What follows is a detailed description of the proposed Deep Learning pipeline for VO.
 	
 	\section{Datasets}
-		\todo{intro text}
-		All the above descriptions \todo{in section ...} of rotations can be converted into each other, therefore it is not a problem to adapt the format of the training data.
+		Every machine learning project starts with the collection and assessment of data.
+		Data is what drives machine learning, and often it is also a limiting factor.
+		Generally, the more data, the better the learning process.
+		However, it is not always easy to get the desired amount and quality.
+		For VO, the videos need to be recorded manually, which is very time consuming.
+		Not only that, but in our supervised setting, accurate per-frame pose annotations are required.
 		
-		\begin{figure}
-			\centering
-			\begin{subfigure}[b]{0.8\linewidth}
-				\centering
-				\includegraphics[width=\linewidth]{Data/kitti-example-image}
-				\caption{
-					KITTI
-					\label{fig:kitti-example-image}
-				}
-			\end{subfigure}%
-			\\
-			\begin{subfigure}[b]{0.8\linewidth}
-				\centering
-				\includegraphics[width=\linewidth]{Data/viper-example-image}
-				\caption{
-					VIPER
-					\label{fig:viper-example-image}
-				}
-			\end{subfigure}%
-			\caption[Example images from different datasets]
-					{Example images from different datasets.
-					 \todo{choose different image with scene dynamics, and show more images per dataset}
-					 \label{fig:example-images-from-datasets}}
-		\end{figure}
+		There are two main quality requirements for the data in VO: Accurate ground truth pose and realistic image quality.
+		
+		
+		
+		All the above descriptions \todo{in section ...} of rotations can be converted into each other, therefore it is not a problem to adapt the format of the training data.
+
 		\subsection{KITTI}
-			KITTI from Karlsruhe Institute of Technology \cite{geiger2013vision} is a dataset that contains many video frames captured from the roof of a driving car.
+			KITTI from the Karlsruhe Institute of Technology (\cite{geiger2013vision}) is a dataset that contains many videos captured from the roof of a driving car.
+			Some example images are shown in figure~\ref{fig:example-images-from-KITTI}.
 			Each video frame is labeled with ground truth data such as camera pose and 3D points from a velodyne laser scanner.
 			The camera pose was obtained by combining the data from GPS and an IMU (inertial measurement unit) that was mounted to the car.
-			The dataset has around 43k stereo pairs of images with size $1226 \times 370$ pixels captured at a frame rate of [FPS]\todo{find frame rate}.
+			The dataset has around 43k stereo pairs of images with size $1226 \times 370$ pixels captured at a frame rate of about 10 fps.
 			For the experiments in this thesis, only the images from the left camera are used.
 			The dataset is divided into 22 sequences, each captured at a different location in the metropolitan area of Karlsruhe, Germany.
 			For the public, the ground truth is only available for the first 11 sequences.
 			The rest of the data is intended to be used for submissions to the KITTI Vision Benchmark Suite\footnote{\url{http://www.cvlibs.net/datasets/kitti/eval_odometry.php}} 
 			online.
 			In the experiments here, only the sequences 0 to 10 are used and divided into training- and test sets, which amounts to around 23k images.
+			\begin{figure}
+				\def\imwidth{5.9cm}
+				\centering
+				\begin{subfigure}[b]{0.5\linewidth}
+					\centering
+					\includegraphics[width=\imwidth]{Data/KITTI/intersection}
+				\end{subfigure}\hfill%
+				\begin{subfigure}[b]{0.5\linewidth}
+					\centering
+					\includegraphics[width=\imwidth]{Data/KITTI/open-field}
+				\end{subfigure}\hfill%
+				\\
+				\vspace{0.1cm}
+				\begin{subfigure}[b]{0.5\linewidth}
+					\centering
+					\includegraphics[width=\imwidth]{Data/KITTI/reflections-on-cars}
+				\end{subfigure}\hfill%
+				\begin{subfigure}[b]{0.5\linewidth}
+					\centering
+					\includegraphics[width=\imwidth]{Data/KITTI/highway}
+				\end{subfigure}\hfill%
+				\caption[Example images from the KITTI dataset]
+						{Example images from the KITTI dataset.
+						 The pictures show wide open areas, narrow streets, reflections and moving cars.
+						 The videos were captured with a camera mounted on top of a car.
+						 \label{fig:example-images-from-KITTI}}
+			\end{figure}
 		
 		\subsection{VIPER}
-			The VIPER dataset from \cite{richter2017playing} contains a mix of car driving and walking sequences, but all data was generated synthetically from the video game Grand Theft Auto 5 released in April 2015.
+			The VIPER dataset from \cite{richter2017playing} contains a mix of car driving and walking sequences, but all data was generated synthetically from the video game Grand Theft Auto 5 (GTA V) for PC released in April 2015.
 			With around 254k frames it is significantly larger that the KITTI dataset.
 			There is a variety of ground truth data available, including camera pose, semantic class labels and 3D object bounding boxes.
 			The camera poses have been directly extracted from the game engine and are therefore fully accurate, while other data such as the semantic labels were generated in a post-processing step.
@@ -61,15 +80,77 @@
 			The splits contain diverse scenes at day and night across different scene types such as urban, suburban under various weather conditions.
 			
 		\subsection{GTA V}
-		% Self made dataset
-		% mention that code for viper is not available
-		% link to github repository
-		% explain how it was caputured
-		% What type of data does it contain
-		%	- walking, running, driving, standing, 
-		%	- weather, light, dynamic scene
-		%	- 
-		
+			\todo{Maybe mention different types: standing, translation, etc.}
+			The GTA V dataset, as presented in figure~\ref{fig:example-images-GTAV}, was created specifically for this thesis shortly before the VIPER dataset by \citeauthor{richter2017playing} was made public.
+			Third party ``modding" tools%
+			\footnote{\url{http://www.dev-c.com/gtav/}}
+			had to be used to extract the camera pose information because the game developers do not intend users to modify the game files and only provide binaries for executing the software.
+			The tool allows one to inject a user defined \CC\@ function to run code in a separate thread next to the game engine with access to variables such as the camera matrix, player- and world properties and more.
+			The tool%
+			\footnote{\url{https://github.com/awaelchli/GTA-V-Camera-Tracker}} 
+			developed for this thesis streams the camera orientation and location to an output file with timestamps for each recorded pose.
+			The video was recorded parallel to the pose with an external program called \emph{NVIDIA ShadowPlay}.
+			Although both the recording of pose and video start synchronously, the rate at which the pose is queried is higher than the frame rate of the recorded video.
+			Hence, the poses written to the output file were interpolated using the timestamps to match the 30 fps video recording.
+			
+			The dataset has a total of 470k frames of walking in first-person perspective.
+			The sequences contain many factors of variation in form of weather changes (cloudy, sunny, night), dynamic motion of cars on the street or people on the sidewalk, different environments (urban, suburban, rural) and changes in speed (standing, walking, running).
+			Although this dataset contains more video data compared to VIPER, it has only pose annotations.
+			\begin{figure}
+				\def\imheightv{2.2}
+				\def\imheight{\imheightv cm}
+				\def\imwidth{\fpeval{16/9*\imheightv}cm}
+				\centering
+				\begin{subfigure}[b]{0.33\linewidth}
+					\centering
+					\includegraphics[height=\imheight, width=\imwidth]{Data/GTAV/pier-cloudy}
+				\end{subfigure}\hfill%
+				\begin{subfigure}[b]{0.33\linewidth}
+					\centering
+					\includegraphics[height=\imheight, width=\imwidth]{Data/GTAV/beach}
+				\end{subfigure}\hfill%
+				\begin{subfigure}[b]{0.33\linewidth}
+					\centering
+					\includegraphics[height=\imheight, width=\imwidth]{Data/GTAV/garden-house}
+				\end{subfigure}%
+				\\
+				\vspace{0.1cm}
+				\begin{subfigure}[b]{0.33\linewidth}
+					\centering
+					\includegraphics[height=\imheight, width=\imwidth]{Data/GTAV/parked-cars-reflections}
+				\end{subfigure}\hfill%
+				\begin{subfigure}[b]{0.33\linewidth}
+					\centering
+					\includegraphics[height=\imheight, width=\imwidth]{Data/GTAV/suburban-sunny-streets}
+				\end{subfigure}\hfill%
+				\begin{subfigure}[b]{0.33\linewidth}
+					\centering
+					\includegraphics[height=\imheight, width=\imwidth]{Data/GTAV/desert-road}
+				\end{subfigure}%
+				\vspace{0.1cm}
+				\begin{subfigure}[b]{0.33\linewidth}
+					\centering
+					\includegraphics[height=\imheight, width=\imwidth]{Data/GTAV/metro}
+				\end{subfigure}\hfill%
+				\begin{subfigure}[b]{0.33\linewidth}
+					\centering
+					\includegraphics[height=\imheight, width=\imwidth]{Data/GTAV/close-shadows}
+				\end{subfigure}\hfill%
+				\begin{subfigure}[b]{0.33\linewidth}
+					\centering
+					\includegraphics[height=\imheight, width=\imwidth]{Data/GTAV/pier-water-reflections}
+				\end{subfigure}%
+				\caption[Example images from the GTA V dataset]
+						{Example images from different sequences in the GTA V dataset which was recorded for this thesis.
+						 The images show wide open- as well as narrow places, reflections on cars and water, complex shadows from foliage and moving objects (people, cars).
+						 \label{fig:example-images-GTAV}}
+				%city-street-intersecton.jpg  
+				%fountain-people.jpg  
+				%desert-gas-station.jpg             
+				%suburban-intersection.jpg
+			\end{figure}
+			
+			
 		\subsection{Preprocessing}\label{sec:preprocessing}
 			Each dataset contains long sequences/videos of thousands of frames over several minutes of recording.
 			Due to the high memory footprint, it is unfeasible to load a complete sequence and feed it to the network.
@@ -90,7 +171,7 @@
 			These poses are all relative to the coordinate system of the first frame in the sequence.
 			In other words, the coordinate system of the first frame is the world coordinate system of all other frames in the sequence.
 			Because the raw sequences are divided into subsequences, the ground truth poses need to be converted to poses that are relative to the first frame within each subsequence.
-			\todo{Refer to math equations in introduction}
+			The formulas in equation~\ref{eq:relative_rotation_conversion_general} from chapter~\ref{chp:foundations} are applied here.
 			
 			
 	\section{Encoding the Pose}
@@ -165,19 +246,21 @@
 			\begin{table}[tb]
 				\small
 				\begin{center}
-					\begin{tabular}{|l|c|c|c|c|}
-						\hline
-						Layer 		& Kernel size 		& Stride 		& Padding 		& Channels 		\\ \hline
-						conv1 		& $7 \times 7$		& 2 			& 3 			& 64 			\\ \hline
-						conv2 		& $5 \times 5$		& 2 			& 2 			& 128 			\\ \hline
-						conv3 		& $5 \times 5$		& 2 			& 2 			& 256			\\ \hline
-						conv3.1 	& $3 \times 3$		& 1 			& 1 			& 256 			\\ \hline
-						conv4 		& $3 \times 3$		& 2 			& 1 			& 512 			\\ \hline
-						conv4.1 	& $3 \times 3$		& 1 			& 1 			& 512 			\\ \hline
-						conv5 		& $3 \times 3$		& 2 			& 1 			& 512 			\\ \hline
-						conv5.1 	& $3 \times 3$		& 1 			& 1 			& 512 			\\ \hline
-						conv6 		& $3 \times 3$		& 2 			& 1 			& 1024 			\\ \hline
-						conv6.1 	& $3 \times 3$		& 1 			& 1 			& 1024 			\\ \hline
+					\begin{tabular}{lcccc}
+						\toprule
+						Layer 		& Kernel size 		& Stride 		& Padding 		& Channels 		\\
+						\midrule
+						conv1 		& $7 \times 7$		& 2 			& 3 			& 64 			\\
+						conv2 		& $5 \times 5$		& 2 			& 2 			& 128 			\\
+						conv3 		& $5 \times 5$		& 2 			& 2 			& 256			\\
+						conv3.1 	& $3 \times 3$		& 1 			& 1 			& 256 			\\
+						conv4 		& $3 \times 3$		& 2 			& 1 			& 512 			\\
+						conv4.1 	& $3 \times 3$		& 1 			& 1 			& 512 			\\
+						conv5 		& $3 \times 3$		& 2 			& 1 			& 512 			\\
+						conv5.1 	& $3 \times 3$		& 1 			& 1 			& 512 			\\
+						conv6 		& $3 \times 3$		& 2 			& 1 			& 1024 			\\
+						conv6.1 	& $3 \times 3$		& 1 			& 1 			& 1024 			\\
+						\bottomrule
 					\end{tabular}
 				\end{center}
 				\caption[Architecture of the feature extraction based on FlownetS]
@@ -200,7 +283,7 @@
 			The key component of the second part is the LSTM that maps the motion features to a hidden state.
 			Due to the recurrent connections, the hidden state does not only encode the pose at the current time step, but also a history of poses from previous time steps.
 			To be clear, it is not obvious that the LSTM will actually learn a representation for the past and use that information to estimate the pose because nothing is explicitly forcing the network to do so.
-			The question whether or not the recurrent connections make a significant contribution will be addressed in section~\ref{sec:odometry-experiments-and-results}.
+			The question whether or not the recurrent connections make a significant contribution will be addressed in section~\ref{sec:odometry-experiments-and-results}.\todo{check ref}
 			
 			As opposed to convolution layers, the LSTM is defined in terms of matrix operations and hence the size of the input to the LSTM is not variable.
 			This also implies that there is a limit on the size of the input images.
@@ -215,13 +298,15 @@
 			\begin{table}[tb]
 				\small
 				\begin{center}
-					\begin{tabular}{|l|c|c|}
-						\hline
-						Layer 		& Input size 					& Output size			\\ \hline
-						lstm1 		& $35840$						& $1000$  				\\ \hline
-						lstm2 		& $1000$						& $1000$ 				\\ \hline
-						drop		& $1000$						& $1000$				\\ \hline
-						fc 			& $1000$						& $6$					\\ \hline
+					\begin{tabular}{lcc}
+						\toprule
+						Layer 		& Input size 					& Output size			\\
+						\midrule
+						LSTM 1 		& $35840$						& $1000$  				\\
+						LSTM 2 		& $1000$						& $1000$ 				\\
+						drop		& $1000$						& $1000$				\\
+						fc 			& $1000$						& $6$					\\
+						\bottomrule
 					\end{tabular}
 				\end{center}
 				\caption[Architecture of the recurrent part of the pose network]
@@ -265,4 +350,9 @@
 			\todo{Mention (maybe in discussion) the difference of this training technique to deepvo paper.}
 			
 			
+			
+	\section{Implementation}
+		PyTorch is a deep learning framework for Python that comes with a rich tensor library.
+		It differs from other libraries (TensorFlow, Caffe, Theano and more) in the sense that it builds the computational graph dynamically at runtime.
+		This flexibility allows for controlling the computational flow while training or testing the network.
 
