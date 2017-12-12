@@ -76,8 +76,10 @@
 		
 	\section{The Problem on Long Sequences}
 		Ideally, we would like to train the model on sequences with an arbitrary number of frames.
-		Due to the high cost of backpropagation in RNNs, the number of frames that can be processed at a time is limited by the available memory. 
-		This allows to 
+		Due to the high cost of backpropagation in RNNs, the number of frames that can be processed at a time is limited by the available memory.
+		However, testing the model is very fast because only the forward operation is performed.
+		In the experiments before, the model was always tested on subsequences with the same length as during training.
+		
 		\begin{table}[tb]
 			\small
 			\begin{center}
@@ -125,6 +127,82 @@
 
 
 	\section{Training with Incremental Poses}
+		
+		\begin{table}[tb]
+			\small
+			\begin{center}
+				\begin{tabular}{cccccrrr}
+					\toprule
+					\multicolumn{5}{c}{\textbf{Experiments}}		& \multicolumn{3}{c}{\textbf{Test error}} 		\\
+					\cmidrule(lr){1-4} 	\cmidrule(lr){6-8}
+					\multicolumn{2}{c}{Length} & Dropout & LSTM &	& Total & Rotation & Translation	\\ 
+					Training & Test & & & & & & \\
+					\midrule
+					25 & 25		& 0			& \xmark 	& 	& 22.4305	& 0.5121	& 21.9184		\\ 
+					25 & 100	& 0			& \xmark 	& 	& 378.8834	& 48.4604	& 330.4230 		\\ 
+					25 & 25		& 0			& \cmark 	& 	& 22.0498	& 0.5642	& 21.4856 		\\ 
+					25 & 100	& 0			& \cmark 	& 	& 335.5754	& 16.5476	& 319.0277 		\\ 
+					25 & 25		& 0.5		& \cmark 	& 	& 21.0171	& 0.4957	& 20.5214		\\ 
+					25 & 100	& 0.5		& \cmark 	& 	& 301.5090	& 22.9736	& 278.5354 		\\ 
+					\bottomrule
+				\end{tabular}
+			\end{center}
+			\caption[Experiments on KITTI: Replacing the LSTM with an affine layer]
+					{Experiments on KITTI: Replacing the LSTM with a fully-connected layer.
+					 \label{tbl:kitti-removing-lstm}}
+		\end{table}
+		
+		\begin{figure}
+			\centering
+			\begin{subfigure}[b]{0.5\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{Python-Plots/deepvo-KITTI/rotation-error-per-meter-comparison-Dropout-No-LSTM}
+				\caption{
+					Rotation
+					\label{fig:avg-rotation-error-dropout-no-LSTM}
+				}
+			\end{subfigure}%
+			\begin{subfigure}[b]{0.5\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{Python-Plots/deepvo-KITTI/translation-error-per-meter-comparison-Dropout-No-LSTM}
+				\caption{
+					Translation
+					\label{fig:avg-translation-error-dropout-no-LSTM}
+				}
+			\end{subfigure}%
+			\caption[Average rotation- and translation error]
+					{\label{fig:avg-rotation-and-translation-error-dropout-no-LSTM}}
+		\end{figure}
+		
+		\begin{table}[tb]
+			\small
+			\begin{center}
+				\begin{tabular}{lcrrrr}
+					\toprule
+					%\multicolumn{2}{c}{\textbf{Experiments}}		& \multicolumn{4}{c}{\textbf{Test error}} 		\\
+					%\cmidrule(lr){1-2} 	\cmidrule(lr){3-6}
+					\textbf{Hidden state} & & \multicolumn{2}{c}{\textbf{Relative Pose}} & \multicolumn{2}{c}{\textbf{Global Pose}} \\
+					& & Rotation & Translation & Rotation & Translation \\
+					\midrule
+					Reset 		& 			& 0.2319	& 5.7220	& 9.8600	& 262.7984		\\ 
+					Keep		&			& 0.3097	& 8.5461	& 12.7551	& 426.7877		\\
+					\bottomrule
+				\end{tabular}
+			\end{center}
+			\caption[Experiments on VIPER: Carrying over the hidden state vs. resetting it]
+					{Experiments on VIPER: Carrying over the hidden state vs. resetting it.
+					 \label{tbl:kitti-removing-lstm}}
+		\end{table}
+	
+		\begin{figure}
+			\centering
+			\includegraphics[width=\linewidth]{example-image-a}
+			\caption{Convergence speed comparison state reset vs. keep.}
+		\end{figure}
+		
+		\subsection{Euler Angles}
+		
+		\subsection{Quaternions}
 
 		\begin{figure}
 			\centering
