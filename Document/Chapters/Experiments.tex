@@ -8,6 +8,7 @@
 %	- Dropout Regularization
 	This chapter presents all experiments conducted on the deep learning model that was introduced in chapter~\ref{chp:the_model}.
 	The results shown here give useful insights that supplement the work of \cite{wang2017deepvo}.
+	\todo{table with default values}
 	
 	\section{Dataset Size and Dropout}
 		We start by training the proposed model on the KITTI dataset on small subsequences of 25 frames. 
@@ -67,7 +68,7 @@
 					 The errors at the same distance are averaged over all sequences of that length.
 					 \label{fig:kitti-avg-rotation-translation-error-vs-path-distance}}
 		\end{figure}
-		The relative rotation error is the angle of rotation around the axis corresponding to the relative rotation between estimated and ground truth pose.
+		The relative rotation error is the angle of rotation around the axis corresponding to the relative rotation between estimated- and ground truth pose.
 		\todo{refer to equations introduced in previous chapter}
 		
 		\paragraph{Conclusion}
@@ -75,11 +76,9 @@
 		Especially when training data is scarce, the overlap method can be utilized to artificially increase the dataset and reduce the error on the test data.
 		
 	\section{The Problem on Long Sequences}
-		Ideally, we would like to train the model on sequences with an arbitrary number of frames.
-		Due to the high cost of backpropagation in RNNs, the number of frames that can be processed at a time is limited by the available memory.
-		However, testing the model is very fast because only the forward operation is performed.
 		In the experiments before, the model was always tested on subsequences with the same length as during training.
-		
+		However, in a real-world application, we would like to test the model on sequences with an arbitrary number of frames, and potentially the test sequences are much longer than the ones seen during training.
+		Table~\ref{tbl:kitti-testing-on-longer-sequences} shows an experiment where the sequence length between training set and test set changes.
 		\begin{table}[tb]
 			\small
 			\begin{center}
@@ -100,7 +99,12 @@
 					 When testing on sequences with more frames, the error becomes extremely high compared to the model trained on 100 frames.
 				 \label{tbl:kitti-testing-on-longer-sequences}}
 		\end{table}
-
+		The problem: The model trained on sequences with 25 frames does not generalize to sequences of 100 frames.
+		This is a very undesired result, after all, the recurrent part of the network was designed with the intention to handle arbitrary input sizes.
+		From the results in table~\ref{tbl:kitti-testing-on-longer-sequences} it appears that the network is able to memorize the sequence length and therefore overfits to the specific length it is trained on.
+		The attempt to counteract this behavior with sequences of random size failed.
+		The network would still overfit to the average length of sequences seen during training.
+		Figure~\ref{fig:kitti-testing-on-longer-sequences} visualizes the camera path on a test sequence of 100 frames.
 		\begin{figure}
 			\centering
 			\begin{subfigure}[b]{0.5\linewidth}
@@ -119,13 +123,19 @@
 			\end{subfigure}%
 			\caption[Training and testing on different sequence length]
 					{Training and testing on different sequence length. 
-				 Two models tested on a KITTI subsequence of 100 frames and trained on sequences of (a) 25 frames and (b) 100 frames. 
-				 The markers in the plot are shown every ten frames.
-				 The scale of the axes is in meters.
-				 \label{fig:kitti-testing-on-longer-sequences}}
+					 Two models tested on a KITTI subsequence of 100 frames and trained on sequences of (a) 25 frames and (b) 100 frames. 
+					 The markers in the plot are shown every ten frames.
+					 The scale of the axes is in meters.
+					 \label{fig:kitti-testing-on-longer-sequences}}
 		\end{figure}
-
-
+		One can observe that the estimated path quickly diverges after 25 frames.
+		However, when trained on sequences with 100 frames, the estimation is more accurate.
+		
+		\paragraph{Conclusion}
+		The experiments in this section reveal a serious problem.
+		In the general application of VO, it is not realistic to assume a maximum length for a video and train the model only for that length.
+		
+		
 	\section{Training with Incremental Poses}
 		
 		\begin{table}[tb]
@@ -194,15 +204,33 @@
 					 \label{tbl:kitti-removing-lstm}}
 		\end{table}
 	
-		\begin{figure}
+		\begin{figure}[t]
 			\centering
-			\includegraphics[width=\linewidth]{example-image-a}
-			\caption{Convergence speed comparison state reset vs. keep.}
+			\includegraphics[width=0.7\linewidth]{Python-Plots/deepvo-VIPER/convergence-speed-keep-vs-reset}
+			\caption[]
+					{Convergence speed comparison state reset vs. keep.}
 		\end{figure}
 		
-		\subsection{Euler Angles}
+		\subsection{Euler Angles vs. Quaternions}
 		
-		\subsection{Quaternions}
+			\begin{figure}
+				\centering
+				\begin{subfigure}[b]{0.5\linewidth}
+					\centering
+					\includegraphics[width=\linewidth]{Python-Plots/deepvo-VIPER/rotation-comparison-Euler-Quaternion-Reset-or-Keep-Hidden}
+					\caption{}
+				\end{subfigure}%
+				\begin{subfigure}[b]{0.5\linewidth}
+					\centering
+					\includegraphics[width=\linewidth]{Python-Plots/deepvo-VIPER/translation-comparison-Euler-Quaternion-Reset-or-Keep-Hidden}
+					\caption{}
+				\end{subfigure}%
+				\caption[Experiments on VIPER: Euler vs. quaternion vs. hidden state transfer]
+						{Experiments on VIPER: Euler vs. quaternion vs. hidden state transfer.
+						 50 epochs, 100 frames, no dropout, shuffling for reset
+						 \label{fig:viper-euler-vs-quat-vs-hidden-state-keep-or-reset}}
+			\end{figure}
+		
 
 		\begin{figure}
 			\centering
