@@ -240,7 +240,7 @@
 			Although this data does not include camera motion, according to \citeauthor{wang2017deepvo} the model weights serve as a good initialization that leads to faster convergence. 
 			
 			Estimating camera motion solely based on optical flow is not very robust since scene motion is mixed into the optical flow which can significantly vary in magnitude.
-			In order to have a more abstract representation, only the layers in the first half up to ``conv6.1'' are used for feature extraction.
+			In order to have a more abstract representation, only the layers in the first half up to ``CONV 6.1'' are used for feature extraction.
 			All layers in the second half of FlowNetS are dropped.
 			The exact configuration of the remaining layers is shown in table~\ref{tbl:first_part_of_flownets}.
 			\begin{table}[tb]
@@ -355,4 +355,13 @@
 		PyTorch is a deep learning framework for Python that comes with a rich tensor library.
 		It differs from other libraries (TensorFlow, Caffe, Theano and more) in the sense that it builds the computational graph dynamically at runtime.
 		This flexibility allows for controlling the computational flow while training or testing the network.
+		
+		
+		\begin{figure}[t]
+			\centering
+			\includegraphics[width=\linewidth]{Foundations/LSTM-hidden-state-loop}
+			\caption[text]
+					{text
+					 \label{fig:LSTM-ways-to-use-hidden-state}}
+		\end{figure}
 
