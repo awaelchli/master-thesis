@@ -123,7 +123,7 @@
 			\end{subfigure}%
 			\caption[Training and testing on different sequence length]
 					{Training and testing on different sequence length. 
-					 Two models tested on a KITTI subsequence of 100 frames and trained on sequences of (a) 25 frames and (b) 100 frames. 
+					 Two models tested on a KITTI subsequence of 100 frames when trained on sequences of (a) 25 frames and (b) 100 frames. 
 					 The markers in the plot are shown every ten frames.
 					 The scale of the axes is in meters.
 					 \label{fig:kitti-testing-on-longer-sequences}}
@@ -133,11 +133,20 @@
 		
 		\paragraph{Conclusion}
 		The experiments in this section reveal a serious problem.
-		In the general application of VO, it is not realistic to assume a maximum length for a video and train the model only for that length.
+		One of the main purposes of the LSTM is to handle arbitrary input length, and yet, in the scenario we have so far it is not able to do so.
+		In the general application of VO, it is not realistic to assume a maximum length for a video and to train the model only for that length.
 		
 		
 	\section{Training with Incremental Poses}
+		One potential reason for why the model is overfitting to a certain length could be semantic difference between input and output.
+		Since input at each time step is a pair of consecutive images in the video, the observed motion (by the LSTM) is relative to the current time step.
+		On the other hand, the output pose is forced to be in the global coordinate system given by the very first video frame.
+		This difference could potentially cause confusion and lead to the overfitting problem.
 		
+		To address the issue, we convert the ground truth poses to incremental poses using the formula from equation~\ref{eq:relative_rotation_conversion_general} by setting $j = i - 1$.
+		The first two rows of table~\ref{tbl:kitti-incremental-pose-and-lstm-removal} show the results of training with incremental pose.
+		At test time, the output poses are converted back into the global coordinate system for evaluating the loss on the test set.
+		This allows for a direct comparison with the previous results from table~\ref{tbl:kitti-testing-on-longer-sequences}.
 		\begin{table}[tb]
 			\small
 			\begin{center}
@@ -148,20 +157,36 @@
 					\multicolumn{2}{c}{Length} & Dropout & LSTM &	& Total & Rotation & Translation	\\ 
 					Training & Test & & & & & & \\
 					\midrule
-					25 & 25		& 0			& \xmark 	& 	& 22.4305	& 0.5121	& 21.9184		\\ 
-					25 & 100	& 0			& \xmark 	& 	& 378.8834	& 48.4604	& 330.4230 		\\ 
 					25 & 25		& 0			& \cmark 	& 	& 22.0498	& 0.5642	& 21.4856 		\\ 
 					25 & 100	& 0			& \cmark 	& 	& 335.5754	& 16.5476	& 319.0277 		\\ 
 					25 & 25		& 0.5		& \cmark 	& 	& 21.0171	& 0.4957	& 20.5214		\\ 
 					25 & 100	& 0.5		& \cmark 	& 	& 301.5090	& 22.9736	& 278.5354 		\\ 
+					25 & 25		& 0			& \xmark 	& 	& 22.4305	& 0.5121	& 21.9184		\\ 
+					25 & 100	& 0			& \xmark 	& 	& 378.8834	& 48.4604	& 330.4230 		\\ 
 					\bottomrule
 				\end{tabular}
 			\end{center}
-			\caption[Experiments on KITTI: Replacing the LSTM with an affine layer]
-					{Experiments on KITTI: Replacing the LSTM with a fully-connected layer.
-					 \label{tbl:kitti-removing-lstm}}
+			\caption[Experiments on KITTI: Training with incremental poses]
+					{Experiments on KITTI: Training with incremental poses.
+					 Three variants are tested: LSTM, LSTM with dropout layer, and LSTM replaced with fully-connected layer.
+					 Shown is the loss on the test set with incremental poses converted to global poses.
+					 \label{tbl:kitti-incremental-pose-and-lstm-removal}}
 		\end{table}
+		From these results we can see that the error is significantly lower when testing on long sequences.
+		Since the only difference in the experiments is the format of the pose, it can be concluded that training with incremental pose is the preferred way.
+		In the paper of \cite{wang2017deepvo}, it is never explicitly stated which coordinate system is used.
+		The results in this thesis suggest that \citeauthor{wang2017deepvo} have also used incremental poses in their experiments.
 		
+		The new approach of training the network with incremental poses raises an important question.
+		What exactly is the contribution of the LSTM?
+		Since the pose is not global anymore, the LSTM is not forced to keep track of the accumulation of pose changes from the past frames.
+		To investigate this question, we conduct an experiment where the LSTM is replaced with a fully-connected layer followed by a ReLU.
+		The previous affine output layer is kept, making it a total of two affine layers that regress the pose from the CNN features.
+		This eliminates the recurrence from the network, and all pose estimations are performed solely on consecutive frames.
+		Each output is independent of the previous inputs, therefore it is simply a feedforward network.
+		The last two rows of table~\ref{tbl:kitti-incremental-pose-and-lstm-removal} show a higher loss on the test set when using the replacement.
+		This would suggest that the recurrence does indeed result in a better VO performance.
+		However, when looking at the rotation and translation error along the path in figure~\ref{fig:avg-rotation-and-translation-error-dropout-no-LSTM} (blue), and compare it with the version that uses the LSTM (red, green), the error is actually lower for most of the path.
 		\begin{figure}
 			\centering
 			\begin{subfigure}[b]{0.5\linewidth}
@@ -180,8 +205,36 @@
 					\label{fig:avg-translation-error-dropout-no-LSTM}
 				}
 			\end{subfigure}%
-			\caption[Average rotation- and translation error]
-					{\label{fig:avg-rotation-and-translation-error-dropout-no-LSTM}}
+			\caption[Comparison: LSTM vs. LSTM with dropout vs. no LSTM]
+					{Comparison of the rotation and translation error on subsequences of KITTI sequence 10 for three different models:
+					 LSTM, LSTM with dropout, and LSTM replaced with fully-connected layer.
+					 \label{fig:avg-rotation-and-translation-error-dropout-no-LSTM}}
+		\end{figure}
+		In addition, figure~\ref{fig:kitti-test-sequence-10-lstm-vs-no-lstm} shows the predicted path of the full KITTI sequence 10.
+		Although the shape of the two paths is roughly the same, the feedforward model is closer to the ground truth path, experiencing smaller translational drift.
+		\begin{figure}
+			\centering
+			\begin{subfigure}[b]{0.5\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{Experiments/lstm-vs-fc/incremental-dropout-lstm}
+				\caption{
+					LSTM
+					\label{fig:kitti-sequence-10-lstm}
+				}
+			\end{subfigure}%
+			\begin{subfigure}[b]{0.5\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{Experiments/lstm-vs-fc/incremental-dropout-no-lstm}
+				\caption{
+					Feedforward
+					\label{fig:fig:kitti-sequence-10-no-lstm}
+				}
+			\end{subfigure}%
+			\caption[Estimated motion on KITTI test sequence 10: LSTM vs. feedforward network]
+					{Estimated motion on KITTI test sequence 10: LSTM (a) vs. feedforward network (b).
+					 The estimated incremental poses are converted to global poses in order to recreate the path.
+					 The coordinate axes are in meters, and a marker is plotted every 120 frames.
+					 \label{fig:kitti-test-sequence-10-lstm-vs-no-lstm}}
 		\end{figure}
 		
 		\begin{table}[tb]
