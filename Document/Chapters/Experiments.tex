@@ -59,9 +59,9 @@
 		From the sum of squared differences alone, it is not possible to understand how the error behaves across the sequence.
 		For better visualization, we can compute the error at regular distance intervals along the estimated path.
 		Figure~\ref{fig:kitti-avg-rotation-translation-error-vs-path-distance} shows translation and rotation errors for path distance on subsequences of the KITTI sequence 10.
-		\begin{figure}
+		\begin{figure}[t]
 			\centering
-			\includegraphics[width=0.7\linewidth]{Python-Plots/deepvo-KITTI/relative-rotation-and-translation-error-along-path-overlap80}
+			\includegraphics[width=0.5\linewidth]{Python-Plots/deepvo-KITTI/relative-rotation-and-translation-error-along-path-overlap80}
 			\caption[Experiments on KITTI: Average rotation- and translation error vs. path distance]
 					{Experiments on KITTI: Average rotation- and translation error vs. path distance.
 					 The relative rotation- and translation error is evaluated at equal intervals along the subsequences of KITTI sequence 10.
@@ -71,7 +71,7 @@
 		The relative rotation error is the angle of rotation around the axis corresponding to the relative rotation between estimated- and ground truth pose.
 		\todo{refer to equations introduced in previous chapter}
 		
-		\paragraph{Conclusion}
+		\paragraph{Discussion}
 		From these experiments, we can conclude that sequence overlap and dropout have a positive impact on the generalization of translation estimates.
 		Especially when training data is scarce, the overlap method can be utilized to artificially increase the dataset and reduce the error on the test data.
 		
@@ -131,7 +131,7 @@
 		One can observe that the estimated path quickly diverges after 25 frames.
 		However, when trained on sequences with 100 frames, the estimation is more accurate.
 		
-		\paragraph{Conclusion}
+		\paragraph{Discussion}
 		The experiments in this section reveal a serious problem.
 		One of the main purposes of the LSTM is to handle arbitrary input length, and yet, in the scenario we have so far it is not able to do so.
 		In the general application of VO, it is not realistic to assume a maximum length for a video and to train the model only for that length.
@@ -158,10 +158,10 @@
 					Training & Test & & & & & & \\
 					\midrule
 					25 & 25		& 0			& \cmark 	& 	& 22.0498	& 0.5642	& 21.4856 		\\ 
-					25 & 100	& 0			& \cmark 	& 	& 335.5754	& 16.5476	& 319.0277 		\\ 
 					25 & 25		& 0.5		& \cmark 	& 	& 21.0171	& 0.4957	& 20.5214		\\ 
-					25 & 100	& 0.5		& \cmark 	& 	& 301.5090	& 22.9736	& 278.5354 		\\ 
 					25 & 25		& 0			& \xmark 	& 	& 22.4305	& 0.5121	& 21.9184		\\ 
+					25 & 100	& 0			& \cmark 	& 	& 335.5754	& 16.5476	& 319.0277 		\\ 
+					25 & 100	& 0.5		& \cmark 	& 	& 301.5090	& 22.9736	& 278.5354 		\\ 
 					25 & 100	& 0			& \xmark 	& 	& 378.8834	& 48.4604	& 330.4230 		\\ 
 					\bottomrule
 				\end{tabular}
@@ -184,7 +184,7 @@
 		The previous affine output layer is kept, making it a total of two affine layers that regress the pose from the CNN features.
 		This eliminates the recurrence from the network, and all pose estimations are performed solely on consecutive frames.
 		Each output is independent of the previous inputs, therefore it is simply a feedforward network.
-		The last two rows of table~\ref{tbl:kitti-incremental-pose-and-lstm-removal} show a higher loss on the test set when using the replacement.
+		The last row of table~\ref{tbl:kitti-incremental-pose-and-lstm-removal} shows a higher loss on the test set when using the replacement.
 		This would suggest that the recurrence does indeed result in a better VO performance.
 		However, when looking at the rotation and translation error along the path in figure~\ref{fig:avg-rotation-and-translation-error-dropout-no-LSTM} (blue), and compare it with the version that uses the LSTM (red, green), the error is actually lower for most of the path.
 		\begin{figure}
@@ -237,6 +237,15 @@
 					 \label{fig:kitti-test-sequence-10-lstm-vs-no-lstm}}
 		\end{figure}
 		
+		\paragraph{Discussion}
+		In this second set of experiments, we have addressed the issue where the LSTM would overfit to a certain number of frames seen during training.
+		When forced to output incremental poses, the model is able to estimate motion from videos of arbitrary sizes.
+		However, it is still unclear if and to what amount the LSTM uses the hidden state that encodes the past.
+		In fact, as we have shown, a feedforward network (without recurrence) is able to outperform the LSTM.
+		Based on these observations, one might speculate that the recurrent connection hurts the performance.
+		But this is not a very plausible, because during the optimization process the LSTM would learn to ignore the hidden state by setting the parameters of the cell gates accordingly, if this minimizes the loss.
+		It is possible that the loss function in equation~\ref{eq:euler_pose_loss_function_t}, a balance between euclidean error of translation and rotation, is not well-suited for VO.
+		\todo{continue: euler angles -- quaterions?}
 		\begin{table}[tb]
 			\small
 			\begin{center}
