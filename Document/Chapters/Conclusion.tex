@@ -1,9 +1,26 @@
-\chapter{Conclusion}
+\chapter{Conclusion and Future Work}
 
+The thesis presented a deep learning model for Visual Odometry that makes use of recurrent connections in order to provide a context for each time step where camera location and orientation is estimated.
+The trained neural network can handle videos of arbitrary length and reconstructs the camera path in real-time.
+An analysis on real and synthetic data showed that training RNNs for the domain of videos is challenging.
+We have explored a variety of training schemes on small and large datasets.
+Sequence overlap, dropout and continuously increasing the sequence length (BPTT) seem to be effective on the small KITTI dataset.
+Furthermore, the thesis uncovers the problem with global pose and overfitting to the length of training sequences.
+Although we have solved this problem by converting the camera poses to incremental motions, the situation is rather confusing and counter-intuitive.
+At this point, we can only speculate on why the RNN does not generalize in a way that the camera pose is accumulated from the beginning of the video and over an arbitrary length.
+The fact that replacing the LSTM with a affine layer results in better performance indicates that the recurrent state might not be used to the benefit of pose regression.
+%, and this leaves the question why it does not simply get ignored in this case.
 
-\section{Discussion}
-
-\section{Conclusion and Future Work}
+These issues require further investigation and give plenty of room for future work.
+Estimating both global- and incremental pose at the same time would be a simple modification worth investigating.
+In terms of limitations, the loss function requires a manual balance between rotational- and positional error.
+The thesis did not explicitly explore the impact of the balance weight, but a solution that eliminates or automatically learns such a parameter could certainly have an impact on the convergence speed.
 
 Future Work: Make code more efficient (converting poses on gpu/library)
+
 Output both: incremental- and global pose
+Eliminating balance factor in loss
+
+
+Stereo VO
+FlowNet2 \cite{ilg2016flownet}
