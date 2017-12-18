@@ -563,7 +563,7 @@
 		For example, if we wish to predict the sentiment of a sentence, we can feed each word to the RNN and and ignore all outputs except the last one and use that for backpropagation of the gradient.
 		We refer to this method as \emph{many-to-one}.
 		If there is only one input available, but the output must be a sequence (\emph{one-to-many}), one possibility is to simply feed the same input for all time steps.
-		An example for this method is image captioning, where the input is an image and the output is a description of the image in form of a sentence. \todo{reference to a work on image captioning}
+		An example for this method is image captioning, where the input is an image and the output is a description of the image in form of a sentence (\cite{karpathy2015deep}).
 		Finally, the \emph{one-to-one} setting is a combination of the two above.
 		
 		\paragraph{Signaling Output} 
@@ -817,54 +817,54 @@
 		
 		
 		
-	\section{Tracking a Moving Point Cloud}
-		\todo{INCOMPLETE}
-		Up to this point, the input to the LSTM was always one-dimensional (a number/digit).
-		But how well can it handle vectors as input?
-		This is the main question for this section.
-		To explore it, we conduct a synthetic experiment for a moving camera.
-		
-		\paragraph{The Task}
-		In this next experiment we would like to study the capabilities of the LSTM on a task for motion estimation.
-		To do so, we generate a few 3D points and project them into the image plane of a moving camera.
-		This will create an animation of a set of 2D points.
-		
-		\begin{figure}[tb]
-			\centering
-			\includegraphics[width=0.7\linewidth]{example-image-a}
-			\caption[]
-					{\todo{point cloud example, show few points and multiple points}}
-			\label{}
-		\end{figure}
-	
-		\paragraph{The Data}
-		Each sample from the dataset is a synthetic sequence of frames seen by a moving camera in front of a cloud of 3D points.
-		There are two main steps involved in generating the data.
-		First, we generate the 3D points.
-		Second, the points need to be projected to the screen of each camera.
-		The camera is moving left and right to create a simple motion.
-		To create a large and diverse dataset, we can generate many such sequences for different point clouds and horizontal motions.
-		
-		To make this experiment very simple, the points are distributed uniformly on the surface of a sphere.
-		This can be done by sampling two random variables $z \sim \mathcal{U}(-1, 1)$ and $\theta \sim \mathcal{U}(0, 2\pi)$ that can be used to parameterize the point
-		\begin{equation}
-			\vectr{p} = 
-			\begin{bmatrix}
-				\sqrt{1 - z^2} \cos(\theta) \\ 
-				\sqrt{1 - z^2} \sin(\theta) \\
-				z
-			\end{bmatrix}
-		\end{equation}
-		on the unit sphere. 
-		After repeating this $M$ times, we obtain a cloud $C = \{\vectr{p}_1, \dots \vectr{p}_M\}$ with $M$ points.
-		Each of these points has to be projected
-		
-		
-		\paragraph{The Model}
-		
-		\paragraph{The Optimization Procedure}
-		
-		\paragraph{Results}
-		
-		\paragraph{}
+%	\section{Tracking a Moving Point Cloud}
+%		\todo{INCOMPLETE}
+%		Up to this point, the input to the LSTM was always one-dimensional (a number/digit).
+%		But how well can it handle vectors as input?
+%		This is the main question for this section.
+%		To explore it, we conduct a synthetic experiment for a moving camera.
+%		
+%		\paragraph{The Task}
+%		In this next experiment we would like to study the capabilities of the LSTM on a task for motion estimation.
+%		To do so, we generate a few 3D points and project them into the image plane of a moving camera.
+%		This will create an animation of a set of 2D points.
+%		
+%		\begin{figure}[tb]
+%			\centering
+%			\includegraphics[width=0.7\linewidth]{example-image-a}
+%			\caption[]
+%					{\todo{point cloud example, show few points and multiple points}}
+%			\label{}
+%		\end{figure}
+%	
+%		\paragraph{The Data}
+%		Each sample from the dataset is a synthetic sequence of frames seen by a moving camera in front of a cloud of 3D points.
+%		There are two main steps involved in generating the data.
+%		First, we generate the 3D points.
+%		Second, the points need to be projected to the screen of each camera.
+%		The camera is moving left and right to create a simple motion.
+%		To create a large and diverse dataset, we can generate many such sequences for different point clouds and horizontal motions.
+%		
+%		To make this experiment very simple, the points are distributed uniformly on the surface of a sphere.
+%		This can be done by sampling two random variables $z \sim \mathcal{U}(-1, 1)$ and $\theta \sim \mathcal{U}(0, 2\pi)$ that can be used to parameterize the point
+%		\begin{equation}
+%			\vectr{p} = 
+%			\begin{bmatrix}
+%				\sqrt{1 - z^2} \cos(\theta) \\ 
+%				\sqrt{1 - z^2} \sin(\theta) \\
+%				z
+%			\end{bmatrix}
+%		\end{equation}
+%		on the unit sphere. 
+%		After repeating this $M$ times, we obtain a cloud $C = \{\vectr{p}_1, \dots \vectr{p}_M\}$ with $M$ points.
+%		Each of these points has to be projected
+%		
+%		
+%		\paragraph{The Model}
+%		
+%		\paragraph{The Optimization Procedure}
+%		
+%		\paragraph{Results}
+%		
+%		\paragraph{}
 	

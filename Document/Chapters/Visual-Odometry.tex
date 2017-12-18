@@ -78,6 +78,7 @@
 			The camera poses have been directly extracted from the game engine and are therefore fully accurate, while other data such as the semantic labels were generated in a post-processing step.
 			VIPER is subdivided into training, test, and validation sets with 134k, 70k, and 50k frames respectively.
 			The splits contain diverse scenes at day and night across different scene types such as urban, suburban under various weather conditions.
+			The videos were captured at a frame rate of 15 fps.
 			
 		\subsection{GTA V}
 			\todo{Maybe mention different types: standing, translation, etc.}
@@ -209,7 +210,7 @@
 					 Green: Input of consecutive frames.
 					 Yellow: Feature extraction.
 					 Blue: Pose estimation with recurrent connections.
-					 \todo{ref paper for figure, or redo figure}
+					 The figure was taken from~\cite{wang2017deepvo}.
 					 \label{fig:main-architecture}}
 		\end{figure}
 		
@@ -283,7 +284,7 @@
 			The key component of the second part is the LSTM that maps the motion features to a hidden state.
 			Due to the recurrent connections, the hidden state does not only encode the pose at the current time step, but also a history of poses from previous time steps.
 			To be clear, it is not obvious that the LSTM will actually learn a representation for the past and use that information to estimate the pose because nothing is explicitly forcing the network to do so.
-			The question whether or not the recurrent connections make a significant contribution will be addressed in section~\ref{sec:odometry-experiments-and-results}.\todo{check ref}
+			The question whether or not the recurrent connections make a significant contribution will be addressed in chapter~\ref{chp:experiments-and-results}.
 			
 			As opposed to convolution layers, the LSTM is defined in terms of matrix operations and hence the size of the input to the LSTM is not variable.
 			This also implies that there is a limit on the size of the input images.
@@ -311,8 +312,7 @@
 				\end{center}
 				\caption[Architecture of the recurrent part of the pose network]
 						{Architecture of the recurrent part of the pose network.
-						 It consists of a two-layer LSTM with hidden size 1000, a dropout- and fully-connected layer.
-						 \todo{also include num parameters?}}
+						 It consists of a two-layer LSTM with hidden size 1000, a dropout- and fully-connected layer.}
 				\label{tbl:lstm_and_fc_after_flownet}
 			\end{table}
 		
@@ -323,10 +323,10 @@
 			$\vectr{y}_t = \left[ \, \vectr{p}_t,  \vectr{\varphi}_t \right]$
 			with the loss function
 			\begin{equation}\label{eq:euler_pose_loss_function_t}
-				\mathcal{L}_t(\vectr{y}_t, \vectr{\hat{y}}_t) = 
+				\mathcal{L}_t(\vectr{\hat{y}}_t, \vectr{y}_t) = 
 				%\sum_{t=1}^{T} 
-					\lVert \vectr{p}_t - \vectr{\hat{p}}_t \rVert_2 + 
-					\beta \lVert \vectr{\varphi}_t - \vectr{\hat{\varphi}}_t \rVert_2.
+					\lVert \vectr{\hat{p}}_t - \vectr{p}_t \rVert_2 + 
+					\beta \lVert \vectr{\hat{\varphi}}_t - \vectr{\varphi}_t \rVert_2.
 			\end{equation}
 			As defined in equation~\ref{eq:loss_for_rnn}, the full loss of all estimates in the sequence is the sum of the losses in the sequence, i.e., 
 			$\mathcal{L} = \sum_{t = 1}^{T} \mathcal{L}_t$.
@@ -338,11 +338,21 @@
 			The balance value in equation~\ref{eq:euler_pose_loss_function_t} is manually chosen and set to $\beta = 10$ by default for training.
 			For evaluation on the test set in all experiments that follow, we use $\beta = 1$.
 			Furthermore, the two terms 
-			$\lVert \vectr{p}_t - \vectr{\hat{p}}_t \rVert_2^2$ and 
-			$\lVert \vectr{\varphi}_t - \vectr{\hat{\varphi}}_t \rVert_2^2$
-			in equation~\ref{eq:euler_pose_loss_function_t} are referred to as the translation- and rotation errors respectively.
-			
+			$\lVert \vectr{\hat{p}}_t - \vectr{p}_t\rVert_2^2$ and 
+			$\lVert \vectr{\hat{\varphi}}_t - \vectr{\varphi}_t \rVert_2^2$
+			in equation~\ref{eq:euler_pose_loss_function_t} are referred to as the translation- and rotation errors respectively.	
 			\todo{Mention choice of beta in experiments section}
+			
+			Alternatively, for experiments where the rotations are represented by quaternions, the loss is defined as
+			\begin{equation}\label{eq:quaternion_pose_loss_function_t}
+				\mathcal{L}_t(\vectr{\hat{y}}_t, \vectr{y}_t) = 
+				%\sum_{t=1}^{T} 
+				\lVert \vectr{\hat{p}}_t - \vectr{p}_t \rVert_2 + 
+				\beta (1 - (\vectr{\hat{q}}_t \cdot \vectr{q}_t)^2)
+			\end{equation}
+			where $\cdot$ is the inner product of the two unit quaternions.
+			\todo{quaternions normalized, explain loss}
+			
 			
 			For training, the Adam optimizer is used with default settings and initial learning rates $\lambda_1 = 10^{-4}$ and $\lambda_2 = 10^{-3}$ for each part of the network.
 			$\lambda_1$ is the learning rate for the part that is initialized with weights from a pre-trained FlowNetS.
@@ -360,8 +370,10 @@
 		\begin{figure}[t]
 			\centering
 			\includegraphics[width=\linewidth]{Foundations/LSTM-hidden-state-loop}
-			\caption[text]
-					{text
+			\caption[Hidden state transfer in RNNs]
+					{Hidden state transfer in RNNs. 
+					 When using truncated backpropagation, a long video is divided into multiple parts.
+					 Between video sequences, one can choose to either transfer the hidden state or reset it.
 					 \label{fig:LSTM-ways-to-use-hidden-state}}
 		\end{figure}
 

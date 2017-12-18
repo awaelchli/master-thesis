@@ -11,8 +11,8 @@
 		In order for the robot to determine its location, it has to intelligently analyze the motion in the input image sequence coming from the video camera.
 		To avoid collisions or allow interaction, the 3D structure of the surrounding world and objects has to be reconstructed from the camera input or measured by other sensors.
 		
-		\emph{Visual Odometry (VO)} \todo{reference} addresses the problem of recovering the ego-motion from a video input in real-time. 
-		\emph{Structure from Motion (SfM)} \todo{reference}, an extension of VO, additionally recovers the 3D structure from the video input.
+		\emph{Visual Odometry (VO)} (\cite{nister2004visual}) addresses the problem of recovering the ego-motion from a video input in real-time. 
+		\emph{Structure from Motion (SfM)}, an extension of VO, additionally recovers the 3D structure from the video input.
 		Although these methods have many practical applications not only in robotics, they have some limitations.
 		First of all, both VO and SfM rely on robust feature detection and matching between images in order to accurately estimate motion.
 		The algorithms to extract these informations from images are hand-designed and tuned to work well in specific domains and environments.
@@ -20,8 +20,7 @@
 		These assumptions are made to avoid possible ambiguities arising from, e.g., dynamic motion in the scene or non-Lambertian surfaces.
 		Furthermore, classic VO and SfM do not leverage high-level information about the image content that could be used to eliminate and resolve these conflicts.
 		
-		\todo{Better Transition}
-		Very quickly after birth, we humans learn to develop a complex understanding of the three-dimensional world around us. 
+		Quickly after birth, we humans learn to develop a complex understanding of the three-dimensional world around us. 
 		The emphasis here is on \emph{learning}.
 		There is no external force or teacher that predetermines how the network of neurons in our brain develops and grows.
 		It is the continuous loop of information retrieval (e.g.\@ seeing, feeling) and action (e.g.\@ body movement) that determines reward or penalty (e.g.\@ walking or falling) which then influences the development of connections in the brain.
