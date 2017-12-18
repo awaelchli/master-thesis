@@ -16,11 +16,14 @@ Estimating both global- and incremental pose at the same time would be a simple 
 In terms of limitations, the loss function requires a manual balance between rotational- and positional error.
 The thesis did not explicitly explore the impact of the balance weight, but a solution that eliminates or automatically learns such a parameter could certainly have an impact on the convergence speed.
 
-Future Work: Make code more efficient (converting poses on gpu/library)
+It would also be interesting to explore VO for stereo video input, as it could reduce the drift over time by providing double the amount of measurements for a single viewpoint.
+This would of course require a suitable dataset and potentially increase the memory footprint.
 
-Output both: incremental- and global pose
-Eliminating balance factor in loss
+Another possibility is to incorporate the new and improved FlowNet2 by~\cite{ilg2016flownet}.
+The recently released PyTorch code base for the updated FlowNet could be integrated into the existing pipeline developed for this thesis.
+Although the initialization of the CNN with weights from FlowNet help the convergence speed, it is unclear how large of a benefit the new FlowNet2 weights will bring, since only the first ten layers were used and the decoder part was removed all together. 
 
-
-Stereo VO
-FlowNet2 \cite{ilg2016flownet}
+Lastly, there is room for improvement of the code base developed for this thesis.
+For example, the currently used library for conversion between different pose representations (Euler, quaternion, etc.) does not have a GPU backend.
+It is therefore inefficient to convert poses on-the-fly as they have to be copied to CPU memory and back to the GPU.
+The few functions for pose conversion could be re-implemented with PyTorch, as it provides a the necessary GPU support for its tensor operations.
