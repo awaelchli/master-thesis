@@ -205,7 +205,7 @@
 					\label{fig:avg-translation-error-dropout-no-LSTM}
 				}
 			\end{subfigure}%
-			\caption[Comparison: LSTM vs. LSTM with dropout vs. no LSTM]
+			\caption[Comparison on KITTI: LSTM vs. LSTM with dropout vs. no LSTM]
 					{Comparison of the rotation and translation error on subsequences of KITTI sequence 10 for three different models:
 					 LSTM, LSTM with dropout, and LSTM replaced with fully-connected layer.
 					 \label{fig:avg-rotation-and-translation-error-dropout-no-LSTM}}
@@ -237,6 +237,51 @@
 					 \label{fig:kitti-test-sequence-10-lstm-vs-no-lstm}}
 		\end{figure}
 		
+		\begin{figure}
+			\centering
+			\begin{subfigure}[b]{0.5\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{Python-Plots/deepvo-VIPER/rotation-error-per-meter-comparison-LSTM-No-LSTM}
+				\caption{
+					Rotation
+					\label{fig:avg-rotation-error-VIPER-LSTM-no-LSTM}
+				}
+			\end{subfigure}%
+			\begin{subfigure}[b]{0.5\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{Python-Plots/deepvo-VIPER/translation-error-per-meter-comparison-LSTM-No-LSTM}
+				\caption{
+					Translation
+					\label{fig:avg-translation-error-VIPER-LSTM-no-LSTM}
+				}
+			\end{subfigure}%
+			\caption[Comparison on VIPER: LSTM vs. no LSTM]
+					{Comparing the recurrent and non-recurrent model on the VIPER test dataset.
+					 Both version make similar rotation- and translation errors, but overall the recurrent model has worse performance.
+					 \label{fig-1}}
+		\end{figure}
+		
+		\begin{table}[tb]
+			\small
+			\begin{center}
+				\begin{tabular}{cccrrrr}
+					\toprule
+					%\multicolumn{2}{c}{\textbf{Experiments}}		& \multicolumn{4}{c}{\textbf{Test error}} 		\\
+					%\cmidrule(lr){1-2} 	\cmidrule(lr){3-6}
+					\multicolumn{2}{c}{\textbf{Experiments}} & & \multicolumn{2}{c}{\textbf{Incremental Pose}} & \multicolumn{2}{c}{\textbf{Global Pose}} \\
+					LSTM & Hidden & & Rotation & Translation & Rotation & Translation \\
+					\midrule
+					\xmark		& &			& 0.2162	& 7.3836	& 6.7071	& 241.1611		\\
+					\cmark 		& & 			& 0.2339	& 5.5290	& 11.4762	& 259.9814		\\
+					\cmark		& & 			& & & & \\
+					\bottomrule
+				\end{tabular}
+			\end{center}
+			\caption[Experiments on VIPER: Training with incremental poses]
+			{Tested on length 100
+				\label{tbl:-1}}
+		\end{table}
+		
 		\paragraph{Discussion}
 		In this second set of experiments, we have addressed the issue where the LSTM would overfit to a certain number of frames seen during training.
 		When forced to output incremental poses, the model is able to estimate motion from videos of arbitrary sizes.
@@ -253,7 +298,7 @@
 					\toprule
 					%\multicolumn{2}{c}{\textbf{Experiments}}		& \multicolumn{4}{c}{\textbf{Test error}} 		\\
 					%\cmidrule(lr){1-2} 	\cmidrule(lr){3-6}
-					\textbf{Hidden state} & & \multicolumn{2}{c}{\textbf{Relative Pose}} & \multicolumn{2}{c}{\textbf{Global Pose}} \\
+					\textbf{Hidden state} & & \multicolumn{2}{c}{\textbf{Incremental Pose}} & \multicolumn{2}{c}{\textbf{Global Pose}} \\
 					& & Rotation & Translation & Rotation & Translation \\
 					\midrule
 					Reset 		& 			& 0.2319	& 5.7220	& 9.8600	& 262.7984		\\ 
@@ -263,6 +308,8 @@
 			\end{center}
 			\caption[Experiments on VIPER: Carrying over the hidden state vs. resetting it]
 					{Experiments on VIPER: Carrying over the hidden state vs. resetting it.
+					 If the hidden state is kept between samples, it must be ensured that the videos are read successively.
+					 %When the state is reset, it is possible to shuffle the dataset and feed each video independently.
 					 \label{tbl:kitti-removing-lstm}}
 		\end{table}
 	

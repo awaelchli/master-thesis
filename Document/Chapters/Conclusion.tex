@@ -24,6 +24,8 @@ The recently released PyTorch code base for the updated FlowNet could be integra
 Although the initialization of the CNN with weights from FlowNet help the convergence speed, it is unclear how large of a benefit the new FlowNet2 weights will bring, since only the first ten layers were used and the decoder part was removed all together. 
 
 Lastly, there is room for improvement of the code base developed for this thesis.
-For example, the currently used library for conversion between different pose representations (Euler, quaternion, etc.) does not have a GPU backend.
+For example, the currently used library for conversion between different pose representations (Euler, quaternion, etc.) does not have a GPU back-end.
 It is therefore inefficient to convert poses on-the-fly as they have to be copied to CPU memory and back to the GPU.
 The few functions for pose conversion could be re-implemented with PyTorch, as it provides a the necessary GPU support for its tensor operations.
+
+\todo{Dataset with object motion annotations}
