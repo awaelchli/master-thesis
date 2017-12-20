@@ -79,26 +79,6 @@
 		In the experiments before, the model was always tested on subsequences with the same length as during training.
 		However, in a real-world application, we would like to test the model on sequences with an arbitrary number of frames, and potentially the test sequences are much longer than the ones seen during training.
 		Table~\ref{tbl:kitti-testing-on-longer-sequences} shows an experiment where the sequence length between training set and test set changes.
-		\begin{table}[tb]
-			\small
-			\begin{center}
-				\begin{tabular}{cccrrr}
-					\toprule
-					\multicolumn{2}{c}{\textbf{\#Frames}}	&	& \multicolumn{3}{c}{\textbf{Test error}} \\ 
-					\cmidrule(lr){1-2} 									\cmidrule(lr){4-6}
-					Training 		& Test 			&	& Total 	& Rotation	& Translation	\\ 
-					\midrule
-					25				& 25			&	& 16.5471	& 0.3913	& 16.1558		\\
-					25				& 100			&	& 1060.7528	& 37.6196	& 1023.1332		\\
-					100				& 100			&	& 529.9459	& 39.8967	& 490.0493		\\ 
-					\bottomrule
-				\end{tabular}
-			\end{center}
-			\caption[Experiments on KITTI: Testing on longer sequences]
-					{Experiments on KITTI: Testing on longer sequences. 
-					 When testing on sequences with more frames, the error becomes extremely high compared to the model trained on 100 frames.
-				 \label{tbl:kitti-testing-on-longer-sequences}}
-		\end{table}
 		The problem: The model trained on sequences with 25 frames does not generalize to sequences of 100 frames.
 		This is a very undesired result, after all, the recurrent part of the network was designed with the intention to handle arbitrary input sizes.
 		From the results in table~\ref{tbl:kitti-testing-on-longer-sequences} it appears that the network is able to memorize the sequence length and therefore overfits to the specific length it is trained on.
@@ -128,6 +108,26 @@
 					 The scale of the axes is in meters.
 					 \label{fig:kitti-testing-on-longer-sequences}}
 		\end{figure}
+		\begin{table}[tb]
+			\small
+			\begin{center}
+				\begin{tabular}{cccrrr}
+					\toprule
+					\multicolumn{2}{c}{\textbf{\#Frames}}	&	& \multicolumn{3}{c}{\textbf{Test error}} \\ 
+					\cmidrule(lr){1-2} 									\cmidrule(lr){4-6}
+					Training 		& Test 			&	& Total 	& Rotation	& Translation	\\ 
+					\midrule
+					25				& 25			&	& 16.5471	& 0.3913	& 16.1558		\\
+					25				& 100			&	& 1060.7528	& 37.6196	& 1023.1332		\\
+					100				& 100			&	& 529.9459	& 39.8967	& 490.0493		\\ 
+					\bottomrule
+				\end{tabular}
+			\end{center}
+			\caption[Experiments on KITTI: Testing on longer sequences]
+					{Experiments on KITTI: Testing on longer sequences. 
+					 When testing on sequences with more frames, the error becomes extremely high compared to the model trained on 100 frames.
+					 \label{tbl:kitti-testing-on-longer-sequences}}
+		\end{table}
 		One can observe that the estimated path quickly diverges after 25 frames.
 		However, when trained on sequences with 100 frames, the estimation is more accurate.
 		
@@ -144,25 +144,26 @@
 		This difference could potentially cause confusion and lead to the overfitting problem.
 		
 		To address the issue, we convert the ground truth poses to incremental poses using the formula from equation~\ref{eq:relative_rotation_conversion_general} by setting $j = i - 1$.
-		The first two rows of table~\ref{tbl:kitti-incremental-pose-and-lstm-removal} show the results of training with incremental pose.
+		Table~\ref{tbl:kitti-incremental-pose-and-lstm-removal} shows the results of training with incremental pose.
 		At test time, the output poses are converted back into the global coordinate system for evaluating the loss on the test set.
 		This allows for a direct comparison with the previous results from table~\ref{tbl:kitti-testing-on-longer-sequences}.
 		\begin{table}[tb]
 			\small
 			\begin{center}
-				\begin{tabular}{cccccrrr}
+				\begin{tabular}{ccccrrr}
 					\toprule
-					\multicolumn{5}{c}{\textbf{Experiments}}		& \multicolumn{3}{c}{\textbf{Test error}} 		\\
-					\cmidrule(lr){1-4} 	\cmidrule(lr){6-8}
-					\multicolumn{2}{c}{Length} & Dropout & LSTM &	& Total & Rotation & Translation	\\ 
-					Training & Test & & & & & & \\
+					\multicolumn{4}{c}{\textbf{Experiments}}		& \multicolumn{3}{c}{\textbf{Test error}} 		\\
+					\cmidrule(lr){1-4} 	\cmidrule(lr){5-7}
+					\multicolumn{2}{c}{Length} & Dropout &	& Total & Rotation & Translation	\\ 
+					Training & Test & & & & & \\
 					\midrule
-					25 & 25		& 0			& \cmark 	& 	& 22.0498	& 0.5642	& 21.4856 		\\ 
-					25 & 25		& 0.5		& \cmark 	& 	& 21.0171	& 0.4957	& 20.5214		\\ 
-					25 & 25		& 0			& \xmark 	& 	& 22.4305	& 0.5121	& 21.9184		\\ 
-					25 & 100	& 0			& \cmark 	& 	& 335.5754	& 16.5476	& 319.0277 		\\ 
-					25 & 100	& 0.5		& \cmark 	& 	& 301.5090	& 22.9736	& 278.5354 		\\ 
-					25 & 100	& 0			& \xmark 	& 	& 378.8834	& 48.4604	& 330.4230 		\\ 
+					25 & 25		& 0				& 	& 22.0498	& 0.5642	& 21.4856 		\\ 
+					25 & 25		& 0.5			& 	& 21.0171	& 0.4957	& 20.5214		\\ 
+					%25 & 25		& 0			& \xmark 	& 	& 22.4305	& 0.5121	& 21.9184		\\ 
+					\midrule
+					25 & 100	& 0			 	& 	& 335.5754	& 16.5476	& 319.0277 		\\ 
+					25 & 100	& 0.5		 	& 	& 301.5090	& 22.9736	& 278.5354		\\ 
+					%25 & 100	& 0			& \xmark 	& 	& 378.8834	& 48.4604	& 330.4230 		\\ 
 					\bottomrule
 				\end{tabular}
 			\end{center}
@@ -184,64 +185,72 @@
 		The previous affine output layer is kept, making it a total of two affine layers that regress the pose from the CNN features.
 		This eliminates the recurrence from the network, and all pose estimations are performed solely on consecutive frames.
 		Each output is independent of the previous inputs, therefore it is simply a feedforward network.
-		The last row of table~\ref{tbl:kitti-incremental-pose-and-lstm-removal} shows a higher loss on the test set when using the replacement.
-		This would suggest that the recurrence does indeed result in a better VO performance.
-		However, when looking at the rotation and translation error along the path in figure~\ref{fig:avg-rotation-and-translation-error-dropout-no-LSTM} (blue), and compare it with the version that uses the LSTM (red, green), the error is actually lower for most of the path.
-		\begin{figure}
-			\centering
-			\begin{subfigure}[b]{0.5\linewidth}
-				\centering
-				\includegraphics[width=\linewidth]{Python-Plots/deepvo-KITTI/rotation-error-per-meter-comparison-Dropout-No-LSTM}
-				\caption{
-					Rotation
-					\label{fig:avg-rotation-error-dropout-no-LSTM}
-				}
-			\end{subfigure}%
-			\begin{subfigure}[b]{0.5\linewidth}
-				\centering
-				\includegraphics[width=\linewidth]{Python-Plots/deepvo-KITTI/translation-error-per-meter-comparison-Dropout-No-LSTM}
-				\caption{
-					Translation
-					\label{fig:avg-translation-error-dropout-no-LSTM}
-				}
-			\end{subfigure}%
-			\caption[Comparison on KITTI: LSTM vs. LSTM with dropout vs. no LSTM]
-					{Comparison of the rotation and translation error on subsequences of KITTI sequence 10 for three different models:
-					 LSTM, LSTM with dropout, and LSTM replaced with fully-connected layer.
-					 \label{fig:avg-rotation-and-translation-error-dropout-no-LSTM}}
-		\end{figure}
-		In addition, figure~\ref{fig:kitti-test-sequence-10-lstm-vs-no-lstm} shows the predicted path of the full KITTI sequence 10.
-		Although the shape of the two paths is roughly the same, the feedforward model is closer to the ground truth path, experiencing smaller translational drift.
-		\begin{figure}
-			\centering
-			\begin{subfigure}[b]{0.5\linewidth}
-				\centering
-				\includegraphics[width=\linewidth]{Experiments/lstm-vs-fc/incremental-dropout-lstm}
-				\caption{
-					LSTM
-					\label{fig:kitti-sequence-10-lstm}
-				}
-			\end{subfigure}%
-			\begin{subfigure}[b]{0.5\linewidth}
-				\centering
-				\includegraphics[width=\linewidth]{Experiments/lstm-vs-fc/incremental-dropout-no-lstm}
-				\caption{
-					Feedforward
-					\label{fig:fig:kitti-sequence-10-no-lstm}
-				}
-			\end{subfigure}%
-			\caption[Estimated motion on KITTI test sequence 10: LSTM vs. feedforward network]
-					{Estimated motion on KITTI test sequence 10: LSTM (a) vs. feedforward network (b).
-					 The estimated incremental poses are converted to global poses in order to recreate the path.
-					 The coordinate axes are in meters, and a marker is plotted every 120 frames.
-					 \label{fig:kitti-test-sequence-10-lstm-vs-no-lstm}}
-		\end{figure}
+		For these experiments, the VIPER dataset is used instead of KITTI.
+		The table~\ref{tbl:viper-effect-of-replacing-LSTM} compares the non-recurrent model with two recurrent models, one with a hidden size $d = 1000$ and one with $d = 500$.
+		Both recurrent versions operate only with one LSTM layer as opposed to two as before.
+		This should make for a fairer comparison.
+		Alternatively, one could have chosen to insert two affine layers instead of one and compare with a two-layer LSTM.
+		The test errors in table~\ref{tbl:viper-effect-of-replacing-LSTM} show that the recurrent models perform better for pose, but worse for translation compared to the non-recurrent version.
+		Additionally, in figure~\ref{fig:avg-rotation-error-VIPER-LSTM-no-LSTM} we observe that the rotation error at long distances is significantly higher for the non-recurrent model.
+		
+%		The last row of table~\ref{tbl:kitti-incremental-pose-and-lstm-removal} shows a higher loss on the test set when using the replacement.
+%		This would suggest that the recurrence does indeed result in a better VO performance.
+%		However, when looking at the rotation and translation error along the path in figure~\ref{fig:avg-rotation-and-translation-error-dropout-no-LSTM} (blue), and compare it with the version that uses the LSTM (red, green), the error is actually lower for most of the path.
+%		\begin{figure}
+%			\centering
+%			\begin{subfigure}[b]{0.5\linewidth}
+%				\centering
+%				\includegraphics[width=\linewidth]{Python-Plots/deepvo-KITTI/rotation-error-per-meter-comparison-Dropout-No-LSTM}
+%				\caption{
+%					Rotation
+%					\label{fig:avg-rotation-error-dropout-no-LSTM}
+%				}
+%			\end{subfigure}%
+%			\begin{subfigure}[b]{0.5\linewidth}
+%				\centering
+%				\includegraphics[width=\linewidth]{Python-Plots/deepvo-KITTI/translation-error-per-meter-comparison-Dropout-No-LSTM}
+%				\caption{
+%					Translation
+%					\label{fig:avg-translation-error-dropout-no-LSTM}
+%				}
+%			\end{subfigure}%
+%			\caption[Comparison on KITTI: LSTM vs. LSTM with dropout vs. no LSTM]
+%					{Comparison of the rotation and translation error on subsequences of KITTI sequence 10 for three different models:
+%					 LSTM, LSTM with dropout, and LSTM replaced with fully-connected layer.
+%					 \label{fig:avg-rotation-and-translation-error-dropout-no-LSTM}}
+%		\end{figure}
+%		In addition, figure~\ref{fig:kitti-test-sequence-10-lstm-vs-no-lstm} shows the predicted path of the full KITTI sequence 10.
+%		Although the shape of the two paths is roughly the same, the feedforward model is closer to the ground truth path, experiencing smaller translational drift.
+%		\begin{figure}
+%			\centering
+%			\begin{subfigure}[b]{0.5\linewidth}
+%				\centering
+%				\includegraphics[width=\linewidth]{Experiments/lstm-vs-fc/incremental-dropout-lstm}
+%				\caption{
+%					LSTM
+%					\label{fig:kitti-sequence-10-lstm}
+%				}
+%			\end{subfigure}%
+%			\begin{subfigure}[b]{0.5\linewidth}
+%				\centering
+%				\includegraphics[width=\linewidth]{Experiments/lstm-vs-fc/incremental-dropout-no-lstm}
+%				\caption{
+%					Feedforward
+%					\label{fig:fig:kitti-sequence-10-no-lstm}
+%				}
+%			\end{subfigure}%
+%			\caption[Estimated motion on KITTI test sequence 10: LSTM vs. feedforward network]
+%					{Estimated motion on KITTI test sequence 10: LSTM (a) vs. feedforward network (b).
+%					 The estimated incremental poses are converted to global poses in order to recreate the path.
+%					 The coordinate axes are in meters, and a marker is plotted every 120 frames.
+%					 \label{fig:kitti-test-sequence-10-lstm-vs-no-lstm}}
+%		\end{figure}
 		
 		\begin{figure}
 			\centering
 			\begin{subfigure}[b]{0.5\linewidth}
 				\centering
-				\includegraphics[width=\linewidth]{Python-Plots/deepvo-VIPER/rotation-error-per-meter-comparison-LSTM-No-LSTM}
+				\includegraphics[width=\linewidth]{Python-Plots/deepvo-VIPER/rotation-error-per-meter-comparison-LSTM-No-LSTM-v2}
 				\caption{
 					Rotation
 					\label{fig:avg-rotation-error-VIPER-LSTM-no-LSTM}
@@ -249,48 +258,61 @@
 			\end{subfigure}%
 			\begin{subfigure}[b]{0.5\linewidth}
 				\centering
-				\includegraphics[width=\linewidth]{Python-Plots/deepvo-VIPER/translation-error-per-meter-comparison-LSTM-No-LSTM}
+				\includegraphics[width=\linewidth]{Python-Plots/deepvo-VIPER/translation-error-per-meter-comparison-LSTM-No-LSTM-v2}
 				\caption{
 					Translation
 					\label{fig:avg-translation-error-VIPER-LSTM-no-LSTM}
 				}
 			\end{subfigure}%
-			\caption[Comparison on VIPER: LSTM vs. no LSTM]
-					{Comparing the recurrent and non-recurrent model on the VIPER test dataset.
-					 Both version make similar rotation- and translation errors, but overall the recurrent model has worse performance.
-					 \label{fig-1}}
+			\caption[Experiments on VIPER: The effect of replacing the LSTM]
+					{Comparison of the recurrent and non-recurrent models on the VIPER test dataset.
+					 The recurrent versions have an overall lower rotation error, but they are worse translation error compared to the non-recurrent model.
+					 \label{fig:viper-effect-of-replacing-LSTM}}
 		\end{figure}
 		
 		\begin{table}[tb]
 			\small
 			\begin{center}
-				\begin{tabular}{cccrrrr}
+				\begin{tabular}{ccccrrrr}
 					\toprule
 					%\multicolumn{2}{c}{\textbf{Experiments}}		& \multicolumn{4}{c}{\textbf{Test error}} 		\\
 					%\cmidrule(lr){1-2} 	\cmidrule(lr){3-6}
-					\multicolumn{2}{c}{\textbf{Experiments}} & & \multicolumn{2}{c}{\textbf{Incremental Pose}} & \multicolumn{2}{c}{\textbf{Global Pose}} \\
-					LSTM & Hidden & & Rotation & Translation & Rotation & Translation \\
+					\multicolumn{3}{c}{\textbf{Experiments}} & & \multicolumn{2}{c}{\textbf{Incremental Pose}} & \multicolumn{2}{c}{\textbf{Global Pose}} \\
+					LSTM 	& Hidden 	& Layers	& 	& Rotation & Translation & Rotation & Translation \\
 					\midrule
-					\xmark		& &			& 0.2162	& 7.3836	& 6.7071	& 241.1611		\\
-					\cmark 		& & 			& 0.2339	& 5.5290	& 11.4762	& 259.9814		\\
-					\cmark		& & 			& & & & \\
+					\xmark	& -- 		& --		&	& 0.2162	& \underline{7.3836}	& 6.7071	& \underline{241.1611}		\\
+					%\cmark 	& 1000		& 2			& 	& 0.2339	& 5.5290	& 11.4762	& 259.9814		\\
+					%\cmark	& 1000		& 1			& 	& 0.1689	& 7.6151 	& 5.0371	& 289.6538		\\
+					%\cmark 	& 500		& 1			& 	& \underline{0.1613}	& \underline{7.1238} 	& \underline{4.4305}	& 244.8199		 \\
+					
+					\cmark	& 1000		& 1			& 	& 0.1625&	7.4642 	& 4.8312&	285.5663		\\
+					\cmark 	& 500		& 1			& 	&\underline{0.1581}	&7.5345 	& \underline{4.3250}&	286.7348	 \\
 					\bottomrule
+					
 				\end{tabular}
 			\end{center}
-			\caption[Experiments on VIPER: Training with incremental poses]
-			{Tested on length 100
-				\label{tbl:-1}}
+			\caption[Experiments on VIPER: The effect of replacing the LSTM]
+					{Experiments on VIPER: The effect of replacing the LSTM.
+					 All models are trained for 100 epochs and tested on sequences of 100 frames with both incremental- and global pose.
+					 The recurrent versions perform best in terms of rotation error, whereas the non-recurrent version has lower translation error.
+					 \label{tbl:viper-effect-of-replacing-LSTM}}
 		\end{table}
 		
 		\paragraph{Discussion}
 		In this second set of experiments, we have addressed the issue where the LSTM would overfit to a certain number of frames seen during training.
 		When forced to output incremental poses, the model is able to estimate motion from videos of arbitrary sizes.
 		However, it is still unclear if and to what amount the LSTM uses the hidden state that encodes the past.
-		In fact, as we have shown, a feedforward network (without recurrence) is able to outperform the LSTM.
+		In fact, as we have shown, a feedforward network (without recurrence) is able to outperform the LSTM in positional error.
 		Based on these observations, one might speculate that the recurrent connection hurts the performance.
 		But this is not a very plausible, because during the optimization process the LSTM would learn to ignore the hidden state by setting the parameters of the cell gates accordingly, if this minimizes the loss.
 		It is possible that the loss function in equation~\ref{eq:euler_pose_loss_function_t}, a balance between euclidean error of translation and rotation, is not well-suited for VO.
-		\todo{continue: euler angles -- quaterions?}
+		The balance factor $\beta$ is chosen manually with a simple heuristic based on the fraction between expected translation- and rotation error.
+		In a way, the balance factor tells the optimization algorithm how important the accuracy for rotation is compared to the position.
+		It is certainly possible that the choice of $\beta$ has a significant impact on the networks ability to properly separate rotation and translation from the input.
+		As the scale of the motion between frames heavily depends on the dataset, it is not viable to systematically search through values for $\beta$ for different datasets.
+		A way to eliminate the balance factor is left for future work.
+		
+	\section{Pose Representation and State Transfer}
 		\begin{table}[tb]
 			\small
 			\begin{center}
@@ -320,27 +342,29 @@
 					{Convergence speed comparison state reset vs. keep.}
 		\end{figure}
 		
-		\subsection{Euler Angles vs. Quaternions}
 		
-			\begin{figure}
+		
+		\begin{figure}
+			\centering
+			\begin{subfigure}[b]{0.5\linewidth}
 				\centering
-				\begin{subfigure}[b]{0.5\linewidth}
-					\centering
-					\includegraphics[width=\linewidth]{Python-Plots/deepvo-VIPER/rotation-comparison-Euler-Quaternion-Reset-or-Keep-Hidden}
-					\caption{}
-				\end{subfigure}%
-				\begin{subfigure}[b]{0.5\linewidth}
-					\centering
-					\includegraphics[width=\linewidth]{Python-Plots/deepvo-VIPER/translation-comparison-Euler-Quaternion-Reset-or-Keep-Hidden}
-					\caption{}
-				\end{subfigure}%
-				\caption[Experiments on VIPER: Euler vs. quaternion vs. hidden state transfer]
-						{Experiments on VIPER: Euler vs. quaternion vs. hidden state transfer.
-						 50 epochs, 100 frames, no dropout, shuffling for reset
-						 \label{fig:viper-euler-vs-quat-vs-hidden-state-keep-or-reset}}
-			\end{figure}
+				\includegraphics[width=\linewidth]{Python-Plots/deepvo-VIPER/rotation-comparison-Euler-Quaternion-Reset-or-Keep-Hidden}
+				\caption{}
+			\end{subfigure}%
+			\begin{subfigure}[b]{0.5\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{Python-Plots/deepvo-VIPER/translation-comparison-Euler-Quaternion-Reset-or-Keep-Hidden}
+				\caption{}
+			\end{subfigure}%
+			\caption[Experiments on VIPER: Euler vs. quaternion vs. hidden state transfer]
+					{Experiments on VIPER: Euler vs. quaternion vs. hidden state transfer.
+			 50 epochs, 100 frames, no dropout, shuffling for reset
+			 \label{fig:viper-euler-vs-quat-vs-hidden-state-keep-or-reset}}
+		\end{figure}
 		
-
+		
+	\section{Evaluation on the GTA V Dataset}
+		
 		\begin{figure}
 			\centering
 			\begin{subfigure}[b]{\linewidth}
