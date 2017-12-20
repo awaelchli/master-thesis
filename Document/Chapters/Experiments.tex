@@ -44,7 +44,7 @@
 					 \label{tbl:kitti-overlap-and-dropout}}
 		\end{table}
 		After the same number of epochs, the test error is about 13\% lower for the model trained on overlapping sequences with a decrease of 21\% for rotation and 12\% for translation.
-		The same experiment is repeated by training on sequences of 100 frames with overlap 20 vs. overlap 80. 
+		The same experiment is repeated by training on sequences of 100 frames with overlap 20 vs.\@ overlap 80. 
 		% Total error decreases by about 40\%.
 		The translation error decreases by almost 46\%, however, the rotation loss increases.
 		A similar observation can be made when using dropout on the LSTM output (before the fully-connected layer), as seen in the second last row of table~\ref{tbl:kitti-overlap-and-dropout}.
@@ -61,9 +61,9 @@
 		Figure~\ref{fig:kitti-avg-rotation-translation-error-vs-path-distance} shows translation and rotation errors for path distance on subsequences of the KITTI sequence 10.
 		\begin{figure}[t]
 			\centering
-			\includegraphics[width=0.5\linewidth]{Python-Plots/deepvo-KITTI/relative-rotation-and-translation-error-along-path-overlap80}
-			\caption[Experiments on KITTI: Average rotation- and translation error vs. path distance]
-					{Experiments on KITTI: Average rotation- and translation error vs. path distance.
+			\includegraphics[width=0.7\linewidth]{Python-Plots/deepvo-KITTI/relative-rotation-and-translation-error-along-path-overlap80}
+			\caption[Experiments on KITTI: Average rotation- and translation error vs.\@ path distance]
+					{Experiments on KITTI: Average rotation- and translation error vs.\@ path distance.
 					 The relative rotation- and translation error is evaluated at equal intervals along the subsequences of KITTI sequence 10.
 					 The errors at the same distance are averaged over all sequences of that length.
 					 \label{fig:kitti-avg-rotation-translation-error-vs-path-distance}}
@@ -214,7 +214,7 @@
 %					\label{fig:avg-translation-error-dropout-no-LSTM}
 %				}
 %			\end{subfigure}%
-%			\caption[Comparison on KITTI: LSTM vs. LSTM with dropout vs. no LSTM]
+%			\caption[Comparison on KITTI: LSTM vs.\@ LSTM with dropout vs.\@ no LSTM]
 %					{Comparison of the rotation and translation error on subsequences of KITTI sequence 10 for three different models:
 %					 LSTM, LSTM with dropout, and LSTM replaced with fully-connected layer.
 %					 \label{fig:avg-rotation-and-translation-error-dropout-no-LSTM}}
@@ -239,8 +239,8 @@
 %					\label{fig:fig:kitti-sequence-10-no-lstm}
 %				}
 %			\end{subfigure}%
-%			\caption[Estimated motion on KITTI test sequence 10: LSTM vs. feedforward network]
-%					{Estimated motion on KITTI test sequence 10: LSTM (a) vs. feedforward network (b).
+%			\caption[Estimated motion on KITTI test sequence 10: LSTM vs.\@ feedforward network]
+%					{Estimated motion on KITTI test sequence 10: LSTM (a) vs.\@ feedforward network (b).
 %					 The estimated incremental poses are converted to global poses in order to recreate the path.
 %					 The coordinate axes are in meters, and a marker is plotted every 120 frames.
 %					 \label{fig:kitti-test-sequence-10-lstm-vs-no-lstm}}
@@ -273,20 +273,20 @@
 		\begin{table}[tb]
 			\small
 			\begin{center}
-				\begin{tabular}{ccccrrrr}
+				\begin{tabular}{cccrrrr}
 					\toprule
 					%\multicolumn{2}{c}{\textbf{Experiments}}		& \multicolumn{4}{c}{\textbf{Test error}} 		\\
 					%\cmidrule(lr){1-2} 	\cmidrule(lr){3-6}
-					\multicolumn{3}{c}{\textbf{Experiments}} & & \multicolumn{2}{c}{\textbf{Incremental Pose}} & \multicolumn{2}{c}{\textbf{Global Pose}} \\
-					LSTM 	& Hidden 	& Layers	& 	& Rotation & Translation & Rotation & Translation \\
+					\multicolumn{2}{c}{\textbf{Experiments}} & & \multicolumn{2}{c}{\textbf{Incremental Pose}} & \multicolumn{2}{c}{\textbf{Global Pose}} \\
+					LSTM 	& Hidden size 		& 	& Rotation 	& Translation & Rotation & Translation \\
 					\midrule
-					\xmark	& -- 		& --		&	& 0.2162	& \underline{7.3836}	& 6.7071	& \underline{241.1611}		\\
+					\xmark	& -- 				&	& 0.2162	& \underline{7.3836}	& 6.7071	& \underline{241.1611}		\\
 					%\cmark 	& 1000		& 2			& 	& 0.2339	& 5.5290	& 11.4762	& 259.9814		\\
 					%\cmark	& 1000		& 1			& 	& 0.1689	& 7.6151 	& 5.0371	& 289.6538		\\
 					%\cmark 	& 500		& 1			& 	& \underline{0.1613}	& \underline{7.1238} 	& \underline{4.4305}	& 244.8199		 \\
 					
-					\cmark	& 1000		& 1			& 	& 0.1625&	7.4642 	& 4.8312&	285.5663		\\
-					\cmark 	& 500		& 1			& 	&\underline{0.1581}	&7.5345 	& \underline{4.3250}&	286.7348	 \\
+					\cmark	& 1000				& 	& 0.1625	&	7.4642 	& 4.8312&	285.5663		\\
+					\cmark 	& 500				& 	&\underline{0.1581}	& 7.5345 	& \underline{4.3250}&	286.7348	 \\
 					\bottomrule
 					
 				\end{tabular}
@@ -313,6 +313,14 @@
 		A way to eliminate the balance factor is left for future work.
 		
 	\section{Pose Representation and State Transfer}
+		For all experiments so far, the hidden state $\vectr{h}_t$ of the LSTM is reset (re-initialized as zero) before the next video sample is fed because it is assumed that the videos in the dataset are shuffled.
+		A state transfer from one video to the other would not make sense if the two are different.
+		Also, in the case of global pose where each pose is relative to the first frame in the sequence, the hidden state can not be transfered as the coordinate system would change from one video to the next.
+		However, when training on incremental motions between pairs of frames, it is possible to carry the state from one video to the other when the subsequences are kept in the same order as they occur in the original full video.
+		In this case, backpropagation in time is still only performed over the frames in the subsequence, and not to the very beginning.
+		
+		Table~\ref{tbl:viper-state-reset-vs-keep} compares the test errors of the two forms of training with hidden state.
+		The experiment shows that resetting the state results in lower test errors for both rotation and translation.
 		\begin{table}[tb]
 			\small
 			\begin{center}
@@ -323,45 +331,55 @@
 					\textbf{Hidden state} & & \multicolumn{2}{c}{\textbf{Incremental Pose}} & \multicolumn{2}{c}{\textbf{Global Pose}} \\
 					& & Rotation & Translation & Rotation & Translation \\
 					\midrule
-					Reset 		& 			& 0.2319	& 5.7220	& 9.8600	& 262.7984		\\ 
 					Keep		&			& 0.3097	& 8.5461	& 12.7551	& 426.7877		\\
+					Reset 		& 			& 0.2319	& 5.7220	& 9.8600	& 262.7984		\\ 
 					\bottomrule
 				\end{tabular}
 			\end{center}
-			\caption[Experiments on VIPER: Carrying over the hidden state vs. resetting it]
-					{Experiments on VIPER: Carrying over the hidden state vs. resetting it.
-					 If the hidden state is kept between samples, it must be ensured that the videos are read successively.
-					 %When the state is reset, it is possible to shuffle the dataset and feed each video independently.
-					 \label{tbl:kitti-removing-lstm}}
+			\caption[Experiments on VIPER: State persistence vs.\@ reset]
+					{Experiments on VIPER: State persistence vs.\@ reset.
+					 Both models are identical and trained with with the same hyperparameters with the only difference being how the hidden state is handled.
+					 \label{tbl:viper-state-reset-vs-keep}}
 		\end{table}
-	
+		Additionally, as shown in figure~\ref{fig:viper-convergence-speed-state-reset-vs-keep}, the convergence speed on the validation set is greater for the method that resets the state.
+		The training error converges with the same speed for both methods. 
 		\begin{figure}[t]
 			\centering
 			\includegraphics[width=0.7\linewidth]{Python-Plots/deepvo-VIPER/convergence-speed-keep-vs-reset}
-			\caption[]
-					{Convergence speed comparison state reset vs. keep.}
+			\caption[Convergence speed comparison: State persistence vs.\@ reset]
+					{Convergence speed comparison: State persistence vs.\@ reset.
+					 Two identical models are trained on the VIPER dataset.
+					 In one model (blue), the recurrent state is reset after each video sample.
+					 In the other case (green), the hidden state is carried over for the next video.
+					 The dotted lines show the validation error.
+					 \label{fig:viper-convergence-speed-state-reset-vs-keep}}
 		\end{figure}
+		This experiment gives another indication that the recurrent connection might influence the learning process in a negative way.
+		But the question remains why the optimization does not adjust the weights accordingly such that the hidden state vector is simply ignored.
 		
-		
-		
+		Further experiments show that it is unlikely that the pose representation is the problem.
+		In figure~\ref{fig:viper-euler-vs-quat-vs-hidden-state-keep-or-reset}, combinations of state management and pose representations are compared in terms of rotation- and translation error on VIPER.
 		\begin{figure}
 			\centering
 			\begin{subfigure}[b]{0.5\linewidth}
 				\centering
 				\includegraphics[width=\linewidth]{Python-Plots/deepvo-VIPER/rotation-comparison-Euler-Quaternion-Reset-or-Keep-Hidden}
-				\caption{}
+				\caption{Rotation}
 			\end{subfigure}%
 			\begin{subfigure}[b]{0.5\linewidth}
 				\centering
 				\includegraphics[width=\linewidth]{Python-Plots/deepvo-VIPER/translation-comparison-Euler-Quaternion-Reset-or-Keep-Hidden}
-				\caption{}
+				\caption{Translation}
 			\end{subfigure}%
-			\caption[Experiments on VIPER: Euler vs. quaternion vs. hidden state transfer]
-					{Experiments on VIPER: Euler vs. quaternion vs. hidden state transfer.
-			 50 epochs, 100 frames, no dropout, shuffling for reset
-			 \label{fig:viper-euler-vs-quat-vs-hidden-state-keep-or-reset}}
+			\caption[Experiments on VIPER: Euler vs.\@ quaternion vs.\@ hidden state transfer]
+					{Experiments on VIPER: Euler vs.\@ quaternion vs.\@ hidden state transfer.
+					 In all experiments, the model was trained for 50 epochs on videos of 100 frames.
+					 No dropout is applied.
+					 \label{fig:viper-euler-vs-quat-vs-hidden-state-keep-or-reset}}
 		\end{figure}
-		
+		For the model where the rotations are represented by unit quaternions, the loss from equation~\ref{eq:quaternion_pose_loss_function_t} is used.
+		In order to compare all versions, the rotations are converted to Euler angles at test time and evaluated using the Euclidean loss as before (eq.\@~\ref{eq:euler_pose_loss_function_t}).
+		The results show that the rotation error for the model trained with quaternions is the highest, but in the case of translation error.
 		
 	\section{Evaluation on the GTA V Dataset}
 		
