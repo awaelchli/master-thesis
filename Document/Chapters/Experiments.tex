@@ -379,9 +379,114 @@
 		\end{figure}
 		For the model where the rotations are represented by unit quaternions, the loss from equation~\ref{eq:quaternion_pose_loss_function_t} is used.
 		In order to compare all versions, the rotations are converted to Euler angles at test time and evaluated using the Euclidean loss as before (eq.\@~\ref{eq:euler_pose_loss_function_t}).
-		The results show that the rotation error for the model trained with quaternions is the highest, but in the case of translation error.
+		The results show that the rotation error for the model trained with quaternions is the highest among th others, but in the case of translation error
+		\todo{cont. todo: discussion}
+		
 		
 	\section{Evaluation on the GTA V Dataset}
+		In contrast to the VIPER dataset where most videos are captured from a driving vehicle, in our dataset all motions are captured on foot.
+		Even though the GTA V dataset is synthetic, it contains many challenging types of motion.
+		All motions are captured on foot.
+		The average rotation angle between consecutive frames is 
+		
+		\begin{table}[tb]
+			\small
+			\begin{center}
+				\begin{tabular}{lcrrcrr}
+					\toprule
+					\textbf{Dataset} 		& 	& \multicolumn{2}{c}{\textbf{Rotation [deg]}} 		& & \multicolumn{2}{c}{\textbf{Distance [m]}} 		\\
+									& 	& Avg. 		& Max			&	& Avg. 		& Max					\\
+					\midrule
+					GTA V 30 fps 	& 	&  0.9488	& 31.0659 		&	& 0.1286 	& 0.5440 				\\
+					GTA V 15 fps*	& 	&  1.8976	& 62.1318		& 	& 0.2572	& 1.0880				\\
+					VIPER 15 fps	&   & 0.5284	& 15.6798 		& 	& 0.6792	& 6.6327				\\
+					\bottomrule
+				\end{tabular}
+			\end{center}
+			\caption[Inter-frame motion comparison between the VIPER and GTA V datasets]
+					{Inter-frame motion comparison between the VIPER and GTA V datasets.
+					 The table shows relative rotation angle and traveled distance between consecutive frames on the test set.
+					 \label{tbl:viper-gta-comparison-inter-frame-motion}}
+		\end{table}
+		
+		% gTA
+%		Rotation angle between consecutive frames (AVG / MIN / MAX): / 0.0000 /  degrees
+%		Distance travelled between consecutive frames (AVG / MIN / MAX):  / 0.0000 /  meters
+%		
+%		Statistics for training set:
+%		Rotation angle between consecutive frames (AVG / MIN / MAX): 0.9147 / 0.0000 / 175.0265 degrees
+%		Distance travelled between consecutive frames (AVG / MIN / MAX): 0.1298 / 0.0000 / 0.6191 meters
+		
+		
+		% Viper
+%		VIPER
+%		Statistics for test set:
+%		Rotation angle between consecutive frames (AVG / MIN / MAX): / 0.0000 /  degrees
+%		Distance travelled between consecutive frames (AVG / MIN / MAX):  / 0.0000 / meters
+%		
+%		Statistics for training set:
+%		Rotation angle between consecutive frames (AVG / MIN / MAX): 0.5992 / 0.0000 / 23.1485 degrees
+%		Distance travelled between consecutive frames (AVG / MIN / MAX): 0.6938 / 0.0000 / 8.0416 meters
+		
+		
+		
+		\begin{figure}
+			\centering
+			\begin{subfigure}[b]{\linewidth}
+				\centering
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/bird-0001}
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/b-0001}
+				\caption{
+					Static scene, long range
+					\label{fig:0}
+				}
+			\end{subfigure}%
+			\\
+			\begin{subfigure}[b]{\linewidth}
+				\centering
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/bird-0011}
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/b-0011}
+				\caption{
+					Static scene, close range
+					\label{fig:0}
+				}
+			\end{subfigure}%
+			\\
+			\begin{subfigure}[b]{\linewidth}
+				\centering
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/bird-0005}
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/b-0005}
+				\caption{
+					Forward, stop, motion around fixed look-at point
+					\label{fig:0}
+				}
+			\end{subfigure}%
+			\\
+			\begin{subfigure}[b]{\linewidth}
+				\centering
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/bird-0012}
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/b-0012}
+				\caption{
+					Forward, stop, $90^\circ$ turn, forward
+					\label{fig:0}
+				}
+			\end{subfigure}%
+			\caption[Qualitative results for motion estimation on GTA V]
+					{Qualitative results for motion estimation on the GTA V test set.
+					 Each video is 200 frames long.
+					 Left column: Visualization of the estimated and true path.
+					 Right column: Plot of each coordinate axis of the translation.
+					 The horizontal axis is the time (frame count).
+					 The plots show a marker for every 20th frame.
+					 \label{fig:gtav-qualitative-results-translation}}
+		\end{figure}
+		
+		
+		
+		
+		
+		
+		
 		
 		\begin{figure}
 			\centering
