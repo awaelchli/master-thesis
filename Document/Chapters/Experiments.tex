@@ -385,17 +385,15 @@
 		
 	\section{Evaluation on the GTA V Dataset}
 		In contrast to the VIPER dataset where most videos are captured from a driving vehicle, in our dataset all motions are captured on foot.
-		Even though the GTA V dataset is synthetic, it contains many challenging types of motion.
-		All motions are captured on foot.
-		The average rotation angle between consecutive frames is 
-		
+		Additionally, the frame rate of 30 fps in GTA V is twice as in VIPER.
+		The scale of motion between consecutive frames in the videos is compared in table~\ref{tbl:viper-gta-comparison-inter-frame-motion}.	
 		\begin{table}[tb]
 			\small
 			\begin{center}
 				\begin{tabular}{lcrrcrr}
 					\toprule
 					\textbf{Dataset} 		& 	& \multicolumn{2}{c}{\textbf{Rotation [deg]}} 		& & \multicolumn{2}{c}{\textbf{Distance [m]}} 		\\
-									& 	& Avg. 		& Max			&	& Avg. 		& Max					\\
+									& 	& Average 		& Maximum			&	& Average 		& Maximum					\\
 					\midrule
 					GTA V 30 fps 	& 	&  0.9488	& 31.0659 		&	& 0.1286 	& 0.5440 				\\
 					GTA V 15 fps*	& 	&  1.8976	& 62.1318		& 	& 0.2572	& 1.0880				\\
@@ -405,31 +403,28 @@
 			\end{center}
 			\caption[Inter-frame motion comparison between the VIPER and GTA V datasets]
 					{Inter-frame motion comparison between the VIPER and GTA V datasets.
-					 The table shows relative rotation angle and traveled distance between consecutive frames on the test set.
+					 The table shows the relative rotation angle and traveled distance between consecutive frames on the test set.
+					 Since the GTA V videos are captured with twice the frame rate as VIPER, the numbers are multiplied by two and shown in the second row (*) for direct comparison with VIPER. 
 					 \label{tbl:viper-gta-comparison-inter-frame-motion}}
+			%		GTA
+			%		Statistics for training set:
+			%		Rotation angle between consecutive frames (AVG / MIN / MAX): 0.9147 / 0.0000 / 175.0265 degrees
+			%		Distance travelled between consecutive frames (AVG / MIN / MAX): 0.1298 / 0.0000 / 0.6191 meters
+			
+			%		VIPER
+			%		Statistics for training set:
+			%		Rotation angle between consecutive frames (AVG / MIN / MAX): 0.5992 / 0.0000 / 23.1485 degrees
+			%		Distance travelled between consecutive frames (AVG / MIN / MAX): 0.6938 / 0.0000 / 8.0416 meters
 		\end{table}
+		In VIPER, the camera is usually pointing in the forward driving direction, whereas in GTA V the camera is turned freely in all directions while walking and exploring the video game world.
+		The average rotation angle in VIPER is lower compared to GTA V, since there are only a few rapid rotation movements in short periods of time.
+		Although the traveled distance per frame in VIPER is longer, the freedom of motion in a car is limited as it can move forward or backward, but not to the side.
 		
-		% gTA
-%		Rotation angle between consecutive frames (AVG / MIN / MAX): / 0.0000 /  degrees
-%		Distance travelled between consecutive frames (AVG / MIN / MAX):  / 0.0000 /  meters
-%		
-%		Statistics for training set:
-%		Rotation angle between consecutive frames (AVG / MIN / MAX): 0.9147 / 0.0000 / 175.0265 degrees
-%		Distance travelled between consecutive frames (AVG / MIN / MAX): 0.1298 / 0.0000 / 0.6191 meters
-		
-		
-		% Viper
-%		VIPER
-%		Statistics for test set:
-%		Rotation angle between consecutive frames (AVG / MIN / MAX): / 0.0000 /  degrees
-%		Distance travelled between consecutive frames (AVG / MIN / MAX):  / 0.0000 / meters
-%		
-%		Statistics for training set:
-%		Rotation angle between consecutive frames (AVG / MIN / MAX): 0.5992 / 0.0000 / 23.1485 degrees
-%		Distance travelled between consecutive frames (AVG / MIN / MAX): 0.6938 / 0.0000 / 8.0416 meters
-		
-		
-		
+		The diversity of motion in GTA V makes the dataset more challenging for VO compared to VIPER and even KITTI.
+		Qualitative results of the proposed VO applied to GTA V is shown in figure~\ref{fig:gtav-qualitative-results-translation}.
+		In this case, the quaternion pose representation together with the loss from equation~\ref{eq:quaternion_pose_loss_function_t} was used for training.
+		We observe that the estimations for the translation are not very impressive.
+		The system can not handle motions with sharp turns (fig.\@~\ref{fig:gtav-qualitative-sharp-turn}) or motions in wide open areas where structures like houses and mountains are far away.
 		\begin{figure}
 			\centering
 			\begin{subfigure}[b]{\linewidth}
@@ -438,7 +433,7 @@
 				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/b-0001}
 				\caption{
 					Static scene, long range
-					\label{fig:0}
+					\label{fig:gtav-qualitative-long-range}
 				}
 			\end{subfigure}%
 			\\
@@ -448,7 +443,7 @@
 				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/b-0011}
 				\caption{
 					Static scene, close range
-					\label{fig:0}
+					\label{fig:gtav-qualitative-close-range}
 				}
 			\end{subfigure}%
 			\\
@@ -458,7 +453,7 @@
 				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/b-0005}
 				\caption{
 					Forward, stop, motion around fixed look-at point
-					\label{fig:0}
+					\label{fig:gtav-qualitative-look-at-fixed}
 				}
 			\end{subfigure}%
 			\\
@@ -468,13 +463,13 @@
 				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/b-0012}
 				\caption{
 					Forward, stop, $90^\circ$ turn, forward
-					\label{fig:0}
+					\label{fig:gtav-qualitative-sharp-turn}
 				}
 			\end{subfigure}%
 			\caption[Qualitative results for motion estimation on GTA V]
 					{Qualitative results for motion estimation on the GTA V test set.
 					 Each video is 200 frames long.
-					 Left column: Visualization of the estimated and true path.
+					 Left column: Visualization of the estimated and true path from the bird's-eye perspective where the height dimension is omitted.
 					 Right column: Plot of each coordinate axis of the translation.
 					 The horizontal axis is the time (frame count).
 					 The plots show a marker for every 20th frame.
