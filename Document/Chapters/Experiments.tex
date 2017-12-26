@@ -425,7 +425,7 @@
 		In this case, the quaternion pose representation together with the loss from equation~\ref{eq:quaternion_pose_loss_function_t} was used for training.
 		We observe that the estimations for the translation are not very impressive.
 		The system can not handle motions with sharp turns (fig.\@~\ref{fig:gtav-qualitative-sharp-turn}) or motions in wide open areas where structures like houses and mountains are far away.
-		\begin{figure}
+		\begin{figure}[h]
 			\centering
 			\begin{subfigure}[b]{\linewidth}
 				\centering
@@ -483,7 +483,7 @@
 		
 		
 		
-		\begin{figure}
+		\begin{figure}[h]
 			\centering
 			\begin{subfigure}[t]{\linewidth}
 				\centering
@@ -543,37 +543,62 @@
 
 
 
-		\begin{figure}
+
+
+
+		\begin{figure}[h]
 			\centering
-			\begin{subfigure}[b]{\linewidth}
+			\begin{subfigure}[t]{\linewidth}
 				\centering
-				\includegraphics[width=0.45\linewidth]{example-image-a}
-				\includegraphics[width=0.45\linewidth]{example-image-a}
+				\raisebox{8mm}{
+					\includegraphics[width=0.5\linewidth, trim={5cm 0 9cm 0}, clip]{Experiments/kitti/000607}
+				}
+				\includegraphics[width=0.45\linewidth]{Experiments/kitti/pdf/bird-0007}
 				\caption{
-					Long, curve
-					\label{fig:0}
+					Change of speed at intersection
+					\label{fig:kitti-qualitative-speed-change}
 				}
 			\end{subfigure}%
 			\\
 			\begin{subfigure}[b]{\linewidth}
 				\centering
-				\includegraphics[width=0.45\linewidth]{example-image-b}
-				\includegraphics[width=0.45\linewidth]{example-image-b}
+				\raisebox{8mm}{
+					\includegraphics[width=0.5\linewidth, trim={5cm 0 9cm 0}, clip]{Experiments/kitti/000728}
+				}
+				\includegraphics[width=0.45\linewidth]{Experiments/kitti/pdf/bird-0008}
 				\caption{
-					Short
-					\label{fig:0}
+					Dynamic motion from traffic
+					\label{fig:kitti-qualitative-traffic-1}
 				}
 			\end{subfigure}%
 			\\
 			\begin{subfigure}[b]{\linewidth}
 				\centering
-				\includegraphics[width=0.45\linewidth]{example-image-c}
-				\includegraphics[width=0.45\linewidth]{example-image-c}
+				\raisebox{8mm}{
+					\includegraphics[width=0.5\linewidth, trim={5cm 0 9cm 0}, clip]{Experiments/kitti/000858}
+				}
+				\includegraphics[width=0.45\linewidth]{Experiments/kitti/pdf/bird-0009}
 				\caption{
-					\label{fig:0}
+					Sharp right-hand bend
+					\label{fig:kitti-qualitative-sharp-turn}
+				}
+			\end{subfigure}%
+			\\
+			\begin{subfigure}[b]{\linewidth}
+				\centering
+				\raisebox{8mm}{
+					\includegraphics[width=0.5\linewidth, trim={5cm 0 9cm 0}, clip]{Experiments/kitti/000992}
+				}				\includegraphics[width=0.45\linewidth]{Experiments/kitti/pdf/bird-0010}
+				\caption{
+					Change of speed and scene motion in close proximity
+					\label{fig:kitti-qualitative-truck-close-up-stop}
 				}
 			\end{subfigure}%
 			\caption[Qualitative results for motion estimation on KITTI]
-					{Qualitative results for motion estimation on KITTI.
-				 \label{fig:0}}
+					{Qualitative results for motion estimation on the KITTI test sequence 10.
+					 Left column: Images from the subsequences showing a challenging scenario.
+					 Right column: Bird's-eye view of the estimated and true camera motion.
+					 The height dimension is omitted.
+					 Each subsequence is 100 frames long and a marker is shown for every 10th frame.
+					 \label{fig:kitti-qualitative-results-images-and-estimation}}
 		\end{figure}
