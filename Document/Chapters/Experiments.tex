@@ -485,41 +485,62 @@
 		
 		\begin{figure}
 			\centering
-			\begin{subfigure}[b]{\linewidth}
+			\begin{subfigure}[t]{\linewidth}
 				\centering
-				\includegraphics[width=0.45\linewidth]{example-image-a}
-				\includegraphics[width=0.45\linewidth]{example-image-a}
+				\raisebox{5mm}{
+					\includegraphics[width=0.5\linewidth]{Experiments/viper/011_01171}
+				}
+				\includegraphics[width=0.45\linewidth]{Experiments/viper/pdf/bird-0007}
 				\caption{
-					Long, curve
-					\label{fig:0}
+					Left turn, reflections from sun
+					\label{fig:viper-qualitative-sun-reflections}
 				}
 			\end{subfigure}%
 			\\
 			\begin{subfigure}[b]{\linewidth}
 				\centering
-				\includegraphics[width=0.45\linewidth]{example-image-b}
-				\includegraphics[width=0.45\linewidth]{example-image-b}
+				\raisebox{5mm}{
+					\includegraphics[width=0.5\linewidth]{Experiments/viper/016_00167}
+				}
+				\includegraphics[width=0.45\linewidth]{Experiments/viper/pdf/bird-0008}
 				\caption{
-					Short
-					\label{fig:0}
+					Passing maneuver on highway
+					\label{fig:viper-qualitative-passing-maneuver}
 				}
 			\end{subfigure}%
 			\\
 			\begin{subfigure}[b]{\linewidth}
 				\centering
-				\includegraphics[width=0.45\linewidth]{example-image-c}
-				\includegraphics[width=0.45\linewidth]{example-image-c}
+				\raisebox{5mm}{
+					\includegraphics[width=0.5\linewidth]{Experiments/viper/021_00930}
+				}
+				\includegraphics[width=0.45\linewidth]{Experiments/viper/pdf/bird-0010}
 				\caption{
-					\label{fig:0}
+					Left turn on crowded intersection, light snow and fog
+					\label{fig:viper-qualitative-snow-crowded-intersection}
 				}
 			\end{subfigure}%
-			\caption[Qualitative results for motion estimation on KITTI]
-					{Qualitative results for motion estimation on KITTI.
-				 Left column: Visualization of the estimated and true path.
-				 Right column: Plot of each coordinate axis.
-				 Markers are shown for every \todo{xx} frames.
-					\label{fig:0}}
+			\\
+			\begin{subfigure}[b]{\linewidth}
+				\centering
+				\raisebox{5mm}{
+					\includegraphics[width=0.5\linewidth]{Experiments/viper/027_00465}
+				}				\includegraphics[width=0.45\linewidth]{Experiments/viper/pdf/bird-0012}
+				\caption{
+					Left turn on intersection following a truck in close proximity
+					\label{fig:viper-qualitative-truck-left-turn-close}
+				}
+			\end{subfigure}%
+			\caption[Qualitative results for motion estimation on VIPER]
+					{Qualitative results for motion estimation on the VIPER test set.
+					 Left column: An image from the video showing the scene type and motion scenario.
+					 Right column: Bird's-eye view of the estimated and true camera motion.
+					 The height dimension is omitted.
+					 Each video is 100 frames long and a marker is shown for every 10th frame.
+					 \label{fig:viper-qualitative-results-images-and-estimation}}
 		\end{figure}
+
+
 
 
 		\begin{figure}
@@ -552,7 +573,7 @@
 					\label{fig:0}
 				}
 			\end{subfigure}%
-			\caption[Qualitative results for motion estimation on VIPER]
-					{Qualitative results for motion estimation on VIPER.
+			\caption[Qualitative results for motion estimation on KITTI]
+					{Qualitative results for motion estimation on KITTI.
 				 \label{fig:0}}
 		\end{figure}
