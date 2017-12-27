@@ -1,4 +1,4 @@
-\chapter{Introduction}
+\chapter{Introduction}\label{chp:introduction}
 		
 	\section{Motivation}
 		
@@ -25,7 +25,7 @@
 		There is no external force or teacher that predetermines how the network of neurons in our brain develops and grows.
 		It is the continuous loop of information retrieval (e.g.\@ seeing, feeling) and action (e.g.\@ body movement) that determines reward or penalty (e.g.\@ walking or falling) which then influences the development of connections in the brain.
 		Recent advances in Deep Learning have shown that machines are able to learn and identify patterns in data and use them to solve complex problems that also humans are faced with everyday, e.g., recognizing a persons face or solving puzzle games.
-		Deep Learning has had a significant impact on Computer Vision and is under rapid development, becoming more popular every year.
+		Deep Learning has had a significant impact on computer vision and is under rapid development, becoming more popular every year.
 		
 		The potential and recent successes of Deep Learning motivate an alternative approach to the classic VO and SfM algorithms.
 		Learning a powerful representation of camera motion from a large dataset of image sequences could help overcome some of the aforementioned challenges in SfM as well as reduce the computational cost to provide real-time mobile applications.
@@ -79,8 +79,7 @@
 		Third, it should be robust to noise in form of scene dynamics, lighting changes, camera shake or blur.
 		Furthermore, the system must support any camera model without the need for manual calibration.
 		
-		In this thesis, we explore a Deep Learning approach to the VO problem.
-		Figure~\ref{fig:overview-visual-odometry} presents a high-level overview of the VO problem.
+		In this thesis, we explore a Deep Learning approach to the VO problem as illustrated in figure~\ref{fig:overview-visual-odometry}.
 		\begin{figure}[t]
 			\centering
 			\includegraphics[width=\linewidth]{"Introduction/Problem Overview/overview"}
@@ -103,7 +102,7 @@
 		Training a neural network requires a large dataset with realistic data.
 		Collecting the video data is time consuming, but the challenge lies in the collection of the ground truth, i.e., the camera pose.
 		The accelerometers and gyroscopes in consumer cameras are not accurate enough to capture the pose of the device over a long period of time as they experience large measurement drift.
-		GPS may be used to determine the horizontal location within a few meters depending on the signal strength, but this makes it impossible for indoor navigation.
+		GPS may be used to determine the horizontal location within a few meters depending on the signal strength, but it is not suited for indoor navigation.
 		An alternative way to obtain precise camera pose is by generating it synthetically.
 		However, the challenge here is to generate photo-realistic data with much variation.
 		
@@ -111,24 +110,24 @@
 		It may be problematic to properly separate the motion into rotation and translation, as small rotational changes could be confused with translation.
 		Furthermore, it is unclear how one should design the system to be able to resolve ambiguity.
 		For example, the projection of an arbitrary object is the same when the object is moved twice as far away from the camera and its physical size is doubled.
-		\todo{more challenges}
+		This is known as the \emph{scale ambiguity} and it is inherent to the projective camera model.
+		The \emph{aperture problem} is another example of ambiguity where the global motion of an object can not be determined from local motions in the limited receptive field (aperture) of the camera.
+		Finally, a more serious problem is \emph{scene motion} or \emph{dynamic motion}.
+		Even though object motions usually result in local movement in the image plane, it still remains a challenge to design a system that can properly separate them from the more global camera motion.
 		
 	
 	\section{Contribution}
-		% mention the deepVO paper, based on this work
-		% supplemental insight, reverse engineer
-		% large and diverse synthetic dataset, as an extension to VIPER?
-		%
+		
 		The contributions of this thesis are the following.
 		\begin{itemize}
 			\item A review of prior work on SfM and VO with the focus on Deep Learning oriented methods.
 			
-			\item A large synthetic dataset of labeled videos for Visual Odometry captured from the video game Grand Theft Auto V.
+			\item A large and diverse synthetic dataset of labeled videos for Visual Odometry captured from the video game Grand Theft Auto V.
 			
 			\item An implementation of a VO model using a recurrent neural network architecture as presented in the paper by~\cite{wang2017deepvo}.
-			The code is written in Python with the deep learning framework PyTorch\footnote{\url{http://pytorch.org/}}.
+			The code is written in Python with the deep learning framework PyTorch\footnote{\url{http://pytorch.org}}.
 			
-			\item A study of the models capabilities and limitations with an analysis of hyperparameters, different pose representations and performance metrics.
+			\item A study of the models capabilities and limitations with an analysis of hyperparameters, different pose representations, performance metrics and the impact of the recurrent network itself.
 		\end{itemize}
 		The proposed system is completely end-to-end.
 		It does not require any external calibration and runs in real time after training is completed.
@@ -136,7 +135,8 @@
 	\section{Structure of the Thesis}
 		The remainder of this thesis is structured as follows:
 		\begin{itemize}
-			\item Chapter 2 presents the prior works done on Structure from Motion and Visual Odometry, both the classical methods as well as the recent approaches with Deep Learning.
+			\item Chapter 2 presents the prior works done on Structure from Motion and Visual Odometry. 
+			Both the classical methods as well as the recent approaches with Deep Learning are discussed.
 			
 			\item Chapter 3 contains all the mathematical background needed for the rest of the thesis.
 			Moreover, it reviews the concepts of machine learning, feedforward- and recurrent neural networks.
@@ -144,10 +144,8 @@
 			\item Chapter 4 is a detailed description of the proposed deep learning model for Visual Odometry.
 			
 			\item Chapter 5 documents the experiments and results on real and synthetic datasets.
-			It also shows the strengths and weaknesses of the system.
+			It also shows the strengths and weaknesses of the system under various conditions.
 			
 			\item Chapter 6 concludes the thesis with a discussion of the results and improvements for future work.
 		\end{itemize}
-		\todo{check again if up to date}
-		
-	\section{Notation}
+	

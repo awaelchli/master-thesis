@@ -25,8 +25,6 @@
 			\end{bmatrix} 
 			\in SE(3).
 		\end{equation}
-		\todo{Insert a figure showing: world coordinate frame, camera coordinate frame, transformation matrix}
-		
 		In Structure from Motion (SfM), there is not only one camera, but many cameras with different transformations.
 		This is also the case in Visual Odometry (VO), but the sequence of transformations is ordered according to the path of the camera motion. 
 		Specifically, we deal with a sequence of rotations $\matr{R}_1, \dots, \matr{R}_n$ and translations $\vectr{t}_1, \dots, \vectr{t}_n$. 
@@ -69,7 +67,7 @@
 		The later is definitely useful when numerical errors occur in computations involving the rotation.
 		
 		What follows is a discussion and comparison of three other popular representations used to describe rotations.
-		A brief overview is also shown in table~\ref{tbl:comparison_representations_of_rotations}.
+		A brief overview these is also shown in table~\ref{tbl:comparison_representations_of_rotations}.
 		\begin{table}
 			\small
 			\begin{center}
@@ -78,10 +76,10 @@
 					\toprule
 					Representation	& Constraint 			& Problems 				& Identity			\\
 					\midrule
-					Euler angles 	& None 					& Gimbal lock 			& ambiguous 		\\
-					Axis-angle 		& Unit-norm axis 		& Missing algebraic structure						& ambiguous 		\\
-					Matrix 			& Must be in $SO(3)$ 	& Numerical instability	& unique 			\\
-					Unit quaternion & 4D unit sphere 		& Less intuitive 		& unique			\\
+					Euler angles 	& None 					& Gimbal lock 			& Ambiguous 		\\
+					Axis-angle 		& Unit-norm axis 		& Missing algebraic structure						& Ambiguous 		\\
+					Matrix 			& Must be in $SO(3)$ 	& Numerical instability	& Unique 			\\
+					Unit quaternion & 4D unit sphere 		& Less intuitive 		& Unique			\\
 					\bottomrule
 				\end{tabular}
 			\end{center}
@@ -231,7 +229,7 @@
 		where $\theta \in \R$ is the angle of rotation around a unit-length axis $\vectr{a} = (a_1, a_2, a_3) \in \R^3$.
 		The parameterization makes use of the axis-angle representation, however, quaternions are more powerful in the sense that rotations can be concatenated via multiplication, i.e., $\vectr{q}_2 \vectr{q}_1$ represents the compound rotation of $\vectr{q}_1$ followed by $\vectr{q}_2$.
 		One drawback of the quaternion is that it is a double cover of the space of rotations, meaning that $\vectr{q}$ and $-\vectr{q}$ represent the same rotation.
-		\todo{mention spherical linear interpolation (Slerp)?}
+		%\todo{mention spherical linear interpolation (Slerp)?}
 		\\
 		
 		How well a neural network can be trained to output a rotation may depend on the choice of the representation and its constraints.
@@ -364,7 +362,7 @@
 		\end{equation}
 		where $\matr{K} \in \R^{C \times N \times M}$ is the kernel with size $N \times M$.
 		Usually, this size is chosen to be quadratic, i.e.\@ $N = M$.
-		Note that the convolution is only applied in the spatial dimensions, and that the weights for each channel are different.
+		Note that the convolution is only applied in the spatial dimensions, and that the weights for each channel can be different.
 		The variable $s \in \N$ in equation~\ref{eq:convolution_2D_simple} is the \emph{stride}.
 		A stride greater than one means that outputs are ``skipped", i.e., the spatial size shrinks by the factor $\frac{1}{s}$.
 		%Furthermore, the number of outputs in $\matr{Y}$ changes according to the input size.
@@ -378,7 +376,7 @@
 		
 	\section{Recurrent Neural Networks}\label{sec:recurrent_neural_networks}
 		\newcommand{\imagecourtesycolah}{Image courtesy Christopher Olah \mbox{\href{http://colah.github.io/}{(colah.github.io)}}.}
-		\todo{Need references to early works on RNNs}
+
 		So far, we have looked at the feedforward network, which is a function that maps an input $\vectr{x}$ to an output $\vectr{y} = f(\vectr{x})$.
 		It will always compute the same output for the same input, independently of the input-output pairs it has seen before.
 		Now consider a sequence $\vectr{x}_1, \dots, \vectr{x}_T$ of inputs, e.g., a sentence.
@@ -556,7 +554,6 @@
 		\paragraph{Input to Output Mapping}
 		In section~\ref{sec:recurrent_neural_networks} it was assumed that for each time step $t$ there is an input $\vectr{x}_t$ and an output $\vectr{h}_t$.
 		This is the most general setup for an RNN and we refer to it as \emph{many-to-many}. 
-		
 		For some tasks, it might not be suitable to have an input at each time, or an output at each time.
 		On the other hand, the RNN is not a feedforward network in the time axis and thus does not allow a modification to remove inputs or outputs at certain time steps.
 		However, this does not mean that one has to use all outputs for computing loss and gradients.
@@ -573,8 +570,7 @@
 		For example, in the sentiment analysis example from before, the token can be used as an end-of-sequence symbol to mark the end of a sentence.
 		In general, the symbol does not necessarily have to be used at the end of a sequence.
 		It can be inserted whenever an output is needed.
-		An application of this is shown in an experiment later in the thesis. 
-		\todo{Check again! Explicitly refer to the section}
+		%An application of this is shown in an experiment later in the thesis. 
 		
 		\paragraph{Truncated Backpropagation}
 		As discussed in section~\ref{sec:gradient_computation_RNN}, gradient computation over long sequences can cause vanishing or exploding values that hinder the learning process during training.
@@ -593,7 +589,7 @@
 		During training, we can forward subsequences consecutively and backpropagate $\tau$ steps.
 		After each backpropagation, the hidden state $\vectr{h}_t$ (or $(\vectr{h}_t, \vectr{c}_t)$ in the case of LSTM) is carried over to the next subsequence as initial state.
 		This way, there is always information available from the past even though the gradients are never propagated to the very beginning of the sequence.
-		\todo{mention where this is used later in thesis}
+		An application of this training procedure is presented later in chapter~\ref{chp:experiments-and-results}.
 		
 		\paragraph{Ground Truth}
 		How ground truth is used depends heavily on the task at hand.
@@ -606,7 +602,7 @@
 		The pose is always relative to the first frame in the sequence.
 		The RNN has to learn this relationship directly from the ground truth, not from the input.
 
-	\section{A First Toy Example: Memorizing Digits}\label{sec:toy-example-memory}
+	\section{Toy Example: Memorizing Digits}\label{sec:toy-example-memory}
 		% Capabilities of LSTM
 		% - Memory: Describe binary memory example (sequence of binary digits)
 		% - As classification, formula for cross-entropy loss
@@ -627,9 +623,8 @@
 		The main questions that are investigated are:
 		Can the LSTM memorize the past and use this knowledge for future outputs?
 		And how far back in time can it remember?
-		Does it work best for classification or regression?
+		%Does it work best for classification or regression?
 		What is the influence of the hyperparameters?
-		\todo{Regression still missing from experiments! (one fig. generated)}
 		These are the main questions that are investigated in this section.
 		
 		\paragraph{The Task}
@@ -649,9 +644,9 @@
 		The LSTM reads the digits one by one to store them in memory and at the same time it outputs the digit from memory at time $t - 3$ as highlighted by the colors above.
 		In order to tackle this machine learning problem, we will define three key components:
 		\begin{enumerate}
-			\item Model
-			\item Performance measure
-			\item Optimization procedure
+			\item The model
+			\item The performance measure
+			\item The optimization procedure
 		\end{enumerate}
 	
 		\paragraph{The Model}
@@ -730,14 +725,14 @@
 				\centering
 				\includegraphics[width=\linewidth]{Python-Plots/memory/accuracy-vs-look-back}
 				\caption{
-					$d = 1, T = 50, \lambda = 0.01, N = 10^5$
+					$d = 1, T = 50, \lambda = 10^{-2}, N = 10^5$
 					\label{fig:accuracy-vs-look-back}
 				}
 			\end{subfigure}%
 			\begin{subfigure}[b]{0.5\linewidth}
 				\includegraphics[width=\linewidth]{Python-Plots/memory/accuracy-vs-hidden-size}
 				\caption{
-					$m = 5, T = 50, \lambda = 0.01, N = 10^5$
+					$m = 5, T = 50, \lambda = 10^{-2}, N = 10^5$
 					\label{fig:accuracy-vs-hidden-size}
 				}
 			\end{subfigure}
@@ -745,14 +740,14 @@
 			\begin{subfigure}[b]{0.5\linewidth}
 				\includegraphics[width=\linewidth]{Python-Plots/memory/accuracy-vs-look-back2}
 				\caption{
-					$d = 50, T = 50, \lambda = 0.001, N = 10^5$
+					$d = 50, T = 50, \lambda = 10^{-3}, N = 10^5$
 					\label{fig:accuracy-vs-look-back2}
 				}
 			\end{subfigure}%
 			\begin{subfigure}[b]{0.5\linewidth}
 				\includegraphics[width=\linewidth]{Python-Plots/memory/more-training-data}
 				\caption{
-					$m = 14, d = 50, T = 50, \lambda = 0.001$
+					$m = 14, d = 50, T = 50, \lambda = 10^{-3}$
 					\label{fig:more-training-data}
 				}
 			\end{subfigure}
@@ -793,7 +788,7 @@
 			\end{center}
 			\caption[A simple model to memorize a sequence of numbers]
 					{A simple model to memorize a sequence of numbers.
-					 This is a generalization of the binary model in table~\ref{tbl:model_classification_binary_digits} where $C = 2$.
+					 This is a generalization of the binary model in table~\ref{tbl:model_classification_binary_digits} where $C$ was equal to two.
 					 \label{tbl:model_classification_multi_class_digits}}
 		
 		\end{table}
@@ -805,7 +800,7 @@
 					{Memorizing multiple classes with an LSTM.
 					 Performance of single layer LSTM vs. stacked LSTM.
 					 Adding more layers helps deal with the higher complexity of the output.
-					 Hyperparameters: $m = 5, d = 50, T = 50, \lambda = 0.001, N = 10^5$.
+					 Hyperparameters: $m = 5, d = 50, T = 50, \lambda = 10^{-3}, N = 10^5$.
 					 \label{fig:accuracy-vs-multiple-classes-and-layers}}
 			
 		\end{figure}

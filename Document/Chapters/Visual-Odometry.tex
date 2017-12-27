@@ -14,9 +14,9 @@
 		Therefore, the aim of this chapter is to study and re-implement the ideas presented in their paper and to further expand on it.
 		To reiterate, the task we try to solve in this thesis is Visual Odometry (VO).
 		Given a video, the output of the system should be a sequence of poses describing the camera motion in the video.
-		\citeauthor{wang2017deepvo} propose a Deep Learning approach that makes use of an RNN to handle a video of arbitrary length.
+		\citeauthor{wang2017deepvo} propose a Deep Learning approach that makes use of an RNN to handle a video of arbitrary length and learn dependencies over time.
 		What follows is a detailed description of the proposed Deep Learning pipeline for VO.
-	
+		
 	\section{Datasets}
 		Every machine learning project starts with the collection and assessment of data.
 		Data is what drives machine learning, and often it is also a limiting factor.
@@ -24,13 +24,9 @@
 		However, it is not always easy to get the desired amount and quality.
 		For VO, the videos need to be recorded manually, which is very time consuming.
 		Not only that, but in our supervised setting, accurate per-frame pose annotations are required.
+		Therefore we have two main quality requirements for the data in VO: Accurate ground truth pose and realistic image quality.
+		The following subsections describe the different datasets that are used in this thesis.
 		
-		There are two main quality requirements for the data in VO: Accurate ground truth pose and realistic image quality.
-		
-		
-		
-		All the above descriptions \todo{in section ...} of rotations can be converted into each other, therefore it is not a problem to adapt the format of the training data.
-
 		\subsection{KITTI}
 			KITTI from the Karlsruhe Institute of Technology (\cite{geiger2013vision}) is a dataset that contains many videos captured from the roof of a driving car.
 			Some example images are shown in figure~\ref{fig:example-images-from-KITTI}.
@@ -81,7 +77,6 @@
 			The videos were captured at a frame rate of 15 fps.
 			
 		\subsection{GTA V}
-			\todo{Maybe mention different types: standing, translation, etc.}
 			The GTA V dataset, as presented in figure~\ref{fig:example-images-GTAV}, was created specifically for this thesis shortly before the VIPER dataset by \citeauthor{richter2017playing} was made public.
 			Third party ``modding" tools%
 			\footnote{\url{http://www.dev-c.com/gtav/}}
@@ -176,9 +171,24 @@
 			
 			
 	\section{Encoding the Pose}
-	% Text from intro
-	
-	
+		Each dataset comes with per-frame pose annotations, where each pose is defined by a position and orientation.
+		The position always has the same format: It is a vector $\matr{p} \in \R^3$ describing the location of the camera in three-dimensional space.
+		As discussed before in chapter~\ref{chp:foundations}, the orientation is a rotation that can be represented in different ways, each having different benefits and use cases.
+		Since all representations can be converted between each other, it does not matter in which format the training data is available.
+		No matter which representation is chosen, the pose here is always a concatenation of position $\vectr{p}$ and orientation $\vectr{o}$, that is, 
+		$\vectr{y} = \left[ \, \vectr{p},  \vectr{o} \, \right]$.
+		
+		In this work, we investigate two representations for the rotation: Euler angles and unit quaternions.
+		In the case of Euler angles, the orientation is defined by the three angles 
+		$\vectr{\varphi} = \left[\alpha, \beta, \gamma\right]$, 
+		and so the pose is represented as a vector
+		$\vectr{y} = \left[ \, \vectr{p},  \vectr{\varphi} \, \right] \in \R^6$ 
+		with six degrees of freedom.
+		When using unit quaternions, the pose is represented as 
+		$\vectr{y} = \left[ \, \vectr{p},  \vectr{q} \, \right] \in \R^7$ 
+		where $\vectr{q}$ is a unit-norm quaternion determined by a four-dimensional vector.
+		A comparison of how these representations affect the performance is shown in chapter~\ref{chp:experiments-and-results}.
+		
 	\section{The Model}
 	% Figure with the entire pipeline
 	% - Figure showing optical flow ??
@@ -199,16 +209,15 @@
 		By adjusting the weights during the training phase, it learns a high-level representation of relevant information in the input that is needed to produce the desired output.
 		In the case of visual odometry, we aim to learn a representation for motion.
 		Specifically, the network has to be able to distinguish between dynamic motion in the scene and camera motion.
-		\todo{Refer to challenges/ambiguities discussed in introduction...}
-		The following two sections describe the two main parts of the model.
+		These and other challenges mentioned in the~\nameref{chp:introduction} chapter are addressed by the two main parts of the model described in the following two sections.
 		The architecture of the full model is shown in figure~\ref{fig:main-architecture}.
 		\begin{figure}[t]
 			\centering
 			\includegraphics[width=\linewidth]{Model/DeepVO-arch}
-			\caption[Main architecture for visual odometry]
-					{Main architecture for visual odometry.
-					 Green: Input of consecutive frames.
-					 Yellow: Feature extraction.
+			\caption[Main architecture for Visual Odometry]
+					{Main architecture for Visual Odometry.
+					 Green: Input of consecutive video frames.
+					 Yellow: Feature extraction layers.
 					 Blue: Pose estimation with recurrent connections.
 					 The figure was taken from~\cite{wang2017deepvo}.
 					 \label{fig:main-architecture}}
@@ -234,7 +243,8 @@
 			The second half, called refinement, consists of transposed convolution layers that, in reverse, increase the spatial dimension to form the high resolution optical flow maps.
 			In addition, both FlowNet versions make use of skip-connections that allow the features from earlier layers to be added as input to layers in the second half by concatenating the tensors along the feature channel dimension. 
 			
-			In this thesis, the focus is on FlowNetS because it is the only publicly available implementation for PyTorch.\footnote{\citet*{flownetpytorch} has the source code available on GitHub.}
+			In this thesis, the focus is on FlowNetS because it is the only publicly available implementation for PyTorch.%
+			\footnote{\citet*{flownetpytorch} has the source code available on GitHub.}
 			FlowNetS is also the choice in the work of \citeauthor{wang2017deepvo}, which is the basis of the architecture described here.
 			The FlowNetS implementation comes with pre-trained model weights.
 			It is trained on a synthetic dataset of moving chairs rendered into images that serve as a static background.

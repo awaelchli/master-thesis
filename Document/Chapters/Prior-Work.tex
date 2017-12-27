@@ -114,7 +114,11 @@
 			The same way as for the essential matrix, $\matr{F}$ can be computed using the Eight Point Algorithm although the fundamental matrix is less useful than the essential matrix because it is not anymore possible to uniquely recover $\matr{R}$ and $\matr{t}$ in the uncalibrated case.
 			Nonetheless, $\matr{F}$ defines the epipolar constraint and therefore can be used to find more correspondences in the image pair.
 			
-			\todo{3D reconstruction from Essential matrix via triangulation}
+			The 3D geometry can be reconstructed (up to scale) by triangulation using the essential matrix to determine two lines for corresponding projections.
+			Ideally, the two lines passing through the center of projection and the point on the image plane intersect in 3D space.
+			In practice, the measurement- and numerical errors in the estimation of the essential inhibits an intersection of these lines.
+			In this case it is possible to estimate the 3D point to be the midpoint of the shortest segment connecting the two lines.
+			
 			%The Eight Point Algorithm depends on a selection of pairs of coordinates, each pair representing the same 3D point in the two images respectively.
 			%A manual selection of these correspondences is unpractical, hence the need for an automated system arises. 
 			%\todo{numerical issues, 5 point algorithm}
@@ -123,7 +127,7 @@
 			
 		\subsection{Multi-View Structure from Motion}
 		%\subsection{The Factorization Method}
-			So far, we have seen a method for estimating the relative camera pose \todo{and structure} based on two images by solving the epipolar constraint with matched feature points.
+			So far, we have seen a method for estimating the relative camera pose and 3D structure based on two images by solving the epipolar constraint with matched feature points.
 			The next step is the reconstruction from multiple camera views.
 			The factorization method can be used to recover motion and 3D shape simultaneously for all cameras (step 2 and 3).
 			A first method was introduced by \cite{tomasi1992factorization} that works with an orthographic camera model.
