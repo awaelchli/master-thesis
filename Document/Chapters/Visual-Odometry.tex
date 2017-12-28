@@ -207,7 +207,7 @@
 	% 	
 		The model is the key to solving the task.
 		By adjusting the weights during the training phase, it learns a high-level representation of relevant information in the input that is needed to produce the desired output.
-		In the case of visual odometry, we aim to learn a representation for motion.
+		In the case of Visual Odometry, we aim to learn a representation for motion.
 		Specifically, the network has to be able to distinguish between dynamic motion in the scene and camera motion.
 		These and other challenges mentioned in the~\nameref{chp:introduction} chapter are addressed by the two main parts of the model described in the following two sections.
 		The architecture of the full model is shown in figure~\ref{fig:main-architecture}.
@@ -248,7 +248,7 @@
 			FlowNetS is also the choice in the work of \citeauthor{wang2017deepvo}, which is the basis of the architecture described here.
 			The FlowNetS implementation comes with pre-trained model weights.
 			It is trained on a synthetic dataset of moving chairs rendered into images that serve as a static background.
-			Although this data does not include camera motion, according to \citeauthor{wang2017deepvo} the model weights serve as a good initialization that leads to faster convergence. 
+			Although this data does not include camera motion, according to \mbox{\citeauthor{wang2017deepvo}} the model weights serve as a good initialization that leads to faster convergence. 
 			
 			Estimating camera motion solely based on optical flow is not very robust since scene motion is mixed into the optical flow which can significantly vary in magnitude.
 			In order to have a more abstract representation, only the layers in the first half up to ``CONV 6.1'' are used for feature extraction.
@@ -304,7 +304,7 @@
 			Moreover, as shown in figure~\ref{fig:main-architecture} we adopt the architecture of~\citeauthor{wang2017deepvo} and stack two LSTM layers.
 			Each of these recurrent layers has an associated hidden state of size $d = 1000$.
 			
-			The recurrent layers are followed by dropout and a fully connected layer that reduces the output size of the LSTM to a 6D vector for the pose.
+			The recurrent layers are followed by dropout and a fully connected layer that reduces the output size of the LSTM to a 6D or 7D pose vector depending on the chosen representation.
 			Table~\ref{tbl:lstm_and_fc_after_flownet} summarizes the input- and output dimensions of all layers in the second component of the network.
 			\begin{table}[tb]
 				\small
@@ -316,7 +316,7 @@
 						LSTM 1 		& $35840$						& $1000$  				\\
 						LSTM 2 		& $1000$						& $1000$ 				\\
 						DROP		& $1000$						& $1000$				\\
-						FC 			& $1000$						& $6$					\\
+						FC 			& $1000$						& $6$ or $7$			\\
 						\bottomrule
 					\end{tabular}
 				\end{center}
@@ -325,65 +325,89 @@
 						 It consists of a two-layer LSTM with hidden size 1000, a dropout- and fully-connected layer.}
 				\label{tbl:lstm_and_fc_after_flownet}
 			\end{table}
-		
-		\subsection{Optimization}
-			At each time step $t = 1, \dots, T$ the LSTM outputs a pose estimate 
-			$\vectr{\hat{y}}_t = \left[ \, \vectr{\hat{p}}_t,  \vectr{\hat{\varphi}}_t \right]$.
-			The quality of this estimate is determined by comparison against the ground truth pose 
-			$\vectr{y}_t = \left[ \, \vectr{p}_t,  \vectr{\varphi}_t \right]$
-			with the loss function
-			\begin{equation}\label{eq:euler_pose_loss_function_t}
-				\mathcal{L}_t(\vectr{\hat{y}}_t, \vectr{y}_t) = 
-				%\sum_{t=1}^{T} 
-					\lVert \vectr{\hat{p}}_t - \vectr{p}_t \rVert_2 + 
-					\beta \lVert \vectr{\hat{\varphi}}_t - \vectr{\varphi}_t \rVert_2.
-			\end{equation}
-			As defined in equation~\ref{eq:loss_for_rnn}, the full loss of all estimates in the sequence is the sum of the losses in the sequence, i.e., 
-			$\mathcal{L} = \sum_{t = 1}^{T} \mathcal{L}_t$.
-			This loss function balances the squared error of position and Euler angles with a hyperparameter $\beta > 0$.
-			The scale of positional change is usually higher than the angular changes for rotation, but in general, the scale depends on the ground truth provided in the dataset, e.g., the unit of measurements used or the speed of the camera motion.
-			\cite{kendall2017geometric} find that $\beta$ requires significant tuning to get acceptable results.
-			Moreover, as an alternative they propose a loss based on the reprojection error of the 3D points that naturally balances rotation and translation and therefore the need for manual balancing is eliminated.
-			However, this thesis does not explore a geometric loss function of this type.
-			The balance value in equation~\ref{eq:euler_pose_loss_function_t} is manually chosen and set to $\beta = 10$ by default for training.
-			For evaluation on the test set in all experiments that follow, we use $\beta = 1$.
-			Furthermore, the two terms 
-			$\lVert \vectr{\hat{p}}_t - \vectr{p}_t\rVert_2^2$ and 
-			$\lVert \vectr{\hat{\varphi}}_t - \vectr{\varphi}_t \rVert_2^2$
-			in equation~\ref{eq:euler_pose_loss_function_t} are referred to as the translation- and rotation errors respectively.	
-			\todo{Mention choice of beta in experiments section}
-			
-			Alternatively, for experiments where the rotations are represented by quaternions, the loss is defined as
-			\begin{equation}\label{eq:quaternion_pose_loss_function_t}
-				\mathcal{L}_t(\vectr{\hat{y}}_t, \vectr{y}_t) = 
-				%\sum_{t=1}^{T} 
+			The dropout layer is a special layer that randomly overwrites outputs of the previous layer (in this case it is the LSTM) with zeros.
+			The fraction of outputs that are kept is controlled by a probability $p \in [0, 1]$, and outputs are ignored with probability $1 - p$.
+			By randomly discarding information, the network is forced to learn a redundant representation in order to solve the task.
+			In practice, this leads to less overfitting and reduces the test error.
+			The effect of dropout for VO is studied in chapter~\ref{chp:experiments-and-results}.
+						
+	\section{Training}
+		Starting from the beginning of a video, the hidden state of the LSTM is initialized with zero.
+		Pairs of frames are fed to the CNN that performs the feature extraction as shown in figure~\ref{fig:LSTM-ways-to-use-hidden-state}.
+		\begin{figure}[t]
+			\centering
+			\includegraphics[width=\linewidth]{Foundations/LSTM-hidden-state-loop}
+			\caption[Forward operation in time using CNN and RNN]
+					{Forward operation in time using the combination of a CNN and RNN. 
+					 When using truncated backpropagation, a long video is divided into multiple parts ($i$ and $i + 1$).
+					 Between video sequences, one can choose to either transfer the hidden state or reset it.
+					 \label{fig:LSTM-ways-to-use-hidden-state}}
+		\end{figure}
+		At each time step $t$ the LSTM outputs a pose estimate 
+		$\vectr{\hat{y}}_t = \left[ \, \vectr{\hat{p}}_t,  \vectr{\hat{\varphi}}_t \right]$ 
+		and updates the hidden state $\vectr{h}_t$.
+		The quality of the estimated pose is determined by comparison against the ground truth pose 
+		$\vectr{y}_t = \left[ \, \vectr{p}_t,  \vectr{\varphi}_t \right]$
+		with the loss function
+		\begin{equation}\label{eq:euler_pose_loss_function_t}
+			\mathcal{L}_t(\vectr{\hat{y}}_t, \vectr{y}_t) = 
+			%\sum_{t=1}^{T} 
 				\lVert \vectr{\hat{p}}_t - \vectr{p}_t \rVert_2 + 
-				\beta (1 - (\vectr{\hat{q}}_t \cdot \vectr{q}_t)^2)
-			\end{equation}
-			where $\cdot$ is the inner product of the two unit quaternions.
-			\todo{quaternions normalized, explain loss}
-			
-			
-			For training, the Adam optimizer is used with default settings and initial learning rates $\lambda_1 = 10^{-4}$ and $\lambda_2 = 10^{-3}$ for each part of the network.
-			$\lambda_1$ is the learning rate for the part that is initialized with weights from a pre-trained FlowNetS.
-			It is chosen to be smaller than $\lambda_2$ because the transferred weights are expected to be already close to optimal values and can be fine-tuned with a smaller learning rate.
-			\todo{Mention (maybe in discussion) the difference of this training technique to deepvo paper.}
-			
-			
-			
+				\beta \lVert \vectr{\hat{\varphi}}_t - \vectr{\varphi}_t \rVert_2.
+		\end{equation}
+		As defined in equation~\ref{eq:loss_for_rnn}, the full loss of all estimates in the sequence is the sum of the losses in the sequence, i.e., 
+		$\mathcal{L} = \sum_{t = 1}^{T} \mathcal{L}_t$.
+		The variable $T$ denotes the number of time steps used for backpropagation.
+		Usually, $T$ is fixed before training, and often it is also the length of the input sequences.
+		It is still possible to feed videos with length greater than $T$.
+		As shown with a red arrow in figure~\ref{fig:LSTM-ways-to-use-hidden-state}, the hidden state can be carried over to the next part of the video instead of resetting it to zero.
+		In chapter~\ref{chp:experiments-and-results}, \nameref{chp:experiments-and-results}, we compare the two strategies of how the hidden state is used during training.
+		
+		
+		The loss function in equation~\ref{eq:euler_pose_loss_function_t} balances the squared error of position and Euler angles with a hyperparameter $\beta > 0$.
+		The scale of positional change is usually higher than the angular changes for rotation, but in general, the scale depends on the ground truth provided in the dataset, e.g., the unit of measurements used or the speed of the camera motion.
+		\cite{kendall2017geometric} find that $\beta$ requires significant tuning to get acceptable results.
+		Moreover, as an alternative they propose a loss based on the reprojection error of the 3D points that naturally balances rotation and translation and therefore the need for manual balancing is eliminated.
+		However, this thesis does not explore a geometric loss function of this type.
+		The balance value in equation~\ref{eq:euler_pose_loss_function_t} is manually chosen and set to $\beta = 10$ by default for training.
+		For evaluation on the test set in all experiments that follow, we use $\beta = 1$.
+		Furthermore, the two terms 
+		$\lVert \vectr{\hat{p}}_t - \vectr{p}_t\rVert_2^2$ and 
+		$\lVert \vectr{\hat{\varphi}}_t - \vectr{\varphi}_t \rVert_2^2$
+		in equation~\ref{eq:euler_pose_loss_function_t} are referred to as the translation- and rotation errors respectively.
+		
+		Alternatively, for experiments where the rotations are represented by quaternions, the loss is defined as
+		\begin{equation}\label{eq:quaternion_pose_loss_function_t}
+			\mathcal{L}_t(\vectr{\hat{y}}_t, \vectr{y}_t) = 
+			%\sum_{t=1}^{T} 
+			\lVert \vectr{\hat{p}}_t - \vectr{p}_t \rVert_2 + 
+			\beta (1 - (\vectr{\hat{q}}_t \cdot \vectr{q}_t)^2)
+		\end{equation}
+		where $\cdot$ is the inner product of the two unit quaternions.
+		The output quaternion of the network is not constraint to have unit-norm and thus, the output needs to be normalized in an additional step before applying the loss function.
+		The inner product between the two unit quaternions is equal to the cosine of the angle between the two vectors representing the quaternions on the 4D unit sphere.
+		The square in equation~\ref{eq:quaternion_pose_loss_function_t} is necessary to eliminate the sign, because the two quaternions $\vectr{q}$ and $-\vectr{q}$ represent the same rotation.
+		Alternatively, the absolute value $\lvert \vectr{\hat{q}}_t \cdot \vectr{q}_t \rvert$ could also be used for this purpose.
+		
+		The optimizer used to train the model is Adam (\cite{kingma2014adam}).
+		Adam (Adaptive Moment Estimation) is an extension of the gradient descent method described in chapter~\ref{chp:foundations}.
+		It uses adaptive learning rates for each individual parameter in the network.
+		The learning rates are updated based on an exponentially decaying average of past gradients and squared gradients.
+		
+		The Adam optimizer is applied independently to each part of the network with different initial learning rates
+		$\lambda_1 = 10^{-4}$ and $\lambda_2 = 10^{-3}$.
+		$\lambda_1$ is the learning rate for the part that is initialized with weights from the pre-trained FlowNetS.
+		It is chosen to be smaller than $\lambda_2$ because the transferred weights are expected to be already close to optimal values and can be fine-tuned with a smaller learning rate.
+		
+		The choice of Adam over other optimizers that use adaptive learning rates (e.g.\@ Adagrad, RMSProp, etc.) is rather arbitrary.
+		The main reason why it was chosen in this thesis is to eliminate the need for manual scheduling of learning rate decay over time.
+		Without reducing the learning rate, there is a high risk of an oscillation as the parameters approach a local minimum, and this would lead to a slower convergence.
+
 	\section{Implementation}
 		PyTorch is a deep learning framework for Python that comes with a rich tensor library.
 		It differs from other libraries (TensorFlow, Caffe, Theano and more) in the sense that it builds the computational graph dynamically at runtime.
 		This flexibility allows for controlling the computational flow while training or testing the network.
 		
 		
-		\begin{figure}[t]
-			\centering
-			\includegraphics[width=\linewidth]{Foundations/LSTM-hidden-state-loop}
-			\caption[Hidden state transfer in RNNs]
-					{Hidden state transfer in RNNs. 
-					 When using truncated backpropagation, a long video is divided into multiple parts.
-					 Between video sequences, one can choose to either transfer the hidden state or reset it.
-					 \label{fig:LSTM-ways-to-use-hidden-state}}
-		\end{figure}
+
 
