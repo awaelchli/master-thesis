@@ -50,9 +50,8 @@
 		
 		For the last experiment in table~\ref{tbl:kitti-overlap-and-dropout}, the sequence length grows by an increment of one frame every epoch, starting from 20 frames and stopping at 100 frames after 80 epochs.
 		As we can see, this method of training in combination with the dropout gives the best overall loss on the test set.
-		A possible explanation for this could be the that the learning process is faster for short sequences because the LSTM requires a less complex memory mapping in order to remember the coordinate transforms from earlier time steps, including the first one.
+		A possible explanation for this observation is that the learning process is faster for short sequences because the LSTM requires a less complex memory mapping in order to remember the coordinate transforms from earlier time steps, including the first one.
 		A gradual refinement of such a mapping may be less challenging for the optimization as opposed to learning it directly from long sequences.
-		\todo{Need more explanation here.}
 		
 		Although the numbers in the table can be used to compare the different experiments, they are not very insightful by themselves.
 		From the sum of squared differences alone, it is not possible to understand how the error behaves across the sequence.
@@ -68,7 +67,6 @@
 					 \label{fig:kitti-avg-rotation-translation-error-vs-path-distance}}
 		\end{figure}
 		The relative rotation error is the angle of rotation around the axis corresponding to the relative rotation between estimated- and ground truth pose.
-		\todo{refer to equations introduced in previous chapter}
 		
 		\paragraph{Discussion}
 		From these experiments, we can conclude that sequence overlap and dropout have a positive impact on the generalization of translation estimates.
@@ -378,7 +376,7 @@
 		\end{figure}
 		For the model where the rotations are represented by unit quaternions, the loss from equation~\ref{eq:quaternion_pose_loss_function_t} is used.
 		In order to compare all versions, the rotations are converted to Euler angles at test time and evaluated using the Euclidean loss as before (eq.\@~\ref{eq:euler_pose_loss_function_t}).
-		The results show that the rotation error for the model trained with quaternions is the highest among th others, but in the case of translation error
+		The results show that the rotation error for the model trained with quaternions is the highest among the others, but in the case of translation error, 
 		\todo{cont. todo: discussion}
 		
 		
