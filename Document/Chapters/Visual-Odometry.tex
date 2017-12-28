@@ -404,10 +404,22 @@
 		Without reducing the learning rate, there is a high risk of an oscillation as the parameters approach a local minimum, and this would lead to a slower convergence.
 
 	\section{Implementation}
-		PyTorch is a deep learning framework for Python that comes with a rich tensor library.
-		It differs from other libraries (TensorFlow, Caffe, Theano and more) in the sense that it builds the computational graph dynamically at runtime.
-		This flexibility allows for controlling the computational flow while training or testing the network.
+		The model and training procedure described above is implemented in Python using the deep learning framework PyTorch\footnote{\url{http://pytorch.org}}.
+		This framework comes with a rich tensor library with GPU support for all tensor operations. 
+		PyTorch differs from other frameworks like TensorFlow, Caffe, or Theano in the sense that it builds the computational graph dynamically at runtime.
+		This flexibility allows for dynamic control of computational flow while training or testing the network.
 		
-		
-
-
+		Figure~\ref{fig:code-structure} shows the structure of the code developed for this thesis.
+		\begin{figure}[t]
+			\centering
+			\includegraphics[width=0.9\linewidth]{Implementation/code-structure}
+			\caption[Structure of the implemented software]
+					{Structure of the implemented software.
+					 The main program is broken down into training and testing.
+					 Separate data loading classes for each dataset take care of converting the data into the desired format.}
+			\label{fig:code-structure}
+		\end{figure}
+		The main program is split into training and testing.
+		It has the responsibility to parse and initialize parameters provided by the user, load and save checkpoints, and create a folder structure for output files like plots and log-files.
+		The training and testing code accesses data loading classes and model classes depending on which experiment is conducted.
+		Adding a new dataset only requires the implementation of a class for loading and converting the data to the desired format.
