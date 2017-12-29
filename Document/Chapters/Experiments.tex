@@ -174,6 +174,8 @@
 		Since the only difference in the experiments is the format of the pose, it can be concluded that training with incremental pose is the preferred way.
 		In the paper of \cite{wang2017deepvo}, it is never explicitly stated which coordinate system is used.
 		The results in this thesis suggest that \citeauthor{wang2017deepvo} have also used incremental poses in their experiments.
+		Qualitative results for motion estimation on the KITTI test data are presented in figure~\ref{fig:kitti-qualitative-results-images-and-estimation}.
+		They show how the system handles scenes with moving objects, sharp turns and change of speed.
 		
 		The new approach of training the network with incremental poses raises an important question.
 		What exactly is the contribution of the LSTM?
@@ -432,68 +434,73 @@
 		In VIPER, the camera is usually pointing in the forward driving direction, whereas in \mbox{GTA V} the camera is turned freely in all directions while walking and exploring the video game world.
 		The average rotation angle in VIPER is lower compared to GTA V, since there are only a few rapid rotation movements in short periods of time.
 		Although the traveled distance per frame in VIPER is longer, the freedom of motion in a car is limited as it can move forward or backward, but not to the side.
+		Some qualitative results for motion estimation trained on VIPER are shown in figure~\ref{fig:viper-qualitative-results-images-and-estimation}.
+		The Euler angle representation for pose is used in this setting.
+		Even though the data is synthetic, the images in the figure show that the system is exposed to realistic and challenging scenarios, where multiple object (like cars) interact with the scene in different lighting and weather conditions.
 		
-		The diversity of motion in GTA V makes the dataset more challenging for VO compared to VIPER and even KITTI.
-		Qualitative results of the proposed VO applied to GTA V is shown in figure~\ref{fig:gtav-qualitative-results-translation}.
+		The higher diversity of motion in GTA V makes the dataset more challenging for VO compared to VIPER and even KITTI.
+		Qualitative results of the proposed VO applied to GTA V is shown in figures~\ref{fig:gtav-qualitative-results-images-and-translation} and~\ref{fig:gtav-qualitative-results-translation}.
 		In this case, the quaternion pose representation together with the loss from equation~\ref{eq:quaternion_pose_loss_function_t} was used for training.
 		We observe that the estimations for the translation are not very impressive.
 		The system can not handle motions with sharp turns (fig.\@~\ref{fig:gtav-qualitative-sharp-turn}) or motions in wide open areas where structures like houses and mountains are far away.
+		
+		
 		\begin{figure}[h]
 			\centering
-			\begin{subfigure}[b]{\linewidth}
+			\begin{subfigure}[t]{\linewidth}
 				\centering
-				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/bird-0001}
-				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/b-0001}
+				\raisebox{8mm}{
+					\includegraphics[width=0.5\linewidth, trim={5cm 0 9cm 0}, clip]{Experiments/kitti/000607}
+				}
+				\includegraphics[width=0.45\linewidth]{Experiments/kitti/pdf/bird-0007}
 				\caption{
-					Static scene, long range
-					\label{fig:gtav-qualitative-long-range}
+					Change of speed at intersection
+					\label{fig:kitti-qualitative-speed-change}
 				}
 			\end{subfigure}%
 			\\
 			\begin{subfigure}[b]{\linewidth}
 				\centering
-				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/bird-0011}
-				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/b-0011}
+				\raisebox{8mm}{
+					\includegraphics[width=0.5\linewidth, trim={5cm 0 9cm 0}, clip]{Experiments/kitti/000728}
+				}
+				\includegraphics[width=0.45\linewidth]{Experiments/kitti/pdf/bird-0008}
 				\caption{
-					Static scene, close range
-					\label{fig:gtav-qualitative-close-range}
+					Dynamic motion from traffic
+					\label{fig:kitti-qualitative-traffic-1}
 				}
 			\end{subfigure}%
 			\\
 			\begin{subfigure}[b]{\linewidth}
 				\centering
-				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/bird-0005}
-				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/b-0005}
+				\raisebox{8mm}{
+					\includegraphics[width=0.5\linewidth, trim={5cm 0 9cm 0}, clip]{Experiments/kitti/000858}
+				}
+				\includegraphics[width=0.45\linewidth]{Experiments/kitti/pdf/bird-0009}
 				\caption{
-					Forward, stop, motion around fixed look-at point
-					\label{fig:gtav-qualitative-look-at-fixed}
+					Sharp right-hand bend
+					\label{fig:kitti-qualitative-sharp-turn}
 				}
 			\end{subfigure}%
 			\\
 			\begin{subfigure}[b]{\linewidth}
 				\centering
-				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/bird-0012}
-				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/b-0012}
+				\raisebox{8mm}{
+					\includegraphics[width=0.5\linewidth, trim={5cm 0 9cm 0}, clip]{Experiments/kitti/000992}
+				}				\includegraphics[width=0.45\linewidth]{Experiments/kitti/pdf/bird-0010}
 				\caption{
-					Forward, stop, $90^\circ$ turn, forward
-					\label{fig:gtav-qualitative-sharp-turn}
+					Change of speed and scene motion in close proximity
+					\label{fig:kitti-qualitative-truck-close-up-stop}
 				}
 			\end{subfigure}%
-			\caption[Qualitative results for motion estimation on GTA V]
-					{Qualitative results for motion estimation on the GTA V test set.
-					 Each video is 200 frames long.
-					 Left column: Visualization of the estimated and true path from the bird's-eye perspective where the height dimension is omitted.
-					 Right column: Plot of each coordinate axis of the translation.
-					 The horizontal axis is the time (frame count).
-					 The plots show a marker for every 20th frame.
-					 \label{fig:gtav-qualitative-results-translation}}
+			\caption[Qualitative results for motion estimation on KITTI]
+					{Qualitative results for motion estimation on the KITTI test sequence 10.
+					 Left column: Images from the subsequences showing a challenging scenario.
+					 Right column: Bird's-eye view of the estimated and true camera motion.
+					 The height dimension is omitted.
+					 Each subsequence is 100 frames long and a marker is shown for every 10th frame.
+					 \label{fig:kitti-qualitative-results-images-and-estimation}}
 		\end{figure}
-		
-		
-		
-		
-		
-		
 		
 		
 		\begin{figure}[h]
@@ -552,66 +559,115 @@
 					 Each video is 100 frames long and a marker is shown for every 10th frame.
 					 \label{fig:viper-qualitative-results-images-and-estimation}}
 		\end{figure}
-
-
-
-
-
-
-
+		
+		
 		\begin{figure}[h]
 			\centering
-			\begin{subfigure}[t]{\linewidth}
+			\begin{subfigure}[b]{\linewidth}
 				\centering
-				\raisebox{8mm}{
-					\includegraphics[width=0.5\linewidth, trim={5cm 0 9cm 0}, clip]{Experiments/kitti/000607}
+				\raisebox{5mm}{
+					\includegraphics[width=0.5\linewidth]{Experiments/gta/2075}
 				}
-				\includegraphics[width=0.45\linewidth]{Experiments/kitti/pdf/bird-0007}
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/bird-0001}
 				\caption{
-					Change of speed at intersection
-					\label{fig:kitti-qualitative-speed-change}
+					Static scene, medium range
+					\label{fig:gtav-qualitative-long-range-with-image}
 				}
 			\end{subfigure}%
 			\\
 			\begin{subfigure}[b]{\linewidth}
 				\centering
-				\raisebox{8mm}{
-					\includegraphics[width=0.5\linewidth, trim={5cm 0 9cm 0}, clip]{Experiments/kitti/000728}
+				\raisebox{5mm}{
+					\includegraphics[width=0.5\linewidth]{Experiments/gta/87612}
 				}
-				\includegraphics[width=0.45\linewidth]{Experiments/kitti/pdf/bird-0008}
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/bird-0011}
 				\caption{
-					Dynamic motion from traffic
-					\label{fig:kitti-qualitative-traffic-1}
+					Static scene, close range
+					\label{fig:gtav-qualitative-close-range-with-image}
 				}
 			\end{subfigure}%
 			\\
 			\begin{subfigure}[b]{\linewidth}
 				\centering
-				\raisebox{8mm}{
-					\includegraphics[width=0.5\linewidth, trim={5cm 0 9cm 0}, clip]{Experiments/kitti/000858}
+				\raisebox{5mm}{
+					\includegraphics[width=0.5\linewidth]{Experiments/gta/375962}
 				}
-				\includegraphics[width=0.45\linewidth]{Experiments/kitti/pdf/bird-0009}
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/bird-0005}
 				\caption{
-					Sharp right-hand bend
-					\label{fig:kitti-qualitative-sharp-turn}
+					Forward, stop, motion around fixed look-at point
+					\label{fig:gtav-qualitative-look-at-fixed-with-image}
 				}
 			\end{subfigure}%
 			\\
 			\begin{subfigure}[b]{\linewidth}
 				\centering
-				\raisebox{8mm}{
-					\includegraphics[width=0.5\linewidth, trim={5cm 0 9cm 0}, clip]{Experiments/kitti/000992}
-				}				\includegraphics[width=0.45\linewidth]{Experiments/kitti/pdf/bird-0010}
+				\raisebox{5mm}{
+					\includegraphics[width=0.5\linewidth]{Experiments/gta/15827}
+				}
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/bird-0012}
 				\caption{
-					Change of speed and scene motion in close proximity
-					\label{fig:kitti-qualitative-truck-close-up-stop}
+					Forward, stop, $90^\circ$ turn, forward
+					\label{fig:gtav-qualitative-sharp-turn-with-image}
 				}
 			\end{subfigure}%
-			\caption[Qualitative results for motion estimation on KITTI]
-					{Qualitative results for motion estimation on the KITTI test sequence 10.
-					 Left column: Images from the subsequences showing a challenging scenario.
-					 Right column: Bird's-eye view of the estimated and true camera motion.
-					 The height dimension is omitted.
-					 Each subsequence is 100 frames long and a marker is shown for every 10th frame.
-					 \label{fig:kitti-qualitative-results-images-and-estimation}}
+			\caption[Qualitative results for motion estimation on GTA V - Part 1]
+					{Qualitative results for motion estimation on the GTA V test set (part 1).
+					 Left column: The first frame of the 200 frames long video.
+					 Right column: Visualization of the estimated and true path from the bird's-eye perspective where the height dimension is omitted.
+					 The plots show a marker for every 20th frame.
+					 \label{fig:gtav-qualitative-results-images-and-translation}}
 		\end{figure}
+		
+		
+		\begin{figure}[h]
+			\centering
+			\begin{subfigure}[b]{\linewidth}
+				\centering
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/bird-0001}
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/b-0001}
+				\caption{
+					Static scene, medium range
+					\label{fig:gtav-qualitative-long-range}
+				}
+			\end{subfigure}%
+			\\
+			\begin{subfigure}[b]{\linewidth}
+				\centering
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/bird-0011}
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/b-0011}
+				\caption{
+					Static scene, close range
+					\label{fig:gtav-qualitative-close-range}
+				}
+			\end{subfigure}%
+			\\
+			\begin{subfigure}[b]{\linewidth}
+				\centering
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/bird-0005}
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/b-0005}
+				\caption{
+					Forward, stop, motion around fixed look-at point
+					\label{fig:gtav-qualitative-look-at-fixed}
+				}
+			\end{subfigure}%
+			\\
+			\begin{subfigure}[b]{\linewidth}
+				\centering
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/bird-0012}
+				\includegraphics[width=0.45\linewidth]{Experiments/gta/pdf/b-0012}
+				\caption{
+					Forward, stop, $90^\circ$ turn, forward
+					\label{fig:gtav-qualitative-sharp-turn}
+				}
+			\end{subfigure}%
+			\caption[Qualitative results for motion estimation on GTA V - Part 2]
+					{Qualitative results for motion estimation on the GTA V test set (part 2).
+					 Left column: Visualization of the estimated and true path of the same videos from figure~\ref{fig:gtav-qualitative-results-images-and-translation}.
+					 Right column: Plot of each coordinate axis of the translation.
+					 The horizontal axis is the time (frame count).
+					 The plots show a marker for every 20th frame.
+					 \label{fig:gtav-qualitative-results-translation}}
+		\end{figure}
+	
+		
+		
