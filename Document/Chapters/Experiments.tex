@@ -376,14 +376,30 @@
 		\end{figure}
 		For the model where the rotations are represented by unit quaternions, the loss from equation~\ref{eq:quaternion_pose_loss_function_t} is used.
 		In order to compare all versions, the rotations are converted to Euler angles at test time and evaluated using the Euclidean loss as before (eq.\@~\ref{eq:euler_pose_loss_function_t}).
-		The results show that the rotation error for the model trained with quaternions is the highest among the others, but in the case of translation error, 
-		\todo{cont. todo: discussion}
+		From these results we can make two main observations.
+		First, training with Euler angles (red) results in better performance compared to training with quaternions (blue), both for rotational- and translational error.
+		Second, for the model trained with persistent hidden state, the rotation error is the lowest, but the translation error is highest among the others.
+		Therefore, when comparing all three, there is no clear winner.
 		
+		\paragraph{Discussion}
+		Why do Euler angles work better than quaternions?
+		A possible explanation is that the complexity of the mapping for incremental pose changes is higher for the model where quaternions are used.
+		Small rotational motions in the input result in small Euler angles, and on the other hand, large rotational motions imply larger Euler angles.
+		The relationship between input rotation and output quaternion is more complex.
+		As the unit-quaternion is parameterized by 
+		$
+			\vectr{q} = 
+			\cos\left(\tfrac{\theta}{2}\right) + 
+			\sin\left(\tfrac{\theta}{2}\right) \left(a_1 \vectr{i} + a_2 \vectr{j} + a_3 \vectr{k}\right),
+		$
+		the LSTM is forced to regress the four components that contain sine and cosine.
+		A two-layer LSTM with sigmoid and hyperbolic tangent activation functions (eq.\@ \ref{eq:Vanilla-LSTM-Definition}) might not be powerful enough to approximate the mapping of angle and axis in combination with the cosine- and sine components.
+		Further investigation on this manner is a possibility for future work.
 		
 	\section{Evaluation on the GTA V Dataset}
 		In contrast to the VIPER dataset where most videos are captured from a driving vehicle, in our dataset all motions are captured on foot.
-		Additionally, the frame rate of 30 fps in GTA V is twice as in VIPER.
-		The scale of motion between consecutive frames in the videos is compared in table~\ref{tbl:viper-gta-comparison-inter-frame-motion}.	
+		Additionally, the frame rate of 30 fps in GTA V is twice as high as in VIPER.
+		The scale of motion between consecutive frames in the videos is compared in table~\ref{tbl:viper-gta-comparison-inter-frame-motion}.
 		\begin{table}[tb]
 			\small
 			\begin{center}
@@ -413,7 +429,7 @@
 			%		Rotation angle between consecutive frames (AVG / MIN / MAX): 0.5992 / 0.0000 / 23.1485 degrees
 			%		Distance travelled between consecutive frames (AVG / MIN / MAX): 0.6938 / 0.0000 / 8.0416 meters
 		\end{table}
-		In VIPER, the camera is usually pointing in the forward driving direction, whereas in GTA V the camera is turned freely in all directions while walking and exploring the video game world.
+		In VIPER, the camera is usually pointing in the forward driving direction, whereas in \mbox{GTA V} the camera is turned freely in all directions while walking and exploring the video game world.
 		The average rotation angle in VIPER is lower compared to GTA V, since there are only a few rapid rotation movements in short periods of time.
 		Although the traveled distance per frame in VIPER is longer, the freedom of motion in a car is limited as it can move forward or backward, but not to the side.
 		
