@@ -1,6 +1,6 @@
 \chapter{Conclusion and Future Work}
 
-The thesis presented a deep learning model for Visual Odometry that makes use of recurrent connections in order to provide a context for each time step where camera location and orientation is estimated.
+This thesis presented a deep learning model for Visual Odometry that makes use of recurrent connections in order to provide a context for each time step where camera location and orientation is estimated.
 The trained neural network can handle videos of arbitrary length and reconstructs the camera path in real-time.
 An analysis on real and synthetic data showed that training RNNs for the domain of videos is challenging.
 We have explored a variety of training schemes on small and large datasets.
@@ -19,16 +19,15 @@ The thesis did not explicitly explore the impact of the balance weight, but a so
 It would also be interesting to explore VO for stereo video input, as it could reduce the drift over time by providing double the amount of measurements for a single viewpoint.
 This would of course require a suitable dataset and potentially increase the memory footprint.
 
-Another possibility is to incorporate the new and improved FlowNet2 by~\cite{ilg2016flownet}.
+Furthermore, in the current model, it is unclear to what extent the recurrent network is capable of handling dynamic motion. 
+A dataset with object motion annotations (e.g.\@ in form of masks) would allow to specifically evaluate the impact of the recurrence in this regard.
+Also, the datasets could be further augmented by creating videos of different frame rate.
+
+Another possibility for future work is to incorporate the new and improved FlowNet2 by~\cite{ilg2016flownet}.
 The recently released PyTorch code base for the updated FlowNet could be integrated into the existing pipeline developed for this thesis.
-Although the initialization of the CNN with weights from FlowNet help the convergence speed, it is unclear how large of a benefit the new FlowNet2 weights will bring, since only the first ten layers were used and the decoder part was removed all together. 
+Although the initialization of the CNN with weights from FlowNet help the convergence speed, it is unclear how large of a benefit the new FlowNet2 weights would bring, since only the first ten layers were used and the decoder part was removed all together. 
 
 Lastly, there is room for improvement of the code base developed for this thesis.
 For example, the currently used library for conversion between different pose representations (Euler, quaternion, etc.) does not have a GPU back-end.
 It is therefore inefficient to convert poses on-the-fly as they have to be copied to CPU memory and back to the GPU.
-The few functions for pose conversion could be re-implemented with PyTorch, as it provides a the necessary GPU support for its tensor operations.
-
-\todo{Dataset with object motion annotations\\}
-\todo{Stereo\\}
-\todo{Pre-processing of dataset, different motion separated\\}
-\todo{Different frame rate / speed in dataset\\}
+The few functions for pose conversion could be re-implemented with PyTorch, as it provides the necessary GPU support for its tensor operations.
