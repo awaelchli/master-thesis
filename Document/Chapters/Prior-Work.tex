@@ -33,28 +33,14 @@
 	This chapter presents the prior work that focuses on one or multiple of these steps.
 	Although the topic of this thesis is Visual Odometry, the discussion of prior works includes recovery of 3D structure to give a better overview since the two research areas are closely related. 
 	
-%	\noindent
-%	Possible definition of structure from motion by \cite{survey2017}:
-%	
-%	\say{The structure from motion (SfM) problem in computer vision is the problem of recovering the three-dimensional (3D) structure of a stationary scene from a set of projective measurements, represented as a collection of two-dimensional (2D) images, via estimation of motion of the cameras corresponding to these images.}
-%	
-%	One can define the three basic steps of SfM as:
-%	\begin{enumerate}
-%		\item Feature detection, extraction and matching
-%		\item Camera motion estimation
-%		\item Recovery of 3D structure
-%	\end{enumerate}
-
 	\section{Established Methods}
 	
 		\subsection{Feature Extraction and Matching}
-			% methods: SURF, ORB, SIFT
-			%The Eight Point Algorithm is not the only method that requires accurate correspondences across image pairs.
+
 			All SfM algorithms depend on a robust feature detection and matching to solve the correspondence problem between two or more images.
 			It is usually the first step in the SfM pipeline.
 			A pair of 3D coordinates, one in each camera view, is called \emph{corresponding} if they depict the projection of the same 3D point.
 			In this case, the feature description in the local area of these keypoints matches.
-			%Two keypoints with associated feature descriptors, one in each image, are considered a corresponding pair if the feature descriptions are equal.
 			A reasonable feature descriptor should be invariant to rotation, scale, illumination changes and noise.
 			One of the descriptors that addresses these concerns is the \emph{Scale Invariant Feature Transform (SIFT)} introduced by~\cite{lowe1999object}.
 			In the first step, the feature detection, SIFT identifies patterns that are distinctive from their neighborhood by finding edges, corners and blobs in the image.
@@ -118,12 +104,6 @@
 			In practice, the measurement- and numerical errors in the estimation of the essential inhibits an intersection of these lines.
 			In this case it is possible to estimate the 3D point to be the midpoint of the shortest segment connecting the two lines.
 			
-			%The Eight Point Algorithm depends on a selection of pairs of coordinates, each pair representing the same 3D point in the two images respectively.
-			%A manual selection of these correspondences is unpractical, hence the need for an automated system arises. 
-			%\todo{numerical issues, 5 point algorithm}
-			
-
-			
 		\subsection{Multi-View Structure from Motion}
 		%\subsection{The Factorization Method}
 			So far, we have seen a method for estimating the relative camera pose and 3D structure based on two images by solving the epipolar constraint with matched feature points.
@@ -163,7 +143,6 @@
 			Second, in order for the factorization method to work, all points of the shape must be visible in every frame, i.e., to obtain the measurement matrix one needs to find the correspondences across all frames.
 			This is a serious limitation makes the factorization method less usable in practice.
 			
-		%\subsection{Bundle Adjustment} 
 			An alternative method to solve multi-view SfM is the \emph{bundle adjustment} technique.
 			It is the most general technique for simultaneously recovering 3D shape and camera pose, but it is also computationally expensive.
 			The bundle adjustment technique aims to minimize the re-projection error of the unknown 3D points and camera matrices.
@@ -186,7 +165,6 @@
 			One approach to find a better local minimum is to initialize using an other SfM algorithm such as the factorization method.
 			Since bundle adjustment is very computationally expensive for many cameras, it is often used as a refinement step.
 			
-			
 	\section{Learning-Based Methods}
 	\label{sec:learning_based_methods}
 	
@@ -202,18 +180,6 @@
 	
 			The PoseNet, as proposed by \cite{kendall2015posenet}, is a CNN that performs regression for the location and orientation of the camera given a single image as input.
 			It outputs a 7D vector that describes the camera pose $\vectr{p} = [\vectr{x}, \vectr{q}]^\top$ with a location $\vectr{x}$ and orientation $\vectr{q}$ as a quaternion.
-			%They simultaneously learn the quantities with the euclidean loss.
-	%		\begin{equation}
-	%			\mathcal{L}(I) = 
-	%			\left\|
-	%				\hat{x} - x 
-	%			\right\|_2 
-	%			+ \beta 
-	%			\left\| 
-	%				\hat{q} - \frac{q}{\left\| q \right\|} 
-	%			\right\|_2,
-	%		\end{equation}
-	%		where $\beta$ is a parameter to balance the expected error of pose and orientation.
 			The architecture is a modified GoogleNet with 23 layers which was trained on a classification task.
 			They replace the last layers to perform regression instead of classification.
 			
@@ -231,8 +197,6 @@
 			This means that network is specifically trained for a small number of scenes, e.g., the Cambridge landmarks, and it is not intended to generalize to other scenes and settings. 
 			Nonetheless, the work of \citeauthor{kendall2015posenet} shows that transfer-learning can be used for pose estimation when a large labeled dataset for training is not available and that the pre-trained network can aid to learn pose information despite being trained for pose-invariant outputs.
 			
-		%\subsection{05/2017 - Relative Camera Pose Estimation Using Convolutional Neural Networks}
-		
 			\cite{melekhov2017poseCNN} propose a CNN architecture to estimate the relative pose between two camera images.
 			Similar to PoseNet \cite{kendall2015posenet}, they estimate the 7D pose vector with a network composed of two main parts.
 			The first is the \emph{representation part}.
@@ -306,153 +270,6 @@
 			It is unclear how well-developed the representation is that the network learns since in both works, the subnetwork for single-view depth is separated from the motion network.
 			With a single image as input, the depth estimation is an ill-posed problem.
 			
-			
-			
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% DeMoN not in clean version of prior work yet
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%	\subsection{04/2017 - DeMoN: Depth and Motion Network for Learning Monocular Stereo}
-%		
-%		\cite{ummenhofer2016demon} propose a network architecture to learn depth, motion as well as optical flow and surface normals from two images.
-%		The network architecture consists of three subnetworks in sequence:
-%		\begin{itemize}
-%			\item \textbf{Bootstrap network}
-%				\\
-%				Consists of a pair of encoder-decoder networks.
-%				The first encoder-decoder predicts optical flow and its confidence.
-%				The second encoder-decoder takes the previously computed optical flow and confidence, as well as the original image pair and a warp of the second image using the estimated flow.
-%				In addition, there are three fully connected layers predicting motion.
-%				By taking the image pair as input, the network can make use of motion parallax.
-%			\item \textbf{Iterative network}
-%				\\
-%				The architecture is identical to the bootstrap network, but takes additional inputs.
-%				It is applied iteratively with the idea to improve previous estimates of depth, normals and motion.
-%				The network is trained using four iterations.
-%			\item \textbf{Refinement network}
-%				\\
-%				Up-samples the low resolution predictions to the full image resolution.
-%		\end{itemize}
-%		Motion is parameterized using an axis-angle representation and depth is estimated by its inverse value $1 / z$ in order to represent points at infinity.
-%		For surface normals, motion and optical flow they use the euclidean loss and for depth L1.
-%		In addition to the point wise loss for depth, they define a scale invariant gradient loss that penalizes relative depth errors between neighboring pixels.
-%		
-%		They evaluate the performance of the network on various datasets: {SUN3D}, {RGB-D SLAM}, {MVS}, {Scenes11}, and {NYUv2}.
-%		The results show that estimating normals and flow in addition to depth and motion slightly improves the performance of the system.
-%		Compared to works for depth from a single image, their results demonstrate that the network learns to use motion parallax from the stereo images to generalize better to scenes that heavily differ from the examples seen during training.
-			
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% done. old version. clean
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-		
-%		\subsection{07/2016 - Unsupervised CNN for Single View Depth Estimation}
-%			The work of \cite{garg2016} implements an autoencoder on stereo pair images to predict depth from a single image.
-%			Their architecture consist of the following parts.
-%			\begin{itemize}
-%				\item \textbf{Encoder}
-%					\\
-%					Takes a single image as input. 
-%					At training time, this is the left image of a stereo pair.
-%					The output is the predicted disparity map (scaled inverse depth).
-%				\item \textbf{Decoder}
-%					\\
-%					The decoder is only used at training time.
-%					It takes two inputs: The predicted disparities from the encoder and the right image of the stereo pair.
-%					The right image is warped using the displacements and compared to the encoder input (left image) using the color constancy error (photometric error).
-%			\end{itemize}
-%			Since the stereo pair is rectified, the disparity is a displacement along the scanline of the images.
-%			Thus the decoder implements a simple geometric transformation that does not need to be learned.
-%			At test time, only the encoder network with a single image as input is used.
-%			
-%			As noted by the author, there are standard stereo algorithms that produce disparity maps.
-%			However, these methods can not deal with distortions such as lens flare, motion blur, shadows, etc.
-%			The idea is that a neural network could learn to deal with such problems that occur in natural images.
-%			
-%			The dataset they use is {KITTI} \cite{Geiger2012KITTI} which they augment by random crops, color channel scaling, and flipping the images.
-%		
-%	
-%		\subsection{04/2017 - SfM-Net}
-%		
-%			\cite{SFMNET} implement a deep learning approach to structure from motion. 
-%			Their architecture consists of two subnetworks:
-%			\begin{itemize}
-%				\item \textbf{Structure}
-%					\\
-%					Learns per-frame depth.
-%					The input is a single frame. 
-%					The output of the CNN is a cloud of 3D points, one for each pixel value in the input image.
-%				\item \textbf{Motion}
-%					\\
-%					The input is a pair of frames.
-%					The CNN computes a set of $K$ segmentation masks for moving objects. 
-%					Using these masks, each pixel is assigned to an object specific transformation given by a rotation and a translation.
-%					In addition, camera rotation and translation are computed using the features of the inner layers.
-%			\end{itemize}
-%			Given a pair of images, the forward operation of the network works as follows:
-%			\begin{enumerate}
-%				\item The structure network computes the point cloud for the first frame.
-%				\item The motion network computes the object transformations as well as the camera transformation using both frames.
-%				\item The point cloud is transformed using the learned object transformations and masks.
-%				\item The transformed 3D points are re-projected to 2D using the learned camera transformation between the two frames.
-%			\end{enumerate}
-%			The transformed point cloud corresponds to the depth of the second frame.
-%			Optical flow can be computed directly from the re-projected points.
-%			
-%			The authors of the paper propose various modes of supervision to evaluate the architecture and to handle ambiguities in the reconstruction due to the ill-posed problem:
-%			\begin{itemize}
-%			\item \textbf{Self-supervision}
-%				\\
-%				No ground truth is given.
-%				The loss is defined by the brightness constancy constraint of the second frame warped to the first frame using the predicted optical flow.
-%				For this mode, they use the {KITTI} 2012/15 datasets.
-%			\item \textbf{Depth}
-%				\\
-%				Ground truth is given in the form of depth for each pixel.
-%				This can be acquired for example by a Kinect sensor.
-%				They use the {RGB-D SLAM} dataset for ground truth depth.
-%				This helps to improve camera motion estimation. 
-%			\item \textbf{Camera motion}
-%				\\
-%				Camera motion is given as ground truth in form of a rotation and translation matrix.
-%				The relative transformation between predicted and ground truth transformation is 
-%			\item \textbf{Optical flow and object motion}
-%				\\
-%				They use this type of supervision with the MoSeg dataset which contains ground truth segmentation for each frame.
-%				This dataset contains more non-rigid body transformation.
-%				They evaluate the quality of the object motion mask by intersection over union (IoU).
-%			\end{itemize}
-%			
-%		\subsection{04/2017 - Unsupervised Learning of Depth and Ego-Motion from Video}
-%			
-%			This work from \cite{zhou2017unsupervised} is concurrent to the SfM-Net by \cite{SFMNET}.
-%			Both works share a similar concept.
-%			However, \cite{zhou2017unsupervised} focus on unsupervised training and do not explicitly model scene dynamics.
-%			Similar to SfM-Net, their architecture consists of two jointly trained networks, one for learning depth from a single image (Depth-CNN), and another for learning camera motion from two frames (Pose-CNN).
-%			
-%			The key difference to SfM-Net is that they train with an image sequence $I_1, \dots, I_N$ with one image being the target image $I_t$.
-%			The task for the motion network is to synthesize the target image from two nearby views $I_{t - 1}$ and $I_{t + 1}$.
-%			\begin{itemize}
-%				\item \textbf{Depth-CNN}
-%					\\
-%					Takes the target image $I_t$ as input and predicts a per-pixel depth map $\hat{D}_t$.
-%				\item \textbf{Pose-CNN}
-%					\\
-%					Uses two source images $I_{t - 1}$ and $I_{t + 1}$ as input and predicts relative camera poses $\hat{T}_{t \rightarrow t - 1}$ and $\hat{T}_{t \rightarrow t + 1}$. 
-%					These transformations are then used to synthesize the target image.
-%			\end{itemize}
-%			Using both the estimated depth and pose matrix as well as the intrinsic matrix of the camera, the coordinate frame of the source images is warped to the coordinate frame of the target image.
-%			To transfer the color information from one frame to the other, bilinear interpolation is used.
-%			The general term for this is \emph{differentiable image warping}.
-%			
-%			When working with realistic data, it is important to make the model robust to non-static objects in the scenes, occlusions and non-Lambertian surfaces.
-%			To do this, the network is forced to additionally learn a per-pixel mask for each target-source pair.
-%			They add a regularization term to force the mask to have non-zero values.
-%		
-
-
 
 
 

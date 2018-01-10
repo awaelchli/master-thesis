@@ -9,7 +9,6 @@ Furthermore, the thesis uncovers the problem with global pose and overfitting to
 Although we have solved this problem by converting the camera poses to incremental motions, the situation is rather confusing and counter-intuitive.
 At this point, we can only speculate on why the RNN does not generalize in a way that the camera pose is accumulated from the beginning of the video and over an arbitrary length.
 The fact that replacing the LSTM with a affine layer results in better performance indicates that the recurrent state might not be used to the benefit of pose regression.
-%, and this leaves the question why it does not simply get ignored in this case.
 
 These issues require further investigation and give plenty of room for future work.
 Estimating both global- and incremental pose at the same time would be a simple modification worth investigating.

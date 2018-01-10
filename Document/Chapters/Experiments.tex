@@ -1,11 +1,5 @@
 \chapter{Experiments And Results}\label{chp:experiments-and-results}
 	
-%\section{Experiments and Results}
-% Ablation studies
-% Problem with "global" pose -> incremental pose
-% Training
-%	- Different learning rate for pretrained flownet
-%	- Dropout Regularization
 	This chapter presents all experiments conducted on the deep learning model that was introduced in chapter~\ref{chp:the_model}.
 	The results shown here give useful insights that supplement the work of \cite{wang2017deepvo}.
 	
@@ -192,59 +186,6 @@
 		The test errors in table~\ref{tbl:viper-effect-of-replacing-LSTM} show that the recurrent models perform better for pose, but worse for translation compared to the non-recurrent version.
 		Additionally, in figure~\ref{fig:avg-rotation-error-VIPER-LSTM-no-LSTM} we observe that the rotation error at long distances is significantly higher for the non-recurrent model.
 		
-%		The last row of table~\ref{tbl:kitti-incremental-pose-and-lstm-removal} shows a higher loss on the test set when using the replacement.
-%		This would suggest that the recurrence does indeed result in a better VO performance.
-%		However, when looking at the rotation and translation error along the path in figure~\ref{fig:avg-rotation-and-translation-error-dropout-no-LSTM} (blue), and compare it with the version that uses the LSTM (red, green), the error is actually lower for most of the path.
-%		\begin{figure}
-%			\centering
-%			\begin{subfigure}[b]{0.5\linewidth}
-%				\centering
-%				\includegraphics[width=\linewidth]{Python-Plots/deepvo-KITTI/rotation-error-per-meter-comparison-Dropout-No-LSTM}
-%				\caption{
-%					Rotation
-%					\label{fig:avg-rotation-error-dropout-no-LSTM}
-%				}
-%			\end{subfigure}%
-%			\begin{subfigure}[b]{0.5\linewidth}
-%				\centering
-%				\includegraphics[width=\linewidth]{Python-Plots/deepvo-KITTI/translation-error-per-meter-comparison-Dropout-No-LSTM}
-%				\caption{
-%					Translation
-%					\label{fig:avg-translation-error-dropout-no-LSTM}
-%				}
-%			\end{subfigure}%
-%			\caption[Comparison on KITTI: LSTM vs.\@ LSTM with dropout vs.\@ no LSTM]
-%					{Comparison of the rotation and translation error on subsequences of KITTI sequence 10 for three different models:
-%					 LSTM, LSTM with dropout, and LSTM replaced with fully-connected layer.
-%					 \label{fig:avg-rotation-and-translation-error-dropout-no-LSTM}}
-%		\end{figure}
-%		In addition, figure~\ref{fig:kitti-test-sequence-10-lstm-vs-no-lstm} shows the predicted path of the full KITTI sequence 10.
-%		Although the shape of the two paths is roughly the same, the feedforward model is closer to the ground truth path, experiencing smaller translational drift.
-%		\begin{figure}
-%			\centering
-%			\begin{subfigure}[b]{0.5\linewidth}
-%				\centering
-%				\includegraphics[width=\linewidth]{Experiments/lstm-vs-fc/incremental-dropout-lstm}
-%				\caption{
-%					LSTM
-%					\label{fig:kitti-sequence-10-lstm}
-%				}
-%			\end{subfigure}%
-%			\begin{subfigure}[b]{0.5\linewidth}
-%				\centering
-%				\includegraphics[width=\linewidth]{Experiments/lstm-vs-fc/incremental-dropout-no-lstm}
-%				\caption{
-%					Feedforward
-%					\label{fig:fig:kitti-sequence-10-no-lstm}
-%				}
-%			\end{subfigure}%
-%			\caption[Estimated motion on KITTI test sequence 10: LSTM vs.\@ feedforward network]
-%					{Estimated motion on KITTI test sequence 10: LSTM (a) vs.\@ feedforward network (b).
-%					 The estimated incremental poses are converted to global poses in order to recreate the path.
-%					 The coordinate axes are in meters, and a marker is plotted every 120 frames.
-%					 \label{fig:kitti-test-sequence-10-lstm-vs-no-lstm}}
-%		\end{figure}
-		
 		\begin{figure}
 			\centering
 			\begin{subfigure}[b]{0.5\linewidth}
@@ -274,20 +215,13 @@
 			\begin{center}
 				\begin{tabular}{cccrrrr}
 					\toprule
-					%\multicolumn{2}{c}{\textbf{Experiments}}		& \multicolumn{4}{c}{\textbf{Test error}} 		\\
-					%\cmidrule(lr){1-2} 	\cmidrule(lr){3-6}
 					\multicolumn{2}{c}{\textbf{Experiments}} & & \multicolumn{2}{c}{\textbf{Incremental Pose}} & \multicolumn{2}{c}{\textbf{Global Pose}} \\
 					LSTM 	& Hidden size 		& 	& Rotation 	& Translation & Rotation & Translation \\
 					\midrule
 					\xmark	& -- 				&	& 0.2162	& \underline{7.3836}	& 6.7071	& \underline{241.1611}		\\
-					%\cmark 	& 1000		& 2			& 	& 0.2339	& 5.5290	& 11.4762	& 259.9814		\\
-					%\cmark	& 1000		& 1			& 	& 0.1689	& 7.6151 	& 5.0371	& 289.6538		\\
-					%\cmark 	& 500		& 1			& 	& \underline{0.1613}	& \underline{7.1238} 	& \underline{4.4305}	& 244.8199		 \\
-					
 					\cmark	& 1000				& 	& 0.1625	&	7.4642 	& 4.8312&	285.5663		\\
 					\cmark 	& 500				& 	&\underline{0.1581}	& 7.5345 	& \underline{4.3250}&	286.7348	 \\
 					\bottomrule
-					
 				\end{tabular}
 			\end{center}
 			\caption[Experiments on VIPER: The effect of replacing the LSTM]
@@ -325,8 +259,6 @@
 			\begin{center}
 				\begin{tabular}{lcrrrr}
 					\toprule
-					%\multicolumn{2}{c}{\textbf{Experiments}}		& \multicolumn{4}{c}{\textbf{Test error}} 		\\
-					%\cmidrule(lr){1-2} 	\cmidrule(lr){3-6}
 					\textbf{Hidden state} & & \multicolumn{2}{c}{\textbf{Incremental Pose}} & \multicolumn{2}{c}{\textbf{Global Pose}} \\
 					& & Rotation & Translation & Rotation & Translation \\
 					\midrule
@@ -668,6 +600,3 @@
 					 The plots show a marker for every 20th frame.
 					 \label{fig:gtav-qualitative-results-translation}}
 		\end{figure}
-	
-		
-		

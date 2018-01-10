@@ -1,11 +1,5 @@
 \chapter{Foundations}\label{chp:foundations}
 
-	% Intro
-	% First part: Transformations
-	%	Representation for pose
-	% 	Representation for pose in sequences: Figure
-	% Second part: Deep Learning
-	% Third part: Toy examples for RNN
 	This chapter presents the necessary theoretical background for the thesis.
 	The first part is about the representation of the camera pose, which is ultimately the output of a system for Visual Odometry.
 	In the second part, it follows a very brief review of Deep Learning.
@@ -72,7 +66,6 @@
 			\small
 			\begin{center}
 				\begin{tabular}{llll}
-					% Typical use case & Robotics, Avionics & Computer Graphics, Physics & Intermediate representation & Computer Graphics,
 					\toprule
 					Representation	& Constraint 			& Problems 				& Identity			\\
 					\midrule
@@ -89,8 +82,6 @@
 		\end{table}
 	
 		\paragraph{Euler Angles}
-%		The fact that rotations in 3D have three degrees of freedom means there are only three coordinates needed to identify a rotation. 
-%		Euler angles are one such choice of coordinates.
 		The Euler angles represent a rotation with three numbers 
 		$\alpha, \beta, \gamma \in \left[0, 2\pi\right)$, which are also known as \emph{pitch}, \emph{roll} and \emph{yaw}.
 		There are many different conventions and definitions of these three angles and how they are applied.
@@ -219,7 +210,6 @@
 		\end{equation}
 		One particularly interesting subset of the quaternions are those with unit norm, i.e., $\lVert \vectr{q} \rVert = 1$.
 		They are called \emph{unit quaternions}.
-%		In this thesis, we are particularly interested in the subset of quaternions called the \emph{unit quaternions}. These are all the quaternions with unit norm, i.e., $\lVert \vectr{q} \rVert = 1$. 
 		The quaternions of this form describe 3D rotations and can be parameterized by
 		\begin{equation}
 			\vectr{q} = 
@@ -229,7 +219,6 @@
 		where $\theta \in \R$ is the angle of rotation around a unit-length axis $\vectr{a} = (a_1, a_2, a_3) \in \R^3$.
 		The parameterization makes use of the axis-angle representation, however, quaternions are more powerful in the sense that rotations can be concatenated via multiplication, i.e., $\vectr{q}_2 \vectr{q}_1$ represents the compound rotation of $\vectr{q}_1$ followed by $\vectr{q}_2$.
 		One drawback of the quaternion is that it is a double cover of the space of rotations, meaning that $\vectr{q}$ and $-\vectr{q}$ represent the same rotation.
-		%\todo{mention spherical linear interpolation (Slerp)?}
 		\\
 		
 		How well a neural network can be trained to output a rotation may depend on the choice of the representation and its constraints.
@@ -371,8 +360,6 @@
 		The convolution can be applied on arbitrary input sizes, it is computationally efficient due to the limited number of connections to a neighborhood (sparsity), the same kernel is applied to the whole input (weight sharing) and therefore can ``detect" a pattern in an arbitrary location (shift-invariance).
 		Lastly, a convolution layer usually applies multiple kernels on the same input, resulting in an output $\matr{Y}(l, i, j)$ with multiple channels.
 		The slices indexed by $l$ are called \emph{feature maps}.
-		
-		
 		
 	\section{Recurrent Neural Networks}\label{sec:recurrent_neural_networks}
 		\newcommand{\imagecourtesycolah}{Image courtesy Christopher Olah \mbox{\href{http://colah.github.io/}{(colah.github.io)}}.}
@@ -545,9 +532,6 @@
 		
 	\section{Training RNNs}
 		
-		%\paragraph{Optimization Procedure}
-		%In order to use the loss function to update the model weights, one has to specify an optimization algorithm.
-		
 		There are several ways an RNN can be trained.
 		First of all, one can distinguish the type of input-output relationship for RNNs.
 		
@@ -570,7 +554,6 @@
 		For example, in the sentiment analysis example from before, the token can be used as an end-of-sequence symbol to mark the end of a sentence.
 		In general, the symbol does not necessarily have to be used at the end of a sequence.
 		It can be inserted whenever an output is needed.
-		%An application of this is shown in an experiment later in the thesis. 
 		
 		\paragraph{Truncated Backpropagation}
 		As discussed in section~\ref{sec:gradient_computation_RNN}, gradient computation over long sequences can cause vanishing or exploding values that hinder the learning process during training.
@@ -603,19 +586,6 @@
 		The RNN has to learn this relationship directly from the ground truth, not from the input.
 
 	\section{Toy Example: Memorizing Digits}\label{sec:toy-example-memory}
-		% Capabilities of LSTM
-		% - Memory: Describe binary memory example (sequence of binary digits)
-		% - As classification, formula for cross-entropy loss
-		% - All formulas for LSTM (gates etc.)
-		% - What is the purpose of Hidden size for remembering sequence
-		% - What would one possible solution for the LSTM weights?
-		% - 
-		
-		%To understand how LSTMs are used to learn from sequences of data and how their memory works, we conduct a small example for demonstration. 
-		
-		%The aim of this chapter is to develop an understanding of how the recurrent neural networks work, specifically the LSTM.
-		%We begin with a very simple memorization task to demonstrate how an LSTM is trained on sequences of data and what effect different hyperparameters have.
-		%Building on this knowledge, we explore more sophisticated tasks such as predicting the motion of a cloud of points which will finally lead into the challenging problem of visual odometry and structure from motion.
 		
 		The intention of this toy experiment is to familiarize the reader with the LSTM.
 		Although the following example has nothing to do with VO, it is important to understand the basic properties of the LSTM, the key building block that we will use later in a larger model for VO.
@@ -808,58 +778,3 @@
 		This is due to the more complex mapping between input and output. 
 		An LSTM with a single layer can not handle the complexity.
 		As shown in the red line in figure~\ref{fig:accuracy-vs-multiple-classes-and-layers}, adding a second layer boosts the performance.
-		
-		
-		
-		
-%	\section{Tracking a Moving Point Cloud}
-%		\todo{INCOMPLETE}
-%		Up to this point, the input to the LSTM was always one-dimensional (a number/digit).
-%		But how well can it handle vectors as input?
-%		This is the main question for this section.
-%		To explore it, we conduct a synthetic experiment for a moving camera.
-%		
-%		\paragraph{The Task}
-%		In this next experiment we would like to study the capabilities of the LSTM on a task for motion estimation.
-%		To do so, we generate a few 3D points and project them into the image plane of a moving camera.
-%		This will create an animation of a set of 2D points.
-%		
-%		\begin{figure}[tb]
-%			\centering
-%			\includegraphics[width=0.7\linewidth]{example-image-a}
-%			\caption[]
-%					{\todo{point cloud example, show few points and multiple points}}
-%			\label{}
-%		\end{figure}
-%	
-%		\paragraph{The Data}
-%		Each sample from the dataset is a synthetic sequence of frames seen by a moving camera in front of a cloud of 3D points.
-%		There are two main steps involved in generating the data.
-%		First, we generate the 3D points.
-%		Second, the points need to be projected to the screen of each camera.
-%		The camera is moving left and right to create a simple motion.
-%		To create a large and diverse dataset, we can generate many such sequences for different point clouds and horizontal motions.
-%		
-%		To make this experiment very simple, the points are distributed uniformly on the surface of a sphere.
-%		This can be done by sampling two random variables $z \sim \mathcal{U}(-1, 1)$ and $\theta \sim \mathcal{U}(0, 2\pi)$ that can be used to parameterize the point
-%		\begin{equation}
-%			\vectr{p} = 
-%			\begin{bmatrix}
-%				\sqrt{1 - z^2} \cos(\theta) \\ 
-%				\sqrt{1 - z^2} \sin(\theta) \\
-%				z
-%			\end{bmatrix}
-%		\end{equation}
-%		on the unit sphere. 
-%		After repeating this $M$ times, we obtain a cloud $C = \{\vectr{p}_1, \dots \vectr{p}_M\}$ with $M$ points.
-%		Each of these points has to be projected
-%		
-%		
-%		\paragraph{The Model}
-%		
-%		\paragraph{The Optimization Procedure}
-%		
-%		\paragraph{Results}
-%		
-%		\paragraph{}
-	

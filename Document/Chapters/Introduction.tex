@@ -30,49 +30,13 @@
 		The potential and recent successes of Deep Learning motivate an alternative approach to the classic VO and SfM algorithms.
 		Learning a powerful representation of camera motion from a large dataset of image sequences could help overcome some of the aforementioned challenges in SfM as well as reduce the computational cost to provide real-time mobile applications.
 		
-		
-		
-		
-		%Among others, the visual input from one or more cameras is 
-		%There are many sensors that can be employed to make navigation possible. 
-		%A robot can be built in form of a human, a car or a flying drone.
-		%In order to do so, it has one or more sensors, such as cameras
-		
-%		The term \emph{structure from motion} refers to the observation of 2D motion in a series of images that can be used to recover 3D information.
-%		The camera motion and 3D geometry are by itself completely independent components, but the observed images are only fully determined by the combination of the two.
-%		%The motion of the camera has to be determined simultaneously with structure, because only both components together fully determine the observed projections.
-%		When the desire is to only reconstruct the 3D, e.g.\@ obtaining a 3D model of a vase, the camera parameters can be seen as a by-product of the SfM algorithm. 
-%		After the point cloud is recovered, new views can be rendered on the fly without the need of the original camera poses.
-%		On the other hand, when the interest lies in only recovering the camera path, then SfM produces the point cloud as a by-product.
-%		In SfM, camera parameters and 3D are solved jointly in an iterative manner.
-%		This process has a high computational cost.
-%		It is often not suited for real-time mobile applications where reconstruction from hundreds and thousands of video frames is desired.
-%		Another limitation is that SfM requires the observed scene to be static.
-%		It means that the motion observed in the images can only come from the camera, and not from moving objects in the scene.
-%		Otherwise, the reconstruction problem is ambiguous.
-		
-		%In practice, SfM algorithms are designed and tuned to work optimally in their application domain.
-		%This requires a significant amount of manual intervention and prior knowledge.
-		
-		
-		
-		
-		
-		%We try to precisely describe our ever-changing world we live in. 
-		
-		
 	\section{Visual Odometry by Deep Learning}
-		% A model with deep learning (supervised)
-		% Mapping sequences to sequences
-		% Learning from the past: Recurrence
 		
-		%The interest of this thesis lies in recovering the camera parameters, i.e., the position and orientation.
 		The problem of Visual Odometry is simple to formulate.
 		Given a sequence of temporally ordered images, i.e.\@ a video, the objective is to compute the camera pose at each frame.
 		The camera pose is the location and orientation of the camera in the world coordinate system.
 		It describes the change of coordinates from the local- to the world reference frame in form of a rotation and translation, each having three degrees of freedom.
 
-		%Without loss of generality it is assumed that the world coordinate system coincides with reference frame of the first image in the sequence.
 		There are three main problems that need to be addressed by the proposed solution for VO.
 		First, one needs to specify a suitable reference frame and representation for the camera poses.
 		Second, the system has to be designed in a way that it can handle a video input of variable length and frame rate.
@@ -90,14 +54,10 @@
 		\end{figure}
 		It involves training an artificial neural network on a large number of videos in a supervised fashion.
 		Supervised learning requires that the true camera poses are known during the learning phase.
-		% for continuous performance evaluation.
 		In order for the network to learn a useful mapping from input to output, it is crucial that the collected data has accurate pose labels for each video frame.
 		The first two of the aforementioned problems are addressed by the architectural choices for the neural network, and the robustness depends, for the most part, on the quality and quantity of the available data for learning.
 		
-		
 	\section{Challenges}
-		% Getting the sequences wth ground truth pose (using gps, IMU, synthetic)
-		% Aperture problem?
 		
 		Training a neural network requires a large dataset with realistic data.
 		Collecting the video data is time consuming, but the challenge lies in the collection of the ground truth, i.e., the camera pose.
@@ -115,7 +75,6 @@
 		Finally, a more serious problem is \emph{scene motion} or \emph{dynamic motion}.
 		Even though object motions usually result in local movement in the image plane, it still remains a challenge to design a system that can properly separate them from the more global camera motion.
 		
-	
 	\section{Contribution}
 		
 		The contributions of this thesis are the following.

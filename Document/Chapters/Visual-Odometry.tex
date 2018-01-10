@@ -1,14 +1,9 @@
-\chapter{Visual Odometry with RNN}\label{chp:the_model}
-% Title ideas: 
-% Visual Odometry with Deep Learning
-% Visual Odometry
-% The Full Visual Odometry Pipeline
+\chapter{Visual Odometry with RNN}
+\label{chp:the_model}
+
 	\def\CC{{C\nolinebreak[4]\hspace{-.05em}\raisebox{.4ex}{\tiny\bf ++}}}
 
 	\section{Introduction}
-	% Describe the Task
-	% Prior Work -> Flownet, DeepVO, VINet
-	% 
 		The bulk of this chapter and the experiments that follow in chapter~\ref{chp:experiments-and-results} are based on the work of \cite{wang2017deepvo}.
 		At the time of writing this thesis, they have not released the source code of their implementation.
 		Therefore, the aim of this chapter is to study and re-implement the ideas presented in their paper and to further expand on it.
@@ -140,10 +135,6 @@
 						{Example images from different sequences in the GTA V dataset which was recorded for this thesis.
 						 The images show wide open- as well as narrow places, reflections on cars and water, complex shadows from foliage and moving objects (people, cars).
 						 \label{fig:example-images-GTAV}}
-				%city-street-intersecton.jpg  
-				%fountain-people.jpg  
-				%desert-gas-station.jpg             
-				%suburban-intersection.jpg
 			\end{figure}
 			
 			
@@ -190,21 +181,6 @@
 		A comparison of how these representations affect the performance is shown in chapter~\ref{chp:experiments-and-results}.
 		
 	\section{The Model}
-	% Figure with the entire pipeline
-	% - Figure showing optical flow ??
-	% Feature extraction
-	%	- Optical flow
-	%	- features relevant for motion
-	%	- Flow alone is not enough
-	% 	- Other high-level representation
-	% Pose estimation
-	%	- LSTM transforms feature to pose
-	%	- Uses history from poses seen before to make current estimate more precise
-	%	- 
-	% Loss function and optimization
-	% mse loss on euler + translation
-	% experiments show that euler works best
-	% 	
 		The model is the key to solving the task.
 		By adjusting the weights during the training phase, it learns a high-level representation of relevant information in the input that is needed to produce the desired output.
 		In the case of Visual Odometry, we aim to learn a representation for motion.
@@ -289,8 +265,6 @@
 			The remaining task is now to take these coarse features and map them to the camera pose. 
 			
 		\subsection{Part 2: Pose Estimation}
-		% How does LSTM use flow features 
-		% Table with fc layer and dropout
 			The key component of the second part is the LSTM that maps the motion features to a hidden state.
 			Due to the recurrent connections, the hidden state does not only encode the pose at the current time step, but also a history of poses from previous time steps.
 			To be clear, it is not obvious that the LSTM will actually learn a representation for the past and use that information to estimate the pose because nothing is explicitly forcing the network to do so.
