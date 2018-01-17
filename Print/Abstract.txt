@@ -1,0 +1,9 @@
+In computer vision, Visual Odometry is the problem of recovering the camera motion from a video.
+It is related to Structure from Motion, the problem of reconstructing the 3D geometry from a collection of images.
+Decades of research in these areas have brought successful algorithms that are used in applications like autonomous navigation, motion capture, augmented reality and others.
+Despite the success of these prior works in real-world environments, their robustness is highly dependent on manual calibration and the magnitude of noise present in the images in form of, e.g., non-Lambertian surfaces, dynamic motion and other forms of ambiguity.
+This thesis explores an alternative approach to the Visual Odometry problem via Deep Learning, that is, a specific form of machine learning with artificial neural networks.
+It describes and focuses on the implementation of a recent work that proposes the use of Recurrent Neural Networks to learn dependencies over time due to the sequential nature of the input.
+Together with a convolutional neural network that extracts motion features from the input stream, the recurrent part accumulates knowledge from the past to make camera pose estimations at each point in time.
+An analysis on the performance of this system is carried out on real and synthetic data.
+The evaluation covers several ways of training the network as well as the impact and limitations of the recurrent connection for Visual Odometry.
